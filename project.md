@@ -173,7 +173,8 @@ const handleNavigate = (route: keyof RootStackParamList) => {
 Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only receive callbacks (`onViewCalendar`, `onTabPress`) — they never import navigation directly.
 
 ### Current flow
-- **Splash → Home**: automatically after `2800ms`, or tap anywhere.
+- **Splash → PersonaSelect**: when the splash video ends, or tap anywhere.
+- **PersonaSelect → Home**: "Continue as <persona>" (active personas).
 - **Home → Calendar**: "View Calendar" (ScheduleSection), "Schedule" (QuickActionBar), CALENDAR tab (BottomNavBar).
 - **Calendar → Home**: HOME tab in BottomNavBar or system back.
 - **Login**: registered but not reachable from the UI yet.
@@ -360,6 +361,11 @@ Supports two operational modes:
 ---
 
 ## 10. Implemented Screens
+
+### 0. Persona Select (`src/features/persona/screens/PersonaSelectScreen.tsx`)
+- **Role**: First screen after the splash; pick Renter, Landlord or Property Manager (or Add Persona).
+- **Pieces**: blurred photo backdrop that cross-fades with the centered card, `PersonaCarousel` (snapping cards that scale, drop and fade, with photo parallax), `PaginationDots` (sliding pill in a frosted capsule), and one white "Continue as …" button the same width as the cards. Fades use `Scrim` (stretched `fade.png`, no banding).
+- **Logic**: `usePersonaSelection` (ViewModel); data in `persona/constants.ts`; photos in `src/assets/images/personas/` (Unsplash).
 
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.

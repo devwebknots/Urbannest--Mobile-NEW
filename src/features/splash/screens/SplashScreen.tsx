@@ -1,6 +1,6 @@
 /**
  * SplashScreen: plays the ambient motion video (arc light sweep, flowing
- * silk wave, warm villa glow) once, then fades to Home. Tap to skip.
+ * silk wave, warm villa glow) once, then fades to persona selection. Tap to skip.
  */
 
 import React, { useCallback, useState } from 'react';
@@ -19,19 +19,19 @@ import { SPLASH_COLORS } from '../constants';
 import { useSplashSequence } from '../hooks/useSplashSequence';
 
 interface Props {
-  navigation?: { replace: (route: 'Home') => void };
+  navigation?: { replace: (route: 'PersonaSelect') => void };
 }
 
 export const SplashScreen: React.FC<Props> = ({ navigation }) => {
-  const goHome = useCallback(() => {
+  const goNext = useCallback(() => {
     if (navigation?.replace) {
-      navigation.replace('Home');
+      navigation.replace('PersonaSelect');
     } else if (navigationRef.isReady()) {
-      navigationRef.reset({ index: 0, routes: [{ name: 'Home' }] });
+      navigationRef.reset({ index: 0, routes: [{ name: 'PersonaSelect' }] });
     }
   }, [navigation]);
 
-  const s = useSplashSequence(goHome);
+  const s = useSplashSequence(goNext);
 
   // Size the video box ourselves (same crop as the poster's "cover"), so the
   // player never rescales. Letting the player do "cover" itself flashes a

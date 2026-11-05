@@ -20,4 +20,4 @@ export const SPLASH_COLORS = {
  * TESTING ONLY: keep the app on the splash screen (no auto-exit, tap does
  * nothing, video loops). Set back to false before release.
  */
-export const SPLASH_HOLD_FOR_TESTING = true;
+export const SPLASH_HOLD_FOR_TESTING = false;

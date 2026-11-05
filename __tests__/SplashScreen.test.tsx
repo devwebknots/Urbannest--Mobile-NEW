@@ -4,7 +4,7 @@ import { SplashScreen } from '../src/features/splash';
 
 jest.useFakeTimers();
 
-test('splash replaces itself with Home exactly once', async () => {
+test('splash replaces itself with PersonaSelect exactly once', async () => {
   const replace = jest.fn();
   let tree!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
@@ -14,7 +14,7 @@ test('splash replaces itself with Home exactly once', async () => {
     jest.runAllTimers();
   });
   expect(replace).toHaveBeenCalledTimes(1);
-  expect(replace).toHaveBeenCalledWith('Home');
+  expect(replace).toHaveBeenCalledWith('PersonaSelect');
   await ReactTestRenderer.act(() => {
     tree.unmount();
   });
