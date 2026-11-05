@@ -21,7 +21,12 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="Splash"
         component={SplashScreen}
-        options={{ gestureEnabled: false, animation: 'none' }}
+        options={{
+          gestureEnabled: false,
+          animation: 'none',
+          // Let the native splash picture show through until JS draws its copy
+          contentStyle: { backgroundColor: 'transparent' },
+        }}
       />
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />

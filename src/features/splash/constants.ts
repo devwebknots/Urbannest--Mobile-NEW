@@ -3,17 +3,21 @@
  */
 
 export const SPLASH_TIMING = {
-  /** Fade-in of the poster frame (ms) */
-  introDuration: 400,
   /** Exit fade duration (ms) */
   exitDuration: 450,
   /** Fallback exit if the video never reports its end (video is ~5.9s) */
   maxDuration: 7500,
-  /** Hold time on the still frame when reduce motion is on, or video fails */
+  /** Hold time on the navy screen when reduce motion is on, or video fails */
   stillHold: 2000,
 } as const;
 
 export const SPLASH_COLORS = {
-  /** Matches the darkest navy of the artwork, so letterbox edges blend in */
-  base: '#0A1438',
+  /** Must match android splashBackground (res/values/colors.xml) */
+  base: '#0B1D3A',
 } as const;
+
+/**
+ * TESTING ONLY: keep the app on the splash screen (no auto-exit, tap does
+ * nothing, video loops). Set back to false before release.
+ */
+export const SPLASH_HOLD_FOR_TESTING = true;
