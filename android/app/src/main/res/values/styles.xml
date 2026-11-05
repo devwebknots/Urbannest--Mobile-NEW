@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <!-- Native launch screen: solid brand navy, no white flash before JS renders -->
+        <item name="android:windowBackground">@color/splashBackground</item>
+        <item name="android:statusBarColor">@color/splashBackground</item>
+        <item name="android:navigationBarColor">@color/splashBackground</item>
+    </style>
+
+</resources>

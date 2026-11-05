@@ -1,0 +1,4 @@
+<resources>
+    <!-- Native launch background; must match SPLASH_COLORS.base (colors.headerDarkBlue) -->
+    <color name="splashBackground">#0B1D3A</color>
+</resources>
