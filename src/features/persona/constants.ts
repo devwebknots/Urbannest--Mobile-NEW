@@ -39,6 +39,7 @@ export const PERSONA_SLIDES: readonly PersonaSlide[] = [
     persona: {
       id: 'manager',
       title: 'Property Manager',
+      ctaName: 'PMS',
       role: 'Independent PM',
       description:
         'Run showings, inspections and vendor work orders from one command center.',

@@ -11,6 +11,8 @@ export type PersonaIcon = 'home' | 'key' | 'briefcase';
 export interface Persona {
   readonly id: string;
   readonly title: string;
+  /** Shorter name for the continue button, e.g. "PMS" */
+  readonly ctaName?: string;
   /** Short role line, e.g. "Main account" */
   readonly role: string;
   readonly description: string;

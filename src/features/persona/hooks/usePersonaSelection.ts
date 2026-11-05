@@ -71,7 +71,7 @@ export function usePersonaSelection(
   if (active?.kind === 'persona') {
     ctaLabel =
       active.persona.status === 'active'
-        ? `Continue as ${active.persona.title}`
+        ? `Continue as ${active.persona.ctaName ?? active.persona.title}`
         : 'Request activation';
   }
 
