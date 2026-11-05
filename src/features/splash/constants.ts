@@ -5,8 +5,8 @@
 export const SPLASH_TIMING = {
   /** Exit fade duration (ms) */
   exitDuration: 450,
-  /** Fallback exit if the video never reports its end (video is ~5.9s) */
-  maxDuration: 7500,
+  /** Leave the splash after this long (ms), even if the ~5.9s video is still playing */
+  maxDuration: 4000,
   /** Hold time on the navy screen when reduce motion is on, or video fails */
   stillHold: 2000,
 } as const;
