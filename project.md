@@ -87,6 +87,7 @@ UrbanNestMobile/
     │   ├── calendar/  { components/, screens/CalendarScreen.tsx, index.ts }
     │   ├── guest/     { assets/, components/, hooks/, screens/GuestHomeScreen.tsx, constants.ts, types.ts, index.ts }
     │   ├── persona/   { assets/, components/, hooks/, screens/PersonaSelectScreen.tsx, index.ts }
+    │   ├── renter/    { assets/, components/, hooks/, screens/RenterHomeScreen.tsx, constants.ts, types.ts, index.ts }
     │   └── splash/    { assets/, components/, screens/SplashScreen.tsx, index.ts }
     ├── hooks/                   # useAppTheme, useDebounce, useKeyboard
     ├── navigation/
@@ -145,6 +146,7 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | `Splash` (initial) | `SplashScreen` (`@/features/splash`) | `gestureEnabled: false`, `animation: 'none'` |
 | `GuestHome` | `GuestHomeScreen` (`@/features/guest`) | `gestureEnabled: false` |
 | `PersonaSelect` | `PersonaSelectScreen` (`@/features/persona`) | `gestureEnabled: false` |
+| `RenterHome` | `RenterHomeScreen` (`@/features/renter`) | `animation: 'slide_from_right'` |
 | `Home` | `HomeScreen` (`@/features/home`) | stack default |
 | `Calendar` | `CalendarScreen` (`@/features/calendar`) | `animation: 'slide_from_right'` |
 | `Login` | `LoginScreen` (`@/features/auth/screens/LoginScreen`) | stack default |
@@ -154,7 +156,7 @@ Global `screenOptions`: `{ headerShown: false, animation: 'fade' }` — every sc
 ### Param lists (`src/types/navigation.ts`, re-exported by `src/navigation/types.ts`)
 ```ts
 export type RootStackParamList = {
-  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; Auth: undefined; Main: undefined;
+  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; Auth: undefined; Main: undefined;
   Home: undefined; Calendar: undefined; Login: undefined;
 };
 export type AuthStackParamList = { Login: undefined; Register: undefined; ForgotPassword: { email?: string } | undefined };
@@ -180,7 +182,8 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 ### Current flow
 - **Splash → GuestHome** (`replace`): when the splash video ends, or tap anywhere.
 - **GuestHome → PersonaSelect** (`navigate`): "Log In / Sign Up" pill in the hero.
-- **PersonaSelect → Home**: "Continue as <persona>" (active personas).
+- **PersonaSelect → RenterHome** (`replace`): "Continue as Renter".
+- **PersonaSelect → Home** (`replace`): "Continue as PMS". The route for each persona is in `ROUTE_FOR_PERSONA` (`usePersonaSelection`).
 - **Home → Calendar**: "View Calendar" (ScheduleSection), "Schedule" (QuickActionBar), CALENDAR tab (BottomNavBar).
 - **Calendar → Home**: HOME tab in BottomNavBar or system back.
 - **Login**: registered but not reachable from the UI yet.
@@ -416,6 +419,16 @@ Supports two operational modes:
 - **Pieces**: blurred photo backdrop that cross-fades with the centered card, `PersonaCarousel` (snapping cards that scale, drop and fade, with photo parallax), `PaginationDots` (sliding pill in a frosted capsule), and one white "Continue as …" button the same width as the cards. Fades use `Scrim` (stretched `fade.png`, no banding).
 - **Logic**: `usePersonaSelection` (ViewModel); data in `persona/constants.ts`; photos in `src/assets/images/personas/` (Unsplash).
 
+### 0c. Renter Home — My Residences (`src/features/renter/screens/RenterHomeScreen.tsx`)
+- **Role**: Landing page after choosing the Renter persona. Built from the "Urban Nest Residences Dashboard" design in the app theme.
+- **Pieces** (top → bottom, page bg `pageTint`):
+  0. Header art `residences_header.jpg` (1290×1150: the design’s dusk-house image `012.png`, fitted to width; bottom fades navy → light blue → `pageTint` with stops sampled from the mockup, so the filter bar sits on the pale band), absolutely positioned at `width × width/1.12`.
+  1. `RenterHeader`: house icon + "URBAN NEST", initials avatar, "MY RENTALS" eyebrow, "My Residences" (Playfair 34), two-line subtitle.
+  2. `ResidenceFilterBar`: white segmented track — All Rentals / Active / Past with count bubbles; active segment = `navy` pill.
+  3. `ResidenceCard`s (24dp apart): fully rounded photo (same height on every card: width × 0.46, `RESIDENCE_IMAGE_RATIO`) with dark status pill (green / grey dot) and frosted "…" menu; Playfair Bold navy name + gold "PREMIUM HOME" badge; navy pin + address; footer: calendar/clock icon circles with label + bold value (divider between two facts) and action (footer wraps, so dates never truncate; the action drops to its own line, right-aligned, when space is short) — gradient "Check-In Now", `pageTint` "Manage Residence", text link "Details →".
+  4. `RenterTabBar`: floating white bar (radius 28) — Residences / Search / Alerts (blue dot) / Profile, icon above label; active = navy rounded tile.
+- **Logic**: `useRenterHome` (filter, tab, counts, card + menu actions — "coming soon" alerts for now). Mock data in `renter/constants.ts`; photos in `src/assets/images/renter/` (cropped from the design) via `renterAssets.ts`. Cards fade up in sequence (off in tests).
+
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.
 - **Components**:
@@ -516,7 +529,8 @@ Supports two operational modes:
   - Automatically when the splash sequence ends.
   - Instantly on tap anywhere on the splash screen.
 - **GuestHome ➔ PersonaSelect**: "Log In / Sign Up" pill.
-- **PersonaSelect ➔ Home**: "Continue as …" button.
+- **PersonaSelect ➔ RenterHome**: "Continue as Renter".
+- **PersonaSelect ➔ Home**: "Continue as PMS".
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.
   - Tapping **Schedule** in `QuickActionBar`.

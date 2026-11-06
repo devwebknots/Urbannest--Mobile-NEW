@@ -9,8 +9,15 @@ import { navigationRef } from '@/navigation/navigationRef';
 import { PERSONA_SLIDES } from '../constants';
 import type { PersonaSlide } from '../types';
 
+/** Where each active persona lands after "Continue". */
+export type PersonaRoute = 'Home' | 'RenterHome';
+
+const ROUTE_FOR_PERSONA: Record<string, PersonaRoute> = {
+  renter: 'RenterHome',
+};
+
 export interface PersonaNavigation {
-  replace: (route: 'Home') => void;
+  replace: (route: PersonaRoute) => void;
 }
 
 export interface PersonaSelection {
@@ -28,13 +35,16 @@ export function usePersonaSelection(
 ): PersonaSelection {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const goHome = useCallback(() => {
-    if (navigation?.replace) {
-      navigation.replace('Home');
-    } else if (navigationRef.isReady()) {
-      navigationRef.reset({ index: 0, routes: [{ name: 'Home' }] });
-    }
-  }, [navigation]);
+  const goTo = useCallback(
+    (route: PersonaRoute) => {
+      if (navigation?.replace) {
+        navigation.replace(route);
+      } else if (navigationRef.isReady()) {
+        navigationRef.reset({ index: 0, routes: [{ name: route }] });
+      }
+    },
+    [navigation],
+  );
 
   const select = useCallback(
     (index: number) => {
@@ -56,9 +66,9 @@ export function usePersonaSelection(
         );
         return;
       }
-      goHome();
+      goTo(ROUTE_FOR_PERSONA[slide.persona.id] ?? 'Home');
     },
-    [goHome],
+    [goTo],
   );
 
   const onContinue = useCallback(

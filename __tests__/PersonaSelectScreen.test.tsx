@@ -2,7 +2,7 @@ import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import { PersonaSelectScreen } from '../src/features/persona';
 
-test('persona screen shows every persona and continues to Home', async () => {
+test('persona screen shows every persona and continues the Renter to RenterHome', async () => {
   const replace = jest.fn();
   let tree!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
@@ -28,7 +28,7 @@ test('persona screen shows every persona and continues to Home', async () => {
   await ReactTestRenderer.act(() => {
     cta.props.onPress();
   });
-  expect(replace).toHaveBeenCalledWith('Home');
+  expect(replace).toHaveBeenCalledWith('RenterHome');
 
   await ReactTestRenderer.act(() => {
     tree.unmount();
