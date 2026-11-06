@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ShieldIcon } from '@/components/icons';
-import { borderRadius, colors, shadows, spacing, typography } from '@/config/theme';
+import { borderRadius, colors, spacing, typography } from '@/config/theme';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 import { TRUST_POINTS } from '../constants';
 import { HeadsetIcon, LockIcon } from './GuestIcons';
@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     borderRadius: borderRadius.xl,
     backgroundColor: colors.surface,
-    ...shadows.sm,
   },
   item: {
     flex: 1,

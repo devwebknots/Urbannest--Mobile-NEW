@@ -7,7 +7,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { ChevronRightIcon } from '@/components/icons';
+import { ChevronRightIcon, ClockIcon } from '@/components/icons';
 import {
   borderRadius,
   colors,
@@ -39,11 +39,9 @@ export const GuidesSection: React.FC<Props> = ({
     width: cardW,
     height: cardW / GUEST_IMAGE_ASPECT.guideFeatured,
   };
-  const thumbW = (cardW - spacing.xl) / 2;
-  const thumb = {
-    width: thumbW,
-    height: thumbW / GUEST_IMAGE_ASPECT.guideThumb,
-  };
+  // Two cards side by side; the photo spans the card width
+  const thumbW = (cardW - spacing.lg) / 2;
+  const thumb = { width: thumbW, height: Math.round(thumbW * 0.62) };
 
   return (
     <View style={styles.wrap}>
@@ -80,21 +78,24 @@ export const GuidesSection: React.FC<Props> = ({
         {guides.map(g => (
           <Pressable
             key={g.id}
-            style={{ width: thumbW }}
+            style={({ pressed }) => [styles.card, { width: thumbW }, pressed && styles.pressed]}
             onPress={() => onPress?.(g.id)}
             accessibilityRole="button"
+            accessibilityLabel={g.title}
           >
-            <Image
-              source={g.image}
-              style={[styles.thumb, thumb]}
-              resizeMode="cover"
-            />
-            <Text style={styles.itemTitle} numberOfLines={2}>
-              {g.title}
-            </Text>
-            <Text style={styles.itemMeta}>
-              {g.audience} • {g.readTime}
-            </Text>
+            <Image source={g.image} style={[styles.thumb, thumb]} resizeMode="cover" />
+            <View style={styles.cardBody}>
+              <Text style={styles.audience} numberOfLines={1}>
+                {g.audience}
+              </Text>
+              <Text style={styles.itemTitle} numberOfLines={2}>
+                {g.title}
+              </Text>
+              <View style={styles.metaRow}>
+                <ClockIcon size={ms(12)} color={colors.textMuted} />
+                <Text style={styles.itemMeta}>{g.readTime}</Text>
+              </View>
+            </View>
           </Pressable>
         ))}
       </View>
@@ -141,23 +142,49 @@ const styles = StyleSheet.create({
   },
   grid: {
     flexDirection: 'row',
-    gap: spacing.xl,
-    marginTop: spacing.xl,
+    gap: spacing.lg,
+    marginTop: spacing.lg,
+  },
+  card: {
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  pressed: {
+    opacity: 0.92,
   },
   thumb: {
-    borderRadius: borderRadius.lg,
     backgroundColor: colors.surfaceMuted,
   },
+  cardBody: {
+    padding: spacing.md,
+  },
+  audience: {
+    ...typographyPresets.eyebrow,
+    fontFamily: typography.fontFamily.body.semiBold,
+    fontSize: scaleFont(10),
+    color: colors.primary,
+  },
   itemTitle: {
-    ...typographyPresets.bodyMedium,
-    fontSize: scaleFont(12.5),
-    lineHeight: scaleFont(17),
-    color: colors.textPrimary,
+    fontFamily: typography.fontFamily.body.semiBold,
+    fontSize: scaleFont(13),
+    lineHeight: scaleFont(18),
+    // Always 2 lines tall so both cards line up
+    minHeight: scaleFont(36),
+    color: colors.navy,
+    marginTop: spacing.xs,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
     marginTop: spacing.sm,
   },
   itemMeta: {
     ...typographyPresets.caption,
-    marginTop: spacing.xs,
+    fontSize: scaleFont(11.5),
   },
 });
 

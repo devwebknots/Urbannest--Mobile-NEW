@@ -1,3 +1,10 @@
+/**
+ * RentalCard: "Rentals Near You" row. Photo on the left fills the card's
+ * height (Premium badge on it). Right side, top to bottom: name + heart,
+ * address, bed / bath / area with small icons (wrap if long), then the
+ * price on its own line at the bottom.
+ */
+
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MapPinIcon } from '@/components/icons';
@@ -12,7 +19,7 @@ import {
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 import type { RentalListing } from '../types';
 import { GUEST_IMAGE_ASPECT } from '../assets/guestAssets';
-import { HeartIcon, StarGlyph } from './GuestIcons';
+import { AreaIcon, BathIcon, BedIcon, HeartIcon, StarGlyph } from './GuestIcons';
 
 interface Props {
   item: RentalListing;
@@ -21,10 +28,24 @@ interface Props {
   onPress?: () => void;
 }
 
+const Stat: React.FC<{ icon: React.ReactNode; label: string }> = ({ icon, label }) => (
+  <View style={styles.stat}>
+    {icon}
+    <Text style={styles.statText} numberOfLines={1}>
+      {label}
+    </Text>
+  </View>
+);
+
 export const RentalCard: React.FC<Props> = ({ item, favorite, onToggleFavorite, onPress }) => (
-  <Pressable style={styles.card} onPress={onPress} accessibilityRole="button">
-    <View>
-      <Image source={item.image} style={styles.image} resizeMode="cover" />
+  <Pressable
+    style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+    onPress={onPress}
+    accessibilityRole="button"
+    accessibilityLabel={item.name}
+  >
+    <View style={styles.media}>
+      <Image source={item.image} style={StyleSheet.absoluteFill} resizeMode="cover" />
       {item.badgeInImage ? null : (
         <View style={styles.badge}>
           <StarGlyph size={scaleFont(9)} color={colors.gold} />
@@ -34,65 +55,70 @@ export const RentalCard: React.FC<Props> = ({ item, favorite, onToggleFavorite, 
     </View>
 
     <View style={styles.body}>
-      <View style={styles.titleRow}>
-        <Text style={styles.name} numberOfLines={1}>
-          {item.name}
-        </Text>
-        <Pressable
-          onPress={onToggleFavorite}
-          hitSlop={10}
-          accessibilityRole="button"
-          accessibilityLabel={favorite ? 'Remove from favorites' : 'Add to favorites'}
-        >
-          <HeartIcon
-            size={ms(17)}
-            color={favorite ? colors.favorite : colors.textMuted}
-            filled={favorite}
-          />
-        </Pressable>
+      <View>
+        <View style={styles.titleRow}>
+          <Text style={styles.name} numberOfLines={1}>
+            {item.name}
+          </Text>
+          <Pressable
+            onPress={onToggleFavorite}
+            hitSlop={10}
+            style={styles.heart}
+            accessibilityRole="button"
+            accessibilityLabel={favorite ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            <HeartIcon
+              size={ms(16)}
+              color={favorite ? colors.favorite : colors.textMuted}
+              filled={favorite}
+            />
+          </Pressable>
+        </View>
+
+        <View style={styles.addressRow}>
+          <MapPinIcon size={ms(11)} color={colors.textMuted} />
+          <Text style={styles.address} numberOfLines={1}>
+            {item.address}
+          </Text>
+        </View>
+
+        <View style={styles.stats}>
+          <Stat icon={<BedIcon size={ms(13)} color={colors.navy} />} label={item.beds} />
+          <Stat icon={<BathIcon size={ms(13)} color={colors.navy} />} label={item.baths} />
+          <Stat icon={<AreaIcon size={ms(13)} color={colors.navy} />} label={item.sqft} />
+        </View>
       </View>
 
       <View style={styles.priceRow}>
         {item.pricePrefix ? <Text style={styles.prefix}>{item.pricePrefix} </Text> : null}
-        <Text style={typographyPresets.price}>{item.price}</Text>
+        <Text style={styles.price}>{item.price}</Text>
         <Text style={styles.per}> /mo</Text>
-      </View>
-
-      <View style={styles.stats}>
-        <Text style={styles.stat}>{item.beds}</Text>
-        <View style={styles.dot} />
-        <Text style={styles.stat}>{item.baths}</Text>
-        <View style={styles.dot} />
-        <Text style={styles.stat}>{item.sqft}</Text>
-      </View>
-
-      <View style={styles.addressRow}>
-        <MapPinIcon size={ms(12)} color={colors.textMuted} />
-        <Text style={styles.address} numberOfLines={1}>
-          {item.address}
-        </Text>
       </View>
     </View>
   </Pressable>
 );
 
-const IMAGE_W = ms(112);
+const IMAGE_W = ms(108);
 
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     marginHorizontal: spacing.screenHorizontal,
-    padding: spacing.sm + 2,
-    borderRadius: borderRadius.xl,
+    padding: spacing.md,
+    borderRadius: borderRadius.xxl,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.borderLight,
     ...shadows.sm,
   },
-  image: {
+  pressed: {
+    opacity: 0.94,
+  },
+  media: {
     width: IMAGE_W,
-    height: IMAGE_W / GUEST_IMAGE_ASPECT.rental,
-    borderRadius: borderRadius.lg,
+    minHeight: IMAGE_W / GUEST_IMAGE_ASPECT.rental,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
     backgroundColor: colors.surfaceMuted,
   },
   badge: {
@@ -115,8 +141,9 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    marginLeft: spacing.md,
-    justifyContent: 'center',
+    marginLeft: spacing.lg,
+    paddingVertical: spacing.xs,
+    justifyContent: 'space-between',
   },
   titleRow: {
     flexDirection: 'row',
@@ -125,45 +152,58 @@ const styles = StyleSheet.create({
   name: {
     ...typographyPresets.cardTitle,
     flex: 1,
-    marginRight: spacing.sm,
+    fontSize: scaleFont(15),
+    color: colors.navy,
   },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginTop: spacing.xs,
-  },
-  prefix: {
-    ...typographyPresets.cardSubtitle,
-  },
-  per: {
-    ...typographyPresets.cardSubtitle,
-    color: colors.textMuted,
-  },
-  stats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.sm,
-  },
-  stat: {
-    ...typographyPresets.cardSubtitle,
-    color: colors.textPrimary,
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.textPrimary,
-    marginHorizontal: spacing.sm,
+  heart: {
+    marginLeft: spacing.sm,
   },
   addressRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
   },
   address: {
-    ...typographyPresets.cardSubtitle,
     flex: 1,
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: scaleFont(11.5),
+    color: colors.textMuted,
+  },
+  stats: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: spacing.md,
+    rowGap: spacing.xs,
+    marginTop: spacing.md,
+  },
+  stat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: ms(5),
+  },
+  statText: {
+    fontFamily: typography.fontFamily.body.medium,
+    fontSize: scaleFont(11.5),
+    color: colors.textPrimary,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginTop: spacing.md,
+  },
+  prefix: {
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: scaleFont(11.5),
+    color: colors.textSecondary,
+  },
+  price: {
+    ...typographyPresets.price,
+    color: colors.navy,
+  },
+  per: {
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: scaleFont(12),
     color: colors.textMuted,
   },
 });

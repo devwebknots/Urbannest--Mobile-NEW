@@ -12,6 +12,13 @@ export const guestAssets = {
   guideLivingRoom: require('@/assets/images/guest/guide_living_room.png'),
   guideKitchen: require('@/assets/images/guest/guide_kitchen.png'),
   guideModernExterior: require('@/assets/images/guest/guide_modern_exterior.png'),
+  // City tiles (Unsplash License), cropped to the tile shape (480 x 557):
+  // NY 1485871981521, San Diego BhTgjLZ_v2U (Hakan Toker),
+  // Philadelphia 1569761316261, Houston 1GQoJGCoRTw (Adrian Newell)
+  cityNewYork: require('@/assets/images/guest/city_new_york.jpg'),
+  citySanDiego: require('@/assets/images/guest/city_san_diego.jpg'),
+  cityPhiladelphia: require('@/assets/images/guest/city_philadelphia.jpg'),
+  cityHouston: require('@/assets/images/guest/city_houston.jpg'),
 };
 
 /** Width / height of the design images, so they display uncropped. */

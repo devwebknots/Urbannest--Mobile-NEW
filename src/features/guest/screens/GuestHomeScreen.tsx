@@ -25,6 +25,7 @@ import { HeroSection } from '../components/HeroSection';
 import { RentalCard } from '../components/RentalCard';
 import { SearchCard } from '../components/SearchCard';
 import { CenteredHeader, SectionHeader } from '../components/SectionHeader';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for the hidden trust section
 import { TrustBar } from '../components/TrustBar';
 import {
   CATEGORIES,
@@ -57,7 +58,7 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxxl }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + spacing.sectionGap }}
       >
         <HeroSection
           images={HERO_IMAGES}
@@ -104,7 +105,8 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
           <SectionHeader
             title="Rentals Near You"
             subtitle="Browse nearby options tailored to your location."
-            action={{ label: 'Newest', variant: 'dropdown' }}
+            // Sort filter hidden for now
+            // action={{ label: 'Newest', variant: 'dropdown' }}
           />
           <View style={styles.list}>
             {RENTALS_NEAR_YOU.map(item => (
@@ -134,15 +136,17 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
         </View>
 
         <View style={styles.section}>
-          <SectionHeader eyebrow="Top Cities" title="Explore Real Estate In Popular Cities" />
+          <SectionHeader title="Explore Real Estate In Popular Cities" />
           <View style={styles.sectionBody}>
             <CitiesSection cities={TOP_CITIES} />
           </View>
         </View>
 
+        {/* Trust section hidden for now — uncomment to bring it back
         <View style={styles.section}>
           <TrustBar />
         </View>
+        */}
       </ScrollView>
     </View>
   );

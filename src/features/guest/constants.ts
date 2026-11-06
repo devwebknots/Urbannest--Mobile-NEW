@@ -15,7 +15,6 @@ import type {
 const unsplash = (id: string, w = 800) => ({
   uri: `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`,
 });
-const picsum = (seed: string) => ({ uri: `https://picsum.photos/seed/${seed}/400/500` });
 
 // One slide per page dot. Only the first slide has a design image so far.
 export const HERO_IMAGES = [guestAssets.hero, guestAssets.hero, guestAssets.hero];
@@ -136,25 +135,25 @@ export const TOP_CITIES: City[] = [
     id: 'c1',
     name: 'New York',
     listings: '12,000+',
-    image: unsplash('1496442226666-8d4d0e62e6e9', 400),
+    image: guestAssets.cityNewYork,
   },
   {
     id: 'c2',
     name: 'San Diego',
     listings: '8,200+',
-    image: picsum('sandiego'),
+    image: guestAssets.citySanDiego,
   },
   {
     id: 'c3',
     name: 'Philadelphia',
     listings: '6,400+',
-    image: picsum('philadelphia'),
+    image: guestAssets.cityPhiladelphia,
   },
   {
     id: 'c4',
     name: 'Houston',
     listings: '9,100+',
-    image: picsum('houston'),
+    image: guestAssets.cityHouston,
   },
 ];
 

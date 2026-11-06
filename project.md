@@ -627,7 +627,7 @@ Supports two operational modes:
 - Poppins fonts are still in `src/assets/fonts/` though deprecated.
 - `useAppTheme` exposes `isDarkMode`, but there is no dark palette yet.
 - `heroTitle` should be Playfair Display ExtraBold (800): add `PlayfairDisplay-ExtraBold.ttf`, link it, and switch the preset's font.
-- Guest home: hero has only one design image (repeated for the 3 dots); `rental_glass_villa.png` has the Premium badge baked in; need a text-free hero export; featured carousel and city tiles still use remote placeholder images; Search / categories / See More / guides / cities buttons have no destination yet.
+- Guest home: hero has only one design image (repeated for the 3 dots); `rental_glass_villa.png` has the Premium badge baked in; need a text-free hero export; featured carousel still uses remote Unsplash images (city tiles are now bundled: `city_*.jpg` in `src/assets/images/guest/`, Unsplash License); Search / categories / See More / guides / cities buttons have no destination yet.
 
 ---
 
