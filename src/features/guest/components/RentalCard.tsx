@@ -11,6 +11,7 @@ import { MapPinIcon } from '@/components/icons';
 import {
   borderRadius,
   colors,
+  commonStyles,
   shadows,
   spacing,
   typography,
@@ -47,9 +48,9 @@ export const RentalCard: React.FC<Props> = ({ item, favorite, onToggleFavorite, 
     <View style={styles.media}>
       <Image source={item.image} style={styles.image} resizeMode="cover" />
       {item.badgeInImage ? null : (
-        <View style={styles.badge}>
+        <View style={[commonStyles.premiumBadge, styles.badge]}>
           <StarGlyph size={scaleFont(9)} color={colors.gold} />
-          <Text style={styles.badgeText}>Premium</Text>
+          <Text style={typographyPresets.premiumBadge}>Premium</Text>
         </View>
       )}
     </View>
@@ -57,7 +58,7 @@ export const RentalCard: React.FC<Props> = ({ item, favorite, onToggleFavorite, 
     <View style={styles.body}>
       <View>
         <View style={styles.titleRow}>
-          <Text style={styles.name} numberOfLines={1}>
+          <Text style={[typographyPresets.listingTitle, styles.name]} numberOfLines={1}>
             {item.name}
           </Text>
           <Pressable
@@ -133,19 +134,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: spacing.sm,
     right: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.xs,
-    backgroundColor: colors.navy,
-  },
-  badgeText: {
-    fontFamily: typography.fontFamily.body.medium,
-    fontSize: scaleFont(9),
-    color: colors.white,
-    fontWeight: typography.fontWeight.medium,
   },
   body: {
     flex: 1,
@@ -158,10 +146,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   name: {
-    ...typographyPresets.cardTitle,
     flex: 1,
-    fontSize: scaleFont(15),
-    color: colors.navy,
   },
   heart: {
     marginLeft: spacing.sm,

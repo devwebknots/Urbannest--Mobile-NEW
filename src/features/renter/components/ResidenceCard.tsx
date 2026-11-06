@@ -11,10 +11,10 @@ import { CalendarIcon, ClockIcon, MapPinIcon } from '@/components/icons';
 import {
   borderRadius,
   colors,
+  commonStyles,
   gradients,
   shadows,
   spacing,
-  typography,
   typographyPresets,
 } from '@/config/theme';
 import { ArrowRightIcon, StarGlyph } from '@/features/guest/components/GuestIcons';
@@ -152,15 +152,13 @@ export const ResidenceCard: React.FC<Props> = ({
 
       <View style={styles.body}>
         <View style={styles.titleRow}>
-          <Text style={styles.name} numberOfLines={2}>
+          <Text style={[typographyPresets.listingTitle, styles.name]} numberOfLines={2}>
             {residence.name}
           </Text>
           {residence.premium ? (
-            <View style={styles.premium}>
-              <View style={styles.premiumStar}>
-                <StarGlyph size={scaleFont(9)} color={colors.white} />
-              </View>
-              <Text style={styles.premiumText}>Premium Home</Text>
+            <View style={commonStyles.premiumBadge}>
+              <StarGlyph size={scaleFont(9)} color={colors.gold} />
+              <Text style={typographyPresets.premiumBadge}>Premium</Text>
             </View>
           ) : null}
         </View>
@@ -235,8 +233,7 @@ const styles = StyleSheet.create({
     borderRadius: ms(4),
   },
   statusText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(12),
+    ...typographyPresets.badge,
     color: colors.white,
   },
   menu: {
@@ -274,31 +271,6 @@ const styles = StyleSheet.create({
   },
   name: {
     flex: 1,
-    fontFamily: typography.fontFamily.heading.bold,
-    fontSize: scaleFont(21),
-    lineHeight: scaleFont(28),
-    letterSpacing: -0.2,
-    color: colors.navy,
-  },
-  premium: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: ms(5),
-  },
-  premiumStar: {
-    width: ms(17),
-    height: ms(17),
-    borderRadius: ms(8.5),
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.gold,
-  },
-  premiumText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(10),
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-    color: '#C8901E',
   },
   addressRow: {
     flexDirection: 'row',
@@ -310,11 +282,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   address: {
-    ...typographyPresets.body,
+    ...typographyPresets.cardSubtitle,
     flex: 1,
-    fontSize: scaleFont(13),
-    lineHeight: scaleFont(19),
-    color: colors.textPrimary,
   },
   footer: {
     flexDirection: 'row',
@@ -345,14 +314,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.pageTint,
   },
   metaLabel: {
-    ...typographyPresets.caption,
-    fontSize: scaleFont(11.5),
-    color: colors.textSecondary,
+    ...typographyPresets.cardSubtitle,
   },
   metaValue: {
-    fontFamily: typography.fontFamily.body.bold,
-    fontSize: scaleFont(14),
-    lineHeight: scaleFont(20),
+    ...typographyPresets.bodyBold,
     color: colors.navy,
   },
   // Pushed right; drops to its own line when the facts need the room
@@ -385,8 +350,7 @@ const styles = StyleSheet.create({
     gap: ms(5),
   },
   actionText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(13.5),
+    ...typographyPresets.button,
     color: colors.navy,
   },
   actionTextLight: {

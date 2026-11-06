@@ -7,8 +7,8 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { BrandLockup } from '@/components/BrandLogo';
-import { colors, spacing, typography, typographyPresets } from '@/config/theme';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { colors, spacing, typographyPresets } from '@/config/theme';
+import { moderateScale as ms } from '@/utils/responsive';
 
 interface Props {
   topInset: number;
@@ -23,7 +23,7 @@ export const RenterHeader: React.FC<Props> = ({ topInset, initials, onProfilePre
         label="URBAN NEST"
         logoSize={ms(20)}
         gap={spacing.sm}
-        textStyle={styles.brandText}
+        textStyle={typographyPresets.brandTitle}
         style={styles.brand}
       />
       <Pressable
@@ -39,7 +39,7 @@ export const RenterHeader: React.FC<Props> = ({ topInset, initials, onProfilePre
     <View style={styles.copy}>
       <Text style={styles.eyebrow}>My Rentals</Text>
       <Text style={styles.title}>My Residences</Text>
-      <Text style={styles.subtitle}>
+      <Text style={[typographyPresets.heroSubtitle, styles.subtitle]}>
         The properties you're currently renting{'\n'}and previously lived in.
       </Text>
     </View>
@@ -59,12 +59,6 @@ const styles = StyleSheet.create({
   brand: {
     flex: 1,
   },
-  brandText: {
-    fontFamily: typography.fontFamily.body.bold,
-    fontSize: scaleFont(17),
-    letterSpacing: 1.6,
-    color: colors.white,
-  },
   avatar: {
     width: AVATAR,
     height: AVATAR,
@@ -76,10 +70,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.6)',
   },
   avatarText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(13),
+    ...typographyPresets.button,
     color: colors.navy,
-    letterSpacing: 0.5,
   },
   copy: {
     marginTop: spacing.xxxl,
@@ -87,19 +79,12 @@ const styles = StyleSheet.create({
   eyebrow: {
     ...typographyPresets.eyebrow,
     color: 'rgba(199,210,254,0.85)',
-    letterSpacing: 3,
   },
   title: {
     ...typographyPresets.heroTitle,
-    fontSize: scaleFont(34),
-    lineHeight: scaleFont(42),
     marginTop: spacing.xs,
   },
   subtitle: {
-    fontFamily: typography.fontFamily.body.regular,
-    fontSize: typography.fontSize.base,
-    lineHeight: scaleFont(21),
-    color: 'rgba(226,232,240,0.85)',
     marginTop: spacing.sm,
   },
 });

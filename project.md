@@ -366,6 +366,12 @@ The application strictly uses **2 font families** (Poppins was deprecated and re
 | `eyebrow` | Inter | 500 Medium | 11 / 14 | uppercase, letterSpacing 1.4, `textMuted` | "FEATURED PROPERTIES", "TOP CITIES" |
 | `price` | Inter | 700 Bold | 16 / 22 | — | Listing prices |
 | `caption` | Inter | 400 Regular | 10.5 / 14 | `textMuted` | Meta text ("Renters • 4 min read", stats) |
+| `brandTitle` | Playfair Display | 700 Bold | 21 | white | Logo text in page headers (pass as `BrandLockup` `textStyle`) |
+| `heroSubtitle` | Inter | 400 Regular | 12 / 18 (`fontSize.sm` / `lineHeight.sm`) | white 88% | Paragraph under `heroTitle` on a dark header |
+| `listingTitle` | Inter | 600 SemiBold | 15 / 20 | `navy` | Property name on listing / residence cards |
+| `premiumBadge` | Inter | 500 Medium | 9 | white | "Premium" text; container is `commonStyles.premiumBadge` (navy pill) + gold `StarGlyph` |
+
+All presets above (plus `cardTitle`, `cardSubtitle`, `body*`, `label`, `badge`, `button`, `tabLabel` in `theme.ts`) are the **only** text styles screens may use. Apply them directly, e.g. `style={[typographyPresets.listingTitle, styles.name]}`, where the local style holds layout only.
 
 Hero accent word "Simple": `PlayfairDisplay-SemiBold` + `fontStyle: 'italic'` (synthesized; no italic font file), color `heroAccent`, with the `heroAccentUnderline` bar.
 
@@ -432,9 +438,9 @@ Supports two operational modes:
 - **Role**: Landing page after choosing the Renter persona. Built from the "Urban Nest Residences Dashboard" design in the app theme.
 - **Pieces** (top → bottom, page bg `pageTint`):
   0. Header art `residences_header.jpg` (1290×1150: the design’s dusk-house image `012.png`, fitted to width; bottom fades navy → light blue → `pageTint` with stops sampled from the mockup, so the filter bar sits on the pale band), absolutely positioned at `width × width/1.12`.
-  1. `RenterHeader`: house icon + "URBAN NEST", initials avatar, "MY RENTALS" eyebrow, "My Residences" (Playfair 34), two-line subtitle.
+  1. `RenterHeader`: house icon + "URBAN NEST", initials avatar, "MY RENTALS" eyebrow, "My Residences" (`heroTitle`, 30), two-line subtitle. Logo text and subtitle match the guest hero.
   2. `ResidenceFilterBar`: frosted white track — All Rentals / Active / Past with count bubbles (fixed widths 1.3 : 1 : 1). One glass pill (solid `navy` + smooth white `Scrim` sheen from the top + light hairline rim) springs between segments (`Animated.spring`, JS driver since it animates left/width); labels and badges cross-fade navy ↔ white as it passes.
-  3. `ResidenceCard`s (24dp apart): fully rounded photo (same height on every card: width × 0.46, `RESIDENCE_IMAGE_RATIO`) with dark status pill (green / grey dot) and frosted "…" menu; Playfair Bold navy name + gold "PREMIUM HOME" badge; navy pin + address; footer: calendar/clock icon circles with label + bold value (divider between two facts) and action (footer wraps, so dates never truncate; the action drops to its own line, right-aligned, when space is short) — gradient "Check-In Now", `pageTint` "Manage Residence", text link "Details →".
+  3. `ResidenceCard`s (24dp apart): fully rounded photo (same height on every card: width × 0.46, `RESIDENCE_IMAGE_RATIO`) with dark status pill (green / grey dot) and frosted "…" menu; `cardTitle` (15) navy name + navy "Premium" badge (same as the guest rental card); navy pin + `cardSubtitle` address; footer: calendar/clock icon circles with label + bold value (divider between two facts) and action (footer wraps, so dates never truncate; the action drops to its own line, right-aligned, when space is short) — gradient "Check-In Now", `pageTint` "Manage Residence", text link "Details →".
   4. `RenterTabBar`: floating frosted capsule bar — Homes / Search / Alerts (dot) / Profile, icon above label. Same glass capsule as the filter (navy + white `Scrim` sheen + rim) springs between tabs; icons/labels cross-fade navy ↔ white. Tabs without a page slide over, show "coming soon", and glide back to Homes on close.
 - **Logic**: `useRenterHome` (filter, tab, counts, card + menu actions — "coming soon" alerts for now). Mock data in `renter/constants.ts`; photos in `src/assets/images/renter/` (cropped from the design) via `renterAssets.ts`. Cards fade up in sequence (off in tests).
 
@@ -581,6 +587,10 @@ Supports two operational modes:
 ## 11. Development Rules
 
 1. **Design system fidelity**: no arbitrary colors or fonts. Colors come from `colors` / `gradients` in `theme.ts`, fonts from `typography`, text styles from `typographyPresets`.
+   - **Typography is standardised to the Guest Home screen.** Every screen must reuse the same text styles the guest screen uses for the same kind of element. Never pick a font, weight or size because it looks nice.
+   - Use a `typographyPresets` entry directly in the component (never copy its values into a local style). Do not override its `fontSize` / `lineHeight` / `letterSpacing`; only `color` and layout props (margin, flex, textAlign) may be added.
+   - Same element = same style: logo text = `brandTitle`; big page title = `heroTitle` (30); title subtitle = `heroSubtitle`; section titles = `sectionHeading` / `displayTitle`; property card name = `listingTitle`; address / secondary text = `cardSubtitle`; meta values = `bodyBold`; prices = `price`; button text = `button`; segment labels = `bodyMedium`; status / count badges = `badge`; "Premium" badge = `commonStyles.premiumBadge` + gold `StarGlyph` + `premiumBadge` text; eyebrows = `eyebrow` (letterSpacing 1.4).
+   - If no preset fits, add a new preset to `theme.ts` and list it in Section 8.3 first. Do not hand-write a one-off style.
 2. **Spacing**: `spacing.sectionGap` (40dp) between page sections, `spacing.section` (24dp) between stacked cards, `spacing.screenHorizontal` (20dp) side margins.
 3. **No native-linking dependencies** for icons/gradients — use `src/components/icons` and `src/components/LinearGradient.tsx`.
 4. **Responsive scaling**: `moderateScale()` for margins, padding, sizes, radii; `scaleFont()` for font sizes.

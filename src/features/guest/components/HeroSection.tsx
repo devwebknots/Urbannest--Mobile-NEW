@@ -28,7 +28,7 @@ import {
   typographyPresets,
 } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { moderateScale as ms } from '@/utils/responsive';
 import { GUEST_IMAGE_ASPECT } from '../assets/guestAssets';
 import { ArrowRightIcon } from './GuestIcons';
 
@@ -117,7 +117,7 @@ export const HeroSection: React.FC<Props> = ({
               label="Urban Nest"
               logoSize={ms(24)}
               gap={spacing.sm}
-              textStyle={styles.brandText}
+              textStyle={typographyPresets.brandTitle}
             />
           </View>
           <Pressable
@@ -150,7 +150,7 @@ export const HeroSection: React.FC<Props> = ({
               <View style={styles.accentUnderline} />
             </View>
           </View>
-          <Text style={styles.subtitle}>
+          <Text style={[typographyPresets.heroSubtitle, styles.subtitle]}>
             Find your perfect home, all in one place.{'\n'}Discover a space that
             feels like yours.
           </Text>
@@ -196,12 +196,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  brandText: {
-    fontFamily: typography.fontFamily.heading.bold,
-    fontSize: scaleFont(21),
-    color: colors.white,
-    fontWeight: typography.fontWeight.bold,
-  },
   iconButton: {
     padding: spacing.xs,
     marginRight: spacing.md,
@@ -245,10 +239,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     marginTop: spacing.md,
-    fontFamily: typography.fontFamily.body.regular,
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
-    color: 'rgba(255, 255, 255, 0.88)',
   },
   exploreButton: {
     marginTop: spacing.xl,

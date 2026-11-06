@@ -13,9 +13,9 @@ import {
   Text,
   View,
 } from 'react-native';
-import { borderRadius, colors, spacing, typography } from '@/config/theme';
+import { borderRadius, colors, spacing, typography, typographyPresets } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { moderateScale as ms } from '@/utils/responsive';
 import { FILTERS } from '../constants';
 import type { ResidenceFilter } from '../types';
 
@@ -190,8 +190,7 @@ const styles = StyleSheet.create({
     gap: ms(7),
   },
   label: {
-    fontFamily: typography.fontFamily.body.medium,
-    fontSize: scaleFont(13.5),
+    ...typographyPresets.bodyMedium,
     color: colors.navy,
   },
   labelActive: {
@@ -213,8 +212,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.25)',
   },
   badgeText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(11),
+    ...typographyPresets.badge,
     color: colors.textSecondary,
   },
   badgeTextActive: {

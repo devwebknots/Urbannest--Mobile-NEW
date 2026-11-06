@@ -418,6 +418,35 @@ export const typographyPresets: Record<string, TextStyle> = {
     fontWeight: typography.fontWeight.medium,
     letterSpacing: 0.5,
   },
+  // Logo text next to the house icon in page headers ("URBAN NEST")
+  brandTitle: {
+    fontFamily: typography.fontFamily.heading.bold,
+    fontSize: scaleFont(21),
+    color: colors.white,
+    fontWeight: typography.fontWeight.bold,
+  },
+  // Paragraph under heroTitle on a dark header
+  heroSubtitle: {
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: typography.fontSize.sm,
+    lineHeight: typography.lineHeight.sm,
+    color: 'rgba(255, 255, 255, 0.88)',
+  },
+  // Property name on listing / residence cards
+  listingTitle: {
+    fontFamily: typography.fontFamily.body.semiBold,
+    fontSize: scaleFont(15),
+    lineHeight: scaleFont(20),
+    color: colors.navy,
+    fontWeight: typography.fontWeight.semibold,
+  },
+  // Text inside the navy "Premium" pill (pair with commonStyles.premiumBadge)
+  premiumBadge: {
+    fontFamily: typography.fontFamily.body.medium,
+    fontSize: scaleFont(9),
+    color: colors.white,
+    fontWeight: typography.fontWeight.medium,
+  },
 };
 
 export const shadows = {
@@ -479,6 +508,16 @@ export const commonStyles = StyleSheet.create({
     paddingHorizontal: moderateScale(8),
     paddingVertical: moderateScale(3),
     borderRadius: borderRadius.pill,
+  },
+  // Navy "Premium" pill: gold StarGlyph + typographyPresets.premiumBadge text
+  premiumBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.xs,
+    backgroundColor: colors.navy,
   },
 });
 
