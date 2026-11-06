@@ -22,7 +22,6 @@ import { MapPinIcon } from '@/components/icons';
 import {
   borderRadius,
   colors,
-  shadows,
   spacing,
   typography,
   typographyPresets,
@@ -101,50 +100,52 @@ const FeaturedCard: React.FC<{
   favorite: boolean;
   onToggleFavorite: () => void;
 }> = ({ item, imageWidth, imageHeight, favorite, onToggleFavorite }) => (
-  <View style={styles.card}>
-    <View>
-      <Image
-        source={item.image}
-        style={[styles.image, { width: imageWidth, height: imageHeight }]}
-        resizeMode="cover"
-      />
-      <View style={styles.badge}>
-        <StarGlyph size={scaleFont(10)} color={colors.gold} />
-        <Text style={styles.badgeText}>Exclusive</Text>
-      </View>
-      <Pressable
-        onPress={onToggleFavorite}
-        hitSlop={8}
-        style={({ pressed }) => [styles.heart, pressed && styles.pressed]}
-        accessibilityRole="button"
-        accessibilityLabel={favorite ? 'Remove from favorites' : 'Add to favorites'}
-      >
-        <HeartIcon size={ms(17)} color={colors.favorite} filled={favorite} />
-      </Pressable>
-    </View>
-
-    <View style={styles.info}>
-      <Text style={styles.type}>{item.type}</Text>
-      <View style={styles.priceRow}>
-        <Text style={styles.price}>{item.price}</Text>
-        <Text style={styles.period}>{item.period}</Text>
-      </View>
-      <View style={styles.addressRow}>
-        <MapPinIcon size={ms(12)} color={colors.textSecondary} />
-        <Text style={styles.address} numberOfLines={1}>
-          {item.address}
-        </Text>
-      </View>
-
-      <View style={styles.stats}>
-        <Stat icon={<BedIcon size={ms(15)} color={colors.navy} />} label={`${item.beds} Bed`} />
-        <View style={styles.statDivider} />
-        <Stat icon={<BathIcon size={ms(15)} color={colors.navy} />} label={`${item.baths} Bath`} />
-        <View style={styles.statDivider} />
-        <Stat
-          icon={<AreaIcon size={ms(15)} color={colors.navy} />}
-          label={`${formatSqft(item.sqft)} Sq Ft`}
+  <View style={styles.cardShadow}>
+    <View style={styles.card}>
+      <View>
+        <Image
+          source={item.image}
+          style={[styles.image, { width: imageWidth, height: imageHeight }]}
+          resizeMode="cover"
         />
+        <View style={styles.badge}>
+          <StarGlyph size={scaleFont(10)} color={colors.gold} />
+          <Text style={styles.badgeText}>Exclusive</Text>
+        </View>
+        <Pressable
+          onPress={onToggleFavorite}
+          hitSlop={8}
+          style={({ pressed }) => [styles.heart, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel={favorite ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          <HeartIcon size={ms(17)} color={colors.favorite} filled={favorite} />
+        </Pressable>
+      </View>
+
+      <View style={styles.info}>
+        <Text style={styles.type}>{item.type}</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.price}>{item.price}</Text>
+          <Text style={styles.period}>{item.period}</Text>
+        </View>
+        <View style={styles.addressRow}>
+          <MapPinIcon size={ms(12)} color={colors.textSecondary} />
+          <Text style={styles.address} numberOfLines={1}>
+            {item.address}
+          </Text>
+        </View>
+
+        <View style={styles.stats}>
+          <Stat icon={<BedIcon size={ms(15)} color={colors.navy} />} label={`${item.beds} Bed`} />
+          <View style={styles.statDivider} />
+          <Stat icon={<BathIcon size={ms(15)} color={colors.navy} />} label={`${item.baths} Bath`} />
+          <View style={styles.statDivider} />
+          <Stat
+            icon={<AreaIcon size={ms(15)} color={colors.navy} />}
+            label={`${formatSqft(item.sqft)} Sq Ft`}
+          />
+        </View>
       </View>
     </View>
   </View>
@@ -162,11 +163,18 @@ const Stat: React.FC<{ icon: React.ReactNode; label: string }> = ({ icon, label 
 const HEART = ms(34);
 
 const styles = StyleSheet.create({
+  // boxShadow, not elevation: Android's elevation shadow ignores the
+  // carousel's fade and shows through the faded side cards as a grey band.
+  // It sits on an outer view so the card's overflow clip doesn't cut it off.
+  cardShadow: {
+    borderRadius: borderRadius.xxl,
+    backgroundColor: colors.surface,
+    boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.06)',
+  },
   card: {
     borderRadius: borderRadius.xxl,
     backgroundColor: colors.surface,
     overflow: 'hidden',
-    ...shadows.md,
   },
   image: {
     backgroundColor: colors.surfaceMuted,
@@ -200,7 +208,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.white,
-    ...shadows.md,
+    boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.08)',
   },
   pressed: {
     transform: [{ scale: 0.92 }],
