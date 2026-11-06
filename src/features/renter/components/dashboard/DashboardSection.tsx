@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(13),
     lineHeight: scaleFont(19),
     color: colors.textSecondary,
-    marginTop: 2,
+    marginTop: spacing.xs,
   },
   link: {
     flexDirection: 'row',

@@ -148,6 +148,7 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | `PersonaSelect` | `PersonaSelectScreen` (`@/features/persona`) | `gestureEnabled: false` |
 | `RenterHome` | `RenterHomeScreen` (`@/features/renter`) | `animation: 'slide_from_right'` |
 | `ResidenceDashboard` | `ResidenceDashboardScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
+| `CheckIn` | `CheckInScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | `Home` | `HomeScreen` (`@/features/home`) | stack default |
 | `Calendar` | `CalendarScreen` (`@/features/calendar`) | `animation: 'slide_from_right'` |
 | `Login` | `LoginScreen` (`@/features/auth/screens/LoginScreen`) | stack default |
@@ -157,7 +158,7 @@ Global `screenOptions`: `{ headerShown: false, animation: 'fade' }` — every sc
 ### Param lists (`src/types/navigation.ts`, re-exported by `src/navigation/types.ts`)
 ```ts
 export type RootStackParamList = {
-  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; ResidenceDashboard: { residenceId: string }; Auth: undefined; Main: undefined;
+  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; ResidenceDashboard: { residenceId: string }; CheckIn: { residenceId: string }; Auth: undefined; Main: undefined;
   Home: undefined; Calendar: undefined; Login: undefined;
 };
 export type AuthStackParamList = { Login: undefined; Register: undefined; ForgotPassword: { email?: string } | undefined };
@@ -184,7 +185,8 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 - **Splash → GuestHome** (`replace`): when the splash video ends, or tap anywhere.
 - **GuestHome → PersonaSelect** (`navigate`): "Log In / Sign Up" pill in the hero.
 - **PersonaSelect → RenterHome** (`replace`): "Continue as Renter".
-- **RenterHome → ResidenceDashboard** (`navigate`): tap a current residence card (past leases show "coming soon"). Back button / system back returns.
+- **RenterHome → CheckIn** (`navigate`): tap a Move-In Ready card ("Check-In Now").
+- **RenterHome → ResidenceDashboard** (`navigate`): tap a current residence card (active lease) (past leases show "coming soon"). Back button / system back returns.
 - **PersonaSelect → Home** (`replace`): "Continue as PMS". The route for each persona is in `ROUTE_FOR_PERSONA` (`usePersonaSelection`).
 - **Home → Calendar**: "View Calendar" (ScheduleSection), "Schedule" (QuickActionBar), CALENDAR tab (BottomNavBar).
 - **Calendar → Home**: HOME tab in BottomNavBar or system back.
@@ -449,6 +451,16 @@ Supports two operational modes:
 - **Colours**: only existing theme tokens (`navy`, `tileBlue`, `chipBlue`, `primary`, `gradients.button`, warning/success tones for status). Button rules: primary = `gradients.button` + white text; secondary = `chipBlue` + navy text; on dark panels = white + navy text; links = `sectionLink` (blue) or navy text + arrow.
 - **Shared renter pieces**: `Reveal` (fade-up), `useRenterTabs` (tab state + coming-soon slide-back), `RenterTabBar`.
 
+
+### 0e. Check-In (`src/features/renter/screens/CheckInScreen.tsx`)
+- **Opened by**: "Check-In Now" on a Move-In Ready residence card (route `CheckIn`, param `residenceId`). Same shell as the dashboard: `ResidenceHero` (eyebrow "Almost home, Alex", pills "• Move-In Ready" + unit), `DetailTopBar` (title "Check-In"), rounded `pageTint` sheet, no tab bar.
+- **Pieces** (`components/checkin/`):
+  1. `CheckInStatusCard`: `gradients.button` panel with faint light rings, gold "CURRENT STATUS" eyebrow, white "Verified" chip, Playfair 30 "Move-In Ready", note, glass facts strip (Lease ID | Move-In date), white "Access Digital Key" pill (navy key circle + key window hint).
+  2. `CheckInChecklist` (in `DashboardSection` "Move-In Checklist"): ONE white card holding progress ("n of 4 confirmed", %, gradient bar on `chipBlue` track), a 2 × 2 grid of tappable tiles and the submit button. Tiles are `pageTint` with a white icon box + navy icon (single navy palette — no multi-colour accents); confirmed tiles turn into `gradients.button` tiles with white text + white tick. Primary gradient "Submit Check-In" — disabled (45% opacity) until all 4 are confirmed; after submit becomes a `chipBlue` "✓ Check-In Submitted" bar and the tiles lock. Footnote under the button.
+  3. `NeighborhoodCard`: ONE white card; pill tab row (Schools / Hospitals / Parks, navy when selected, on a `pageTint` track) switches the list; numbered place rows (Playfair "01", name, uppercase meta, `chipBlue` distance pill with pin), hairline dividers. Tab state `placeTab` in `useCheckIn`. No header link (long title); a centred blue "View on Map →" link (`sectionLink`) closes the card → map (coming soon).
+  4. `CuratedLivingCard` (photo = width × 0.56): interior photo (`living_curated.jpg`, Unsplash 1600210492486) with navy fade + gold kicker + Playfair title, white body with story and gold rule + "THE DIGITAL CURATOR STANDARD".
+- **Logic**: `useCheckIn(residenceId, navigation)` — confirmed set, `canSubmit`, `submitted`, `toggleTask`, `submit` (Alert); key / places / map / profile show "coming soon". Mock data: `CHECK_IN_SUMMARY`, `CHECK_IN_TASKS`, `NEIGHBORHOOD`, `NEIGHBORHOOD_RADIUS`, `CURATED_LIVING`.
+- **Icons** added to `src/assets/icons/renter/`: inspect, bolt, wifi, shield, key, check, school, hospital, park (white 128px line PNGs drawn with System.Drawing, tinted via `RenterIcon`).
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.
 - **Components**:
@@ -551,6 +563,7 @@ Supports two operational modes:
 - **GuestHome ➔ PersonaSelect**: "Log In / Sign Up" pill.
 - **PersonaSelect ➔ RenterHome**: "Continue as Renter".
 - **RenterHome ➔ ResidenceDashboard**: tap a current residence card.
+- **RenterHome ➔ CheckIn**: tap a Move-In Ready card.
 - **PersonaSelect ➔ Home**: "Continue as PMS".
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.

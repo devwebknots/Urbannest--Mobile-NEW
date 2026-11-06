@@ -4,10 +4,13 @@
 
 import { renterAssets } from './assets/renterAssets';
 import type {
+  CheckInSummary,
+  CheckInTask,
   CommunityEvent,
   ConciergeService,
   FinancialSummary,
   LeaseStatus,
+  NeighborhoodCategory,
   Residence,
   ResidenceFilter,
   ServiceRequest,
@@ -130,4 +133,63 @@ export const FEATURED_EVENT: CommunityEvent = {
   moreCount: 12,
   attendingLabel: 'Alex + 15 others attending',
   image: renterAssets.eventSkyLounge,
+};
+
+/* ---------- Check-in (mock) ---------- */
+
+export const CHECK_IN_SUMMARY: CheckInSummary = {
+  leaseId: 'ABC123456',
+  moveInDate: 'Nov 15, 2026',
+  keyWindow: 'Keys from 9:00 AM',
+  description:
+    'Your curated residence is prepared for occupancy. All technical systems have been verified by our team.',
+};
+
+export const CHECK_IN_TASKS: readonly CheckInTask[] = [
+  { id: 'inspection', label: 'Inspection', hint: 'Walkthrough report', icon: 'inspect', accent: 'blue' },
+  { id: 'utilities', label: 'Utilities', hint: 'Power & water live', icon: 'bolt', accent: 'amber' },
+  { id: 'internet', label: 'Internet', hint: 'Fibre activated', icon: 'wifi', accent: 'violet' },
+  { id: 'security', label: 'Home Security', hint: 'Alarm & access', icon: 'shield', accent: 'green' },
+];
+
+export const NEIGHBORHOOD_RADIUS = '5 km';
+
+export const NEIGHBORHOOD: readonly NeighborhoodCategory[] = [
+  {
+    id: 'schools',
+    title: 'Nearby Schools',
+    icon: 'school',
+    accent: 'blue',
+    places: [
+      { name: 'Miracle International School', meta: 'Elite Preparatory', distance: '0.8 km' },
+      { name: 'Maple Grove Elementary', meta: 'Public Excellence', distance: '1.2 km' },
+    ],
+  },
+  {
+    id: 'hospitals',
+    title: 'Hospitals',
+    icon: 'hospital',
+    accent: 'green',
+    places: [
+      { name: 'Cedarwood Memorial Hospital', meta: '24/7 Emergency', distance: '1.5 km' },
+      { name: 'Evergreen Health Institute', meta: 'Specialized Care', distance: '2.1 km' },
+    ],
+  },
+  {
+    id: 'parks',
+    title: 'Amusement Parks',
+    icon: 'park',
+    accent: 'amber',
+    places: [
+      { name: 'StormRider Theme Park', meta: 'Entertainment Hub', distance: '3.4 km' },
+      { name: 'Everland Adventure Park', meta: 'Family Recreation', distance: '4.2 km' },
+    ],
+  },
+];
+
+export const CURATED_LIVING = {
+  eyebrow: 'The Digital Curator Standard',
+  title: 'Curated Living Experience',
+  body: 'offers more than just a residence. It is an intersection of architectural precision and community proximity, designed for the discerning tenant.',
+  image: renterAssets.livingCurated,
 };

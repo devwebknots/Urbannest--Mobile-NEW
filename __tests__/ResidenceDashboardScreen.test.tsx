@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
-import { RenterHomeScreen, ResidenceDashboardScreen } from '../src/features/renter';
+import { CheckInScreen, RenterHomeScreen, ResidenceDashboardScreen } from '../src/features/renter';
 
 test('residence dashboard shows every section for the chosen residence', async () => {
   const goBack = jest.fn();
@@ -47,18 +47,68 @@ test('residence dashboard shows every section for the chosen residence', async (
   });
 });
 
-test('tapping a current residence card opens its dashboard', async () => {
+test('cards open check-in when move-in ready, else the dashboard', async () => {
   const navigate = jest.fn();
   let tree!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
     tree = ReactTestRenderer.create(<RenterHomeScreen navigation={{ navigate }} />);
   });
 
-  const card = tree.root.findByProps({ accessibilityLabel: 'The Obsidian Heights' });
+  for (const [name, route, id] of [
+    ['The Obsidian Heights', 'CheckIn', 'obsidian'],
+    ['The Sterling Collection', 'ResidenceDashboard', 'sterling'],
+  ]) {
+    const card = tree.root.findByProps({ accessibilityLabel: name });
+    await ReactTestRenderer.act(() => {
+      card.props.onPress();
+    });
+    expect(navigate).toHaveBeenCalledWith(route, { residenceId: id });
+  }
+
   await ReactTestRenderer.act(() => {
-    card.props.onPress();
+    tree.unmount();
   });
-  expect(navigate).toHaveBeenCalledWith('ResidenceDashboard', { residenceId: 'obsidian' });
+});
+
+test('check-in submits only after every checklist item is confirmed', async () => {
+  const goBack = jest.fn();
+  let tree!: ReactTestRenderer.ReactTestRenderer;
+  await ReactTestRenderer.act(() => {
+    tree = ReactTestRenderer.create(
+      <CheckInScreen navigation={{ goBack }} route={{ params: { residenceId: 'obsidian' } }} />,
+    );
+  });
+
+  const json = JSON.stringify(tree.toJSON());
+  for (const text of [
+    'The Obsidian Heights',
+    'Move-In Ready',
+    'ABC123456',
+    'Access Digital Key',
+    'Move-In Checklist',
+    'Home Security',
+    'Around Your Home',
+    'Miracle International School',
+    'Curated Living Experience',
+  ]) {
+    expect(json).toContain(text);
+  }
+
+  const submit = () => tree.root.findByProps({ accessibilityLabel: 'Submit check-in' });
+  expect(submit().props.disabled).toBe(true);
+
+  for (const label of ['Inspection', 'Utilities', 'Internet', 'Home Security']) {
+    const tile = tree.root.findByProps({ accessibilityLabel: label });
+    await ReactTestRenderer.act(() => {
+      tile.props.onPress();
+    });
+  }
+  expect(submit().props.disabled).toBe(false);
+
+  await ReactTestRenderer.act(() => {
+    submit().props.onPress();
+  });
+  expect(tree.root.findAllByProps({ accessibilityLabel: 'Check-in submitted' }).length).toBeGreaterThan(0);
 
   await ReactTestRenderer.act(() => {
     tree.unmount();

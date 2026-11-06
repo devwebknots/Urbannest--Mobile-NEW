@@ -19,7 +19,7 @@ interface Props {
 }
 
 /** Accent tints, all from the theme's status / avatar palettes */
-const ACCENTS: Record<ConciergeAccent, { bg: string; fg: string }> = {
+export const ACCENTS: Record<ConciergeAccent, { bg: string; fg: string }> = {
   amber: { bg: colors.warningLight, fg: colors.warningDark },
   blue: { bg: colors.infoLight, fg: colors.primary },
   green: { bg: colors.successLight, fg: colors.successDark },

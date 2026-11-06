@@ -1,7 +1,7 @@
 /**
  * useRenterHome: ViewModel for the renter "My Residences" page.
  * Owns the filter state, the counts and the card actions.
- * Tapping a current residence opens its dashboard.
+ * Tapping a move-in-ready residence opens check-in; an active one, its dashboard.
  */
 
 import { useCallback, useMemo, useState } from 'react';
@@ -11,7 +11,7 @@ import { RENTER_PROFILE, RESIDENCES } from '../constants';
 import type { Residence, ResidenceFilter } from '../types';
 
 export interface RenterHomeNavigation {
-  navigate: (route: 'ResidenceDashboard', params: { residenceId: string }) => void;
+  navigate: (route: 'ResidenceDashboard' | 'CheckIn', params: { residenceId: string }) => void;
 }
 
 const isCurrent = (r: Residence) => r.status !== 'expired';
@@ -44,11 +44,13 @@ export function useRenterHome(navigation?: RenterHomeNavigation) {
         Alert.alert(residence.name, 'Past lease details are coming soon.');
         return;
       }
+      // Move-in-ready homes open the check-in page; active leases their dashboard
+      const route = residence.status === 'moveInReady' ? 'CheckIn' : 'ResidenceDashboard';
       const params = { residenceId: residence.id };
       if (navigation?.navigate) {
-        navigation.navigate('ResidenceDashboard', params);
+        navigation.navigate(route, params);
       } else {
-        navigate('ResidenceDashboard', params);
+        navigate(route, params);
       }
     },
     [navigation],

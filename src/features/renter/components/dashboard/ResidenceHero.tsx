@@ -18,6 +18,10 @@ interface Props {
   city: string;
   statusLabel: string;
   firstName: string;
+  /** Gold line above the name (default: "Welcome home, <firstName>") */
+  eyebrow?: string;
+  /** First pill, with the green dot (default: "Your Residence") */
+  primaryPill?: string;
   width: number;
   height: number;
   /** How far the sheet below overlaps the photo */
@@ -32,6 +36,8 @@ export const ResidenceHero: React.FC<Props> = ({
   city,
   statusLabel,
   firstName,
+  eyebrow,
+  primaryPill = 'Your Residence',
   width,
   height,
   sheetOverlap,
@@ -88,7 +94,7 @@ export const ResidenceHero: React.FC<Props> = ({
       <Animated.View
         style={[styles.copy, { paddingBottom: sheetOverlap + spacing.xl }, copyStyle]}
       >
-        <Text style={styles.eyebrow}>Welcome home, {firstName}</Text>
+        <Text style={styles.eyebrow}>{eyebrow ?? `Welcome home, ${firstName}`}</Text>
         <Text style={styles.name}>{name}</Text>
         <View style={styles.addressRow}>
           <MapPinIcon size={ms(15)} color={colors.heroAccent} style={styles.pin} />
@@ -99,7 +105,7 @@ export const ResidenceHero: React.FC<Props> = ({
         <View style={styles.pills}>
           <View style={styles.pill}>
             <View style={styles.dot} />
-            <Text style={styles.pillText}>Your Residence</Text>
+            <Text style={styles.pillText}>{primaryPill}</Text>
           </View>
           <View style={[styles.pill, styles.pillGhost]}>
             <Text style={styles.pillText}>{statusLabel}</Text>

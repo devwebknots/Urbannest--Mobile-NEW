@@ -8,7 +8,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GuestHomeScreen } from '@/features/guest';
 import { HomeScreen } from '@/features/home';
 import { PersonaSelectScreen } from '@/features/persona';
-import { RenterHomeScreen, ResidenceDashboardScreen } from '@/features/renter';
+import { CheckInScreen, RenterHomeScreen, ResidenceDashboardScreen } from '@/features/renter';
 import { SplashScreen } from '@/features/splash';
 import { LoginScreen } from '@/features/auth/screens/LoginScreen';
 import { navigationRef } from './navigationRef';
@@ -49,6 +49,11 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="ResidenceDashboard"
         component={ResidenceDashboardScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="CheckIn"
+        component={CheckInScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen name="Home" component={HomeScreen} />

@@ -14,6 +14,8 @@ export const renterAssets = {
   marble: require('@/assets/images/renter/residence_marble.jpg'),
   // Dashboard event photo (Unsplash 1572116469696)
   eventSkyLounge: require('@/assets/images/renter/event_sky_lounge.jpg'),
+  // Check-in "Curated Living" photo (Unsplash 1600210492486)
+  livingCurated: require('@/assets/images/renter/living_curated.jpg'),
 };
 
 /** Line icons drawn for the dashboard (white PNGs, tinted in the app). */
@@ -25,6 +27,15 @@ export const renterIcons = {
   lease: require('@/assets/icons/renter/lease.png'),
   bank: require('@/assets/icons/renter/bank.png'),
   faucet: require('@/assets/icons/renter/faucet.png'),
+  inspect: require('@/assets/icons/renter/inspect.png'),
+  bolt: require('@/assets/icons/renter/bolt.png'),
+  wifi: require('@/assets/icons/renter/wifi.png'),
+  shield: require('@/assets/icons/renter/shield.png'),
+  key: require('@/assets/icons/renter/key.png'),
+  check: require('@/assets/icons/renter/check.png'),
+  school: require('@/assets/icons/renter/school.png'),
+  hospital: require('@/assets/icons/renter/hospital.png'),
+  park: require('@/assets/icons/renter/park.png'),
 };
 
 /** Width / height of residences_header.jpg */

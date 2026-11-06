@@ -76,3 +76,39 @@ export interface CommunityEvent {
   readonly attendingLabel: string;
   readonly image: ImageSourcePropType;
 }
+
+/* ---------- Check-in (move-in) ---------- */
+
+export type CheckInIcon = 'inspect' | 'bolt' | 'wifi' | 'shield';
+
+export interface CheckInTask {
+  readonly id: string;
+  readonly label: string;
+  /** Short helper line under the label */
+  readonly hint: string;
+  readonly icon: CheckInIcon;
+  readonly accent: ConciergeAccent;
+}
+
+export interface CheckInSummary {
+  readonly leaseId: string;
+  readonly moveInDate: string;
+  readonly keyWindow: string;
+  readonly description: string;
+}
+
+export type NeighborhoodIcon = 'school' | 'hospital' | 'park';
+
+export interface NeighborhoodPlace {
+  readonly name: string;
+  readonly meta: string;
+  readonly distance: string;
+}
+
+export interface NeighborhoodCategory {
+  readonly id: string;
+  readonly title: string;
+  readonly icon: NeighborhoodIcon;
+  readonly accent: ConciergeAccent;
+  readonly places: readonly NeighborhoodPlace[];
+}

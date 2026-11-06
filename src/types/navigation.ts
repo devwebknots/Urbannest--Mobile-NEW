@@ -20,6 +20,7 @@ export type RootStackParamList = {
   PersonaSelect: undefined;
   RenterHome: undefined;
   ResidenceDashboard: { residenceId: string };
+  CheckIn: { residenceId: string };
   Auth: undefined;
   Main: undefined;
   Home: undefined;
