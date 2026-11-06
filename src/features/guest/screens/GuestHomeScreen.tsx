@@ -19,7 +19,7 @@ import { moderateScale as ms } from '@/utils/responsive';
 import { CategoryRow } from '../components/CategoryRow';
 import { CitiesSection } from '../components/CitiesSection';
 import { FeaturedCarousel } from '../components/FeaturedCarousel';
-import { ArrowRightIcon } from '../components/GuestIcons';
+import { ArrowUpRightIcon } from '../components/GuestIcons';
 import { GuidesSection } from '../components/GuidesSection';
 import { HeroSection } from '../components/HeroSection';
 import { RentalCard } from '../components/RentalCard';
@@ -120,7 +120,9 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
           </View>
           <Pressable style={styles.seeMore} accessibilityRole="button">
             <Text style={styles.seeMoreText}>See More Properties</Text>
-            <ArrowRightIcon size={ms(15)} color={colors.navy} />
+            <View style={styles.seeMoreArrow}>
+              <ArrowUpRightIcon size={ms(12)} color={colors.white} />
+            </View>
           </Pressable>
         </View>
 
@@ -179,10 +181,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     marginTop: spacing.xl,
-    paddingHorizontal: spacing.xl,
+    paddingLeft: spacing.xl,
+    paddingRight: ms(6),
     height: ms(42),
     borderRadius: borderRadius.pill,
     backgroundColor: colors.chipBlue,
+  },
+  seeMoreArrow: {
+    width: ms(30),
+    height: ms(30),
+    borderRadius: ms(15),
+    backgroundColor: colors.navy,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   seeMoreText: {
     ...typographyPresets.button,

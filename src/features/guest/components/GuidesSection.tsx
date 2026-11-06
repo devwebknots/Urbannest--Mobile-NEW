@@ -168,11 +168,12 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   itemTitle: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(13),
-    lineHeight: scaleFont(18),
+    ...typographyPresets.bodyMedium,
+    // Caption size, medium weight
+    fontSize: typographyPresets.caption.fontSize,
+    lineHeight: typographyPresets.caption.lineHeight,
     // Always 2 lines tall so both cards line up
-    minHeight: scaleFont(36),
+    minHeight: typographyPresets.caption.lineHeight! * 2,
     color: colors.navy,
     marginTop: spacing.xs,
   },
