@@ -5,11 +5,9 @@
  * tab bar.
  */
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   Alert,
-  Animated,
-  Easing,
   Image,
   ScrollView,
   StatusBar,
@@ -25,82 +23,25 @@ import { RenterHeader } from '../components/RenterHeader';
 import { RENTER_TAB_BAR_HEIGHT, RenterTabBar } from '../components/RenterTabBar';
 import { ResidenceCard } from '../components/ResidenceCard';
 import { ResidenceFilterBar } from '../components/ResidenceFilterBar';
-import { useRenterHome } from '../hooks/useRenterHome';
-import type { RenterTab } from '../types';
-
-declare const process: { env: { NODE_ENV?: string } };
-const IS_TEST = process.env.NODE_ENV === 'test';
-
-/** Fades and lifts its child in, after `delay` ms. */
-const Reveal: React.FC<{ delay: number; children: React.ReactNode }> = ({
-  delay,
-  children,
-}) => {
-  const progress = useRef(new Animated.Value(IS_TEST ? 1 : 0)).current;
-  useEffect(() => {
-    if (IS_TEST) {
-      return;
-    }
-    Animated.timing(progress, {
-      toValue: 1,
-      duration: 600,
-      delay,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }, [progress, delay]);
-  return (
-    <Animated.View
-      style={{
-        opacity: progress,
-        transform: [
-          {
-            translateY: progress.interpolate({
-              inputRange: [0, 1],
-              outputRange: [24, 0],
-            }),
-          },
-        ],
-      }}
-    >
-      {children}
-    </Animated.View>
-  );
-};
+import { Reveal } from '../components/Reveal';
+import { RenterHomeNavigation, useRenterHome } from '../hooks/useRenterHome';
+import { useRenterTabs } from '../hooks/useRenterTabs';
 
 const comingSoon = (what: string) => Alert.alert(what, 'Coming soon.');
 
-const TAB_TITLES: Record<RenterTab, string> = {
-  residences: 'Homes',
-  search: 'Search',
-  alerts: 'Alerts',
-  profile: 'Profile',
-};
+interface Props {
+  navigation?: RenterHomeNavigation;
+}
 
-export const RenterHomeScreen: React.FC = () => {
+export const RenterHomeScreen: React.FC<Props> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const vm = useRenterHome();
+  const vm = useRenterHome(navigation);
+  const tabs = useRenterTabs();
   const cardWidth = width - spacing.screenHorizontal * 2;
   // Header art keeps its ratio; it fades into pageTint at the bottom,
   // so the page continues seamlessly below it.
   const headerArtHeight = Math.round(width / RENTER_HEADER_ASPECT);
-
-  // Other tabs have no page yet: the capsule slides there, a "coming soon"
-  // note shows once it lands, and closing it glides back to Residences.
-  const onTabChange = (tab: RenterTab) => {
-    vm.setTab(tab);
-    if (tab === 'residences') {
-      return;
-    }
-    setTimeout(
-      () =>
-        Alert.alert(TAB_TITLES[tab], 'Coming soon.', [
-          { text: 'OK', onPress: () => vm.setTab('residences') },
-        ], { cancelable: true, onDismiss: () => vm.setTab('residences') }),
-      280,
-    );
-  };
 
   return (
     <View style={styles.root}>
@@ -152,10 +93,10 @@ export const RenterHomeScreen: React.FC = () => {
       </ScrollView>
 
       <RenterTabBar
-        active={vm.tab}
+        active={tabs.tab}
         bottomInset={insets.bottom}
         hasAlerts={vm.profile.unreadAlerts > 0}
-        onChange={onTabChange}
+        onChange={tabs.onTabChange}
       />
     </View>
   );

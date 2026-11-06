@@ -147,6 +147,7 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | `GuestHome` | `GuestHomeScreen` (`@/features/guest`) | `gestureEnabled: false` |
 | `PersonaSelect` | `PersonaSelectScreen` (`@/features/persona`) | `gestureEnabled: false` |
 | `RenterHome` | `RenterHomeScreen` (`@/features/renter`) | `animation: 'slide_from_right'` |
+| `ResidenceDashboard` | `ResidenceDashboardScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | `Home` | `HomeScreen` (`@/features/home`) | stack default |
 | `Calendar` | `CalendarScreen` (`@/features/calendar`) | `animation: 'slide_from_right'` |
 | `Login` | `LoginScreen` (`@/features/auth/screens/LoginScreen`) | stack default |
@@ -156,7 +157,7 @@ Global `screenOptions`: `{ headerShown: false, animation: 'fade' }` — every sc
 ### Param lists (`src/types/navigation.ts`, re-exported by `src/navigation/types.ts`)
 ```ts
 export type RootStackParamList = {
-  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; Auth: undefined; Main: undefined;
+  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; ResidenceDashboard: { residenceId: string }; Auth: undefined; Main: undefined;
   Home: undefined; Calendar: undefined; Login: undefined;
 };
 export type AuthStackParamList = { Login: undefined; Register: undefined; ForgotPassword: { email?: string } | undefined };
@@ -183,6 +184,7 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 - **Splash → GuestHome** (`replace`): when the splash video ends, or tap anywhere.
 - **GuestHome → PersonaSelect** (`navigate`): "Log In / Sign Up" pill in the hero.
 - **PersonaSelect → RenterHome** (`replace`): "Continue as Renter".
+- **RenterHome → ResidenceDashboard** (`navigate`): tap a current residence card (past leases show "coming soon"). Back button / system back returns.
 - **PersonaSelect → Home** (`replace`): "Continue as PMS". The route for each persona is in `ROUTE_FOR_PERSONA` (`usePersonaSelection`).
 - **Home → Calendar**: "View Calendar" (ScheduleSection), "Schedule" (QuickActionBar), CALENDAR tab (BottomNavBar).
 - **Calendar → Home**: HOME tab in BottomNavBar or system back.
@@ -429,6 +431,23 @@ Supports two operational modes:
   4. `RenterTabBar`: floating frosted capsule bar — Homes / Search / Alerts (dot) / Profile, icon above label. Same glass capsule as the filter (navy + white `Scrim` sheen + rim) springs between tabs; icons/labels cross-fade navy ↔ white. Tabs without a page slide over, show "coming soon", and glide back to Homes on close.
 - **Logic**: `useRenterHome` (filter, tab, counts, card + menu actions — "coming soon" alerts for now). Mock data in `renter/constants.ts`; photos in `src/assets/images/renter/` (cropped from the design) via `renterAssets.ts`. Cards fade up in sequence (off in tests).
 
+### 0d. Residence Dashboard (`src/features/renter/screens/ResidenceDashboardScreen.tsx`)
+- **Role**: Detail page of the residence picked on My Residences (route param `residenceId`). Sections follow the "Urban Nest Residence Dashboard" design; the top is a distinct immersive property layout (not the navy header used elsewhere).
+- **Pieces** (page bg `pageTint`):
+  0. `ResidenceHero`: full-bleed photo of that residence (width × 1.08) with parallax (half-speed drift, stretch on pull-down), top + bottom navy `Scrim`s; gold "WELCOME HOME, ALEX" eyebrow, Playfair 34 name, gold pin + street/city, glass pills "• Your Residence" + lease status. Title block fades/drifts up on scroll.
+  1. `DetailTopBar` (floating): glass back button + avatar; a navy bar with the residence name fades in once the photo scrolls away.
+  2. Content sheet (`pageTint`, top radius 30) overlaps the photo by 30; starts with `LeaseSummaryCard` — Monthly Rent / Renewal / Your Unit with `blueTile` icon circles.
+  3. `DashboardSection` (Playfair Bold 22 navy title, subtitle, gold `goldText` "Explore All →") wraps each block below.
+  4. `ConciergeGrid`: 3 + 2 tiles, alternating `blueTile` / `sandTile`, navy or `goldIcon` line icons.
+  5. `FinancialCard`: `gradients.button` panel (Rental Amount Due, "Due in 3 Days" chip, white Pay Now pill, faint skyline towers) + white HOA row (bank tile, amount, "Scheduled" chip, View Details pill).
+  6. `RequestCard`: sand faucet tile, category / title / ticket meta, status pill (In Progress = warning tones).
+  7. `EventCard`: photo with white "★ Featured Event" pill, Playfair title + `blueTile` date box, description, overlapping initials avatars + "+12", outlined View Details.
+  8. Shared `RenterTabBar` (via `useRenterTabs`).
+- **Logic**: `useResidenceDashboard(residenceId, navigation)`; scroll is an `Animated.ScrollView` with a native-driver `scrollY` shared by hero + top bar; mock data in `renter/constants.ts` (`CONCIERGE_SERVICES`, `FINANCIAL_SUMMARY`, `RECENT_REQUESTS`, `FEATURED_EVENT`). Actions show "coming soon" for now.
+- **Assets**: hero uses the residence card photo; `event_sky_lounge.jpg` (Unsplash 1572116469696, cropped to avoid a bar's signage); line icons drawn as white PNGs in `src/assets/icons/renter/` (`renterIcons`, tinted via `RenterIcon`).
+- **Theme tokens added**: `goldText`, `goldIcon`, `sandTile`, `blueTile`.
+- **Shared renter pieces**: `Reveal` (fade-up), `useRenterTabs` (tab state + coming-soon slide-back), `RenterTabBar`.
+
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.
 - **Components**:
@@ -530,6 +549,7 @@ Supports two operational modes:
   - Instantly on tap anywhere on the splash screen.
 - **GuestHome ➔ PersonaSelect**: "Log In / Sign Up" pill.
 - **PersonaSelect ➔ RenterHome**: "Continue as Renter".
+- **RenterHome ➔ ResidenceDashboard**: tap a current residence card.
 - **PersonaSelect ➔ Home**: "Continue as PMS".
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.
