@@ -1,9 +1,14 @@
 /**
  * FeaturedCarousel: snapping property cards. The centered card is full
  * size; the neighbours peek in from the sides, smaller and faded.
+ * The items repeat (LOOPS copies, starting mid-list) so the carousel feels
+ * endless and the first card never leaves an empty gap on the left.
+ * Card: photo with the Exclusive badge (top left) and a white heart button
+ * (top right); below, a blue type label, price, address, a hairline and
+ * bed / bath / area spread evenly.
  */
 
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import {
   Animated,
   Image,
@@ -33,6 +38,8 @@ interface Props {
 }
 
 const GAP = ms(14);
+/** The list repeats this many times so there is always a card on both sides */
+const LOOPS = 40;
 
 export const FeaturedCarousel: React.FC<Props> = ({ items, favorites, onToggleFavorite }) => {
   const { width } = useWindowDimensions();
@@ -40,12 +47,18 @@ export const FeaturedCarousel: React.FC<Props> = ({ items, favorites, onToggleFa
   const interval = cardWidth + GAP;
   const sidePad = (width - cardWidth) / 2;
   const scrollX = useRef(new Animated.Value(0)).current;
-  const startIndex = Math.floor(items.length / 2);
+  // Endless feel: repeat the items and start in the middle copy, on its
+  // second card, so a neighbour always peeks in on the left and the right
+  const data = useMemo(
+    () => Array.from({ length: LOOPS }, (_, copy) => items.map(item => ({ item, copy }))).flat(),
+    [items],
+  );
+  const startIndex = items.length * Math.floor(LOOPS / 2) + Math.min(1, items.length - 1);
 
   return (
     <Animated.FlatList
-      data={items}
-      keyExtractor={item => item.id}
+      data={data}
+      keyExtractor={entry => `${entry.copy}-${entry.item.id}`}
       horizontal
       showsHorizontalScrollIndicator={false}
       snapToInterval={interval}
@@ -57,7 +70,9 @@ export const FeaturedCarousel: React.FC<Props> = ({ items, favorites, onToggleFa
         useNativeDriver: true,
       })}
       scrollEventThrottle={16}
-      renderItem={({ item, index }) => {
+      initialNumToRender={5}
+      windowSize={5}
+      renderItem={({ item: { item }, index }) => {
         const input = [(index - 1) * interval, index * interval, (index + 1) * interval];
         const scale = scrollX.interpolate({ inputRange: input, outputRange: [0.86, 1, 0.86], extrapolate: 'clamp' });
         const opacity = scrollX.interpolate({ inputRange: input, outputRange: [0.55, 1, 0.55], extrapolate: 'clamp' });
@@ -66,7 +81,7 @@ export const FeaturedCarousel: React.FC<Props> = ({ items, favorites, onToggleFa
             <FeaturedCard
               item={item}
               imageWidth={cardWidth}
-              imageHeight={cardWidth * 0.78}
+              imageHeight={cardWidth * 0.7}
               favorite={favorites.has(item.id)}
               onToggleFavorite={() => onToggleFavorite(item.id)}
             />
@@ -77,6 +92,8 @@ export const FeaturedCarousel: React.FC<Props> = ({ items, favorites, onToggleFa
   );
 };
 
+const formatSqft = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
 const FeaturedCard: React.FC<{
   item: FeaturedProperty;
   imageWidth: number;
@@ -85,37 +102,49 @@ const FeaturedCard: React.FC<{
   onToggleFavorite: () => void;
 }> = ({ item, imageWidth, imageHeight, favorite, onToggleFavorite }) => (
   <View style={styles.card}>
-    <Image source={item.image} style={[styles.image, { width: imageWidth, height: imageHeight }]} resizeMode="cover" />
-    <View style={styles.badge}>
-      <StarGlyph size={scaleFont(11)} color={colors.gold} />
-      <Text style={styles.badgeText}>Exclusive</Text>
+    <View>
+      <Image
+        source={item.image}
+        style={[styles.image, { width: imageWidth, height: imageHeight }]}
+        resizeMode="cover"
+      />
+      <View style={styles.badge}>
+        <StarGlyph size={scaleFont(10)} color={colors.gold} />
+        <Text style={styles.badgeText}>Exclusive</Text>
+      </View>
+      <Pressable
+        onPress={onToggleFavorite}
+        hitSlop={8}
+        style={({ pressed }) => [styles.heart, pressed && styles.pressed]}
+        accessibilityRole="button"
+        accessibilityLabel={favorite ? 'Remove from favorites' : 'Add to favorites'}
+      >
+        <HeartIcon size={ms(17)} color={colors.favorite} filled={favorite} />
+      </Pressable>
     </View>
 
     <View style={styles.info}>
       <Text style={styles.type}>{item.type}</Text>
       <View style={styles.priceRow}>
-        <Text style={typographyPresets.price}>{item.price}</Text>
+        <Text style={styles.price}>{item.price}</Text>
         <Text style={styles.period}>{item.period}</Text>
-        <View style={styles.flex} />
-        <Pressable
-          onPress={onToggleFavorite}
-          hitSlop={8}
-          accessibilityRole="button"
-          accessibilityLabel={favorite ? 'Remove from favorites' : 'Add to favorites'}
-        >
-          <HeartIcon size={ms(20)} color={colors.favorite} filled={favorite} />
-        </Pressable>
       </View>
       <View style={styles.addressRow}>
-        <MapPinIcon size={ms(11)} color={colors.textPrimary} />
+        <MapPinIcon size={ms(12)} color={colors.textSecondary} />
         <Text style={styles.address} numberOfLines={1}>
           {item.address}
         </Text>
       </View>
+
       <View style={styles.stats}>
-        <Stat icon={<BedIcon size={ms(14)} color={colors.textPrimary} />} label={`${item.beds} Bed`} />
-        <Stat icon={<BathIcon size={ms(14)} color={colors.textPrimary} />} label={`${item.baths} Bath`} />
-        <Stat icon={<AreaIcon size={ms(14)} color={colors.textPrimary} />} label={`${item.sqft} Sq Ft`} />
+        <Stat icon={<BedIcon size={ms(15)} color={colors.navy} />} label={`${item.beds} Bed`} />
+        <View style={styles.statDivider} />
+        <Stat icon={<BathIcon size={ms(15)} color={colors.navy} />} label={`${item.baths} Bath`} />
+        <View style={styles.statDivider} />
+        <Stat
+          icon={<AreaIcon size={ms(15)} color={colors.navy} />}
+          label={`${formatSqft(item.sqft)} Sq Ft`}
+        />
       </View>
     </View>
   </View>
@@ -124,13 +153,17 @@ const FeaturedCard: React.FC<{
 const Stat: React.FC<{ icon: React.ReactNode; label: string }> = ({ icon, label }) => (
   <View style={styles.stat}>
     {icon}
-    <Text style={styles.statText}>{label}</Text>
+    <Text style={styles.statText} numberOfLines={1}>
+      {label}
+    </Text>
   </View>
 );
 
+const HEART = ms(34);
+
 const styles = StyleSheet.create({
   card: {
-    borderRadius: borderRadius.xl,
+    borderRadius: borderRadius.xxl,
     backgroundColor: colors.surface,
     overflow: 'hidden',
     ...shadows.md,
@@ -141,13 +174,13 @@ const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
     top: spacing.md,
-    right: spacing.md,
+    left: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
+    height: ms(26),
     paddingHorizontal: spacing.sm + 2,
-    paddingVertical: ms(3),
-    borderRadius: borderRadius.sm,
+    borderRadius: borderRadius.pill,
     borderWidth: 1,
     borderColor: colors.gold,
     backgroundColor: colors.goldBadgeBg,
@@ -155,54 +188,85 @@ const styles = StyleSheet.create({
   badgeText: {
     ...typographyPresets.badge,
     color: colors.white,
+    letterSpacing: 0.3,
+  },
+  heart: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    width: HEART,
+    height: HEART,
+    borderRadius: HEART / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+    ...shadows.md,
+  },
+  pressed: {
+    transform: [{ scale: 0.92 }],
   },
   info: {
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm + 2,
-    paddingBottom: spacing.md,
+    padding: spacing.lg,
   },
   type: {
-    fontFamily: typography.fontFamily.body.medium,
-    fontSize: typography.fontSize.xs,
-    color: colors.textPrimary,
-    fontWeight: typography.fontWeight.medium,
+    ...typographyPresets.eyebrow,
+    fontFamily: typography.fontFamily.body.semiBold,
+    fontSize: scaleFont(10.5),
+    color: colors.primary,
   },
   priceRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 2,
+    alignItems: 'baseline',
+    marginTop: spacing.xs,
+  },
+  price: {
+    ...typographyPresets.price,
+    fontSize: scaleFont(18),
+    lineHeight: scaleFont(24),
+    color: colors.navy,
   },
   period: {
-    ...typographyPresets.caption,
-    marginLeft: spacing.sm,
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: scaleFont(12),
+    marginLeft: spacing.xs,
     color: colors.textSecondary,
   },
-  flex: { flex: 1 },
   addressRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    marginTop: spacing.xs,
+    marginTop: spacing.sm,
   },
   address: {
     flex: 1,
     fontFamily: typography.fontFamily.body.regular,
-    fontSize: scaleFont(9),
-    color: colors.textPrimary,
+    fontSize: scaleFont(11.5),
+    color: colors.textSecondary,
   },
   stats: {
     flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.sm,
+    alignItems: 'center',
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
   },
   stat: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
+    justifyContent: 'center',
+    gap: ms(5),
+  },
+  statDivider: {
+    width: 1,
+    height: ms(14),
+    backgroundColor: colors.border,
   },
   statText: {
-    ...typographyPresets.caption,
-    color: colors.textSecondary,
+    fontFamily: typography.fontFamily.body.medium,
+    fontSize: scaleFont(11.5),
+    color: colors.textPrimary,
   },
 });
 
