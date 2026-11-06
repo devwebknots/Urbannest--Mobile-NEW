@@ -85,6 +85,8 @@ UrbanNestMobile/
     │   │   └── index.ts
     │   ├── home/      { components/, screens/HomeScreen.tsx, index.ts }
     │   ├── calendar/  { components/, screens/CalendarScreen.tsx, index.ts }
+    │   ├── guest/     { assets/, components/, hooks/, screens/GuestHomeScreen.tsx, constants.ts, types.ts, index.ts }
+    │   ├── persona/   { assets/, components/, hooks/, screens/PersonaSelectScreen.tsx, index.ts }
     │   └── splash/    { assets/, components/, screens/SplashScreen.tsx, index.ts }
     ├── hooks/                   # useAppTheme, useDebounce, useKeyboard
     ├── navigation/
@@ -112,7 +114,8 @@ UrbanNestMobile/
 - **Imports**: use the `@/` alias for cross-folder imports (`@/config/theme`, `@/features/home`); relative paths only inside a feature.
 - **File names**: `PascalCase.tsx` for components/screens, `camelCase.ts` for hooks/utils/services.
 - **MVVM (auth is the reference)**: `types.ts` + `slice.ts` + `api.ts` = Model, `hooks/useX.ts` = ViewModel (business logic, formatting), `screens/` = dumb View.
-- **Local images**: `require('@/assets/images/x.png')` collected in a feature `assets/*.ts` file (see `splash/assets/splashAssets.ts`). No base64 for large images.
+- **Local images**: `require('@/assets/images/x.png')` collected in a feature `assets/*.ts` file (see `splash/assets/splashAssets.ts`, `guest/assets/guestAssets.ts`). No base64 for large images.
+- **Always give bundled images explicit pixel `width` + `height`** (compute from `useWindowDimensions()` and the image's aspect ratio). `width: '100%'`, `aspectRatio` or `StyleSheet.absoluteFill` alone make a `require()`d image render at its file size (zoomed / overflowing).
 
 ---
 
@@ -140,6 +143,8 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | Route | Component | Options |
 | :--- | :--- | :--- |
 | `Splash` (initial) | `SplashScreen` (`@/features/splash`) | `gestureEnabled: false`, `animation: 'none'` |
+| `GuestHome` | `GuestHomeScreen` (`@/features/guest`) | `gestureEnabled: false` |
+| `PersonaSelect` | `PersonaSelectScreen` (`@/features/persona`) | `gestureEnabled: false` |
 | `Home` | `HomeScreen` (`@/features/home`) | stack default |
 | `Calendar` | `CalendarScreen` (`@/features/calendar`) | `animation: 'slide_from_right'` |
 | `Login` | `LoginScreen` (`@/features/auth/screens/LoginScreen`) | stack default |
@@ -149,7 +154,7 @@ Global `screenOptions`: `{ headerShown: false, animation: 'fade' }` — every sc
 ### Param lists (`src/types/navigation.ts`, re-exported by `src/navigation/types.ts`)
 ```ts
 export type RootStackParamList = {
-  Splash: undefined; Auth: undefined; Main: undefined;
+  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; Auth: undefined; Main: undefined;
   Home: undefined; Calendar: undefined; Login: undefined;
 };
 export type AuthStackParamList = { Login: undefined; Register: undefined; ForgotPassword: { email?: string } | undefined };
@@ -173,7 +178,8 @@ const handleNavigate = (route: keyof RootStackParamList) => {
 Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only receive callbacks (`onViewCalendar`, `onTabPress`) — they never import navigation directly.
 
 ### Current flow
-- **Splash → PersonaSelect**: when the splash video ends, or tap anywhere.
+- **Splash → GuestHome** (`replace`): when the splash video ends, or tap anywhere.
+- **GuestHome → PersonaSelect** (`navigate`): "Log In / Sign Up" pill in the hero.
 - **PersonaSelect → Home**: "Continue as <persona>" (active personas).
 - **Home → Calendar**: "View Calendar" (ScheduleSection), "Schedule" (QuickActionBar), CALENDAR tab (BottomNavBar).
 - **Calendar → Home**: HOME tab in BottomNavBar or system back.
@@ -310,6 +316,20 @@ Defined in `src/config/theme.ts`:
 | `textMuted` | `#94A3B8` | Subtle dates, day headers, inactive tab colors |
 | `subtitlePeriwinkle` | `#C7D2FE` | Muted subtitle text on dark navy headers |
 
+**Guest home tokens (finalized):**
+
+| Token | Value | Purpose / Usage |
+| :--- | :--- | :--- |
+| `pageTint` | `#EEF3F9` | Light blue-gray page background of the guest home |
+| `navy` | `#0B2A5B` | Active tab pill, Premium badge, dark button text, category icons |
+| `tileBlue` | `#DCE6F4` | Category icon tile background |
+| `chipBlue` | `#DCE8FB` | "See More Properties" pill background |
+| `heroAccent` | `#FAD24D` | Gold italic "Simple" in the hero headline |
+| `heroAccentUnderline` | `rgba(250, 210, 77, 0.4)` | 3px bar under "Simple" |
+| `gold` | `#F5B83D` | Star in Exclusive / Premium badges, badge border |
+| `goldBadgeBg` | `rgba(58, 40, 6, 0.85)` | "Exclusive" badge background |
+| `favorite` | `#EF4444` | Filled favorite heart |
+
 ### 2. Linear Gradients
 Managed via `src/components/LinearGradient.tsx`:
 - **Header Gradient**: `#032B57` → `#518EF9` (Greeting top banner)
@@ -328,9 +348,25 @@ The application strictly uses **2 font families** (Poppins was deprecated and re
    - `Inter-Medium`: Links (`"View All"`, `"View Calendar"`), badges (`"LIVE"`, `"82% BOOKED"`), segment tabs, inactive bottom tabs.
    - `Inter-SemiBold` / `Bold`: Card titles, prospect names (`"Marcus Reed"`), button text, price labels, active bottom tabs.
 
+**Finalized text presets** (`typographyPresets` in `theme.ts`; sizes go through `scaleFont`, exact at 390pt width):
+
+| Preset | Font | Weight | Size / Line height | Extra | Used for |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `heroTitle` | Playfair Display | 800 ExtraBold in Figma → **Bold (700) until `PlayfairDisplay-ExtraBold.ttf` is added** | 30 / 35.4 | letterSpacing -0.75, white | "Finding New Home is *Simple*" |
+| `displayTitle` | Playfair Display | 600 SemiBold | 18 / 24.75 | letterSpacing 0, center | Centered section titles ("Most Exclusive Homes Just For You") |
+| `sectionDescription` | Inter | 400 Regular | 10 / 17.88 | letterSpacing 0, center, `textSecondary` | Paragraph under a centered section title |
+| `sectionHeading` | Playfair Display | 500 Medium | 19 / 26 | — | Left-aligned section titles ("Rentals Near You", "Resources & Guides") |
+| `eyebrow` | Inter | 500 Medium | 11 / 14 | uppercase, letterSpacing 1.4, `textMuted` | "FEATURED PROPERTIES", "TOP CITIES" |
+| `price` | Inter | 700 Bold | 16 / 22 | — | Listing prices |
+| `caption` | Inter | 400 Regular | 10.5 / 14 | `textMuted` | Meta text ("Renters • 4 min read", stats) |
+
+Hero accent word "Simple": `PlayfairDisplay-SemiBold` + `fontStyle: 'italic'` (synthesized; no italic font file), color `heroAccent`, with the `heroAccentUnderline` bar.
+
 ### 4. Spacing Conventions
 - **`spacing.screenHorizontal`**: `20dp` standard side padding on all screens.
-- **`spacing.section`**: `24dp` (`moderateScale(24)`) standard vertical distance between stacked cards and sections.
+- **`spacing.section`**: `24dp` (`moderateScale(24)`) standard vertical distance between stacked cards (dashboard screens).
+- **`spacing.sectionGap`**: `40dp` (`moderateScale(40)`) — **finalized vertical gap between page sections** on the guest home (search card → categories → featured → rentals → guides → cities → trust bar).
+- **Guides section**: `20dp` (`spacing.xl`) everywhere — large card ↔ small cards, between the two small cards, and the text/arrow inset inside the large card.
 - **Card inner padding**: `moderateScale(16)`.
 - **Inner elements gap**: `moderateScale(10)` to `moderateScale(12)`.
 
@@ -362,8 +398,21 @@ Supports two operational modes:
 
 ## 10. Implemented Screens
 
-### 0. Persona Select (`src/features/persona/screens/PersonaSelectScreen.tsx`)
-- **Role**: First screen after the splash; pick Renter, Landlord or Property Manager (or Add Persona).
+### 0a. Guest Home (`src/features/guest/screens/GuestHomeScreen.tsx`)
+- **Role**: First screen after the splash; visitors browse before signing in.
+- **Sections** (top → bottom, `spacing.sectionGap` 40dp apart, page bg `pageTint`):
+  1. `HeroSection`: design hero image (`hero_bg.png`, baked text painted out) shown uncropped at `width / (1560/1620)`; bottom `Scrim` fade to `pageTint`. Header: logo + "Urban Nest" (Playfair Bold 21), search icon, frosted "Log In / Sign Up" pill. `heroTitle` headline, Inter 12 subtitle, white "Explore Homes →" button, page dots.
+  2. `SearchCard` (overlaps hero by 28dp): Rent / Buy / Agents tabs (active = `navy` pill), sliders button, 2×2 filter fields, "Search Properties" with `gradients.button`.
+  3. `CategoryRow`: 5 `tileBlue` icon tiles.
+  4. Featured: `CenteredHeader` (`eyebrow` / `displayTitle` / `sectionDescription`) + `FeaturedCarousel` (snap, side cards scale 0.86 + fade 0.55, "Exclusive" gold badge, favorite heart).
+  5. Rentals Near You: `SectionHeader` + 3 `RentalCard`s (image 448:384, "★ Premium" navy badge unless `badgeInImage`) + "See More Properties" `chipBlue` pill.
+  6. `GuidesSection`: large card (1432:806) + two thumbs (696:338), 20dp spacing.
+  7. `CitiesSection`: horizontal city tiles (100×116).
+  8. `TrustBar`: Verified / Secure / Support.
+- **Logic**: `useGuestHome` (tab mode, favorites, Log In → PersonaSelect). Data in `guest/constants.ts`; images in `src/assets/images/guest/` via `guestAssets.ts`. View-drawn icons in `guest/components/GuestIcons.tsx`.
+
+### 0b. Persona Select (`src/features/persona/screens/PersonaSelectScreen.tsx`)
+- **Role**: Opened from "Log In / Sign Up" on the guest home; pick Renter, Landlord or Property Manager (or Add Persona).
 - **Pieces**: blurred photo backdrop that cross-fades with the centered card, `PersonaCarousel` (snapping cards that scale, drop and fade, with photo parallax), `PaginationDots` (sliding pill in a frosted capsule), and one white "Continue as …" button the same width as the cards. Fades use `Scrim` (stretched `fade.png`, no banding).
 - **Logic**: `usePersonaSelection` (ViewModel); data in `persona/constants.ts`; photos in `src/assets/images/personas/` (Unsplash).
 
@@ -463,9 +512,11 @@ Supports two operational modes:
 - **Tests**: `__tests__/SplashScreen.test.tsx`.
 
 ### 4. Navigation Flow
-- **Splash ➔ Home** (via `replace`, Splash leaves the stack):
-  - Automatically after ~6s (5.6s hold + 0.4s exit).
+- **Splash ➔ GuestHome** (via `replace`, Splash leaves the stack):
+  - Automatically when the splash sequence ends.
   - Instantly on tap anywhere on the splash screen.
+- **GuestHome ➔ PersonaSelect**: "Log In / Sign Up" pill.
+- **PersonaSelect ➔ Home**: "Continue as …" button.
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.
   - Tapping **Schedule** in `QuickActionBar`.
@@ -477,7 +528,7 @@ Supports two operational modes:
 ## 11. Development Rules
 
 1. **Design system fidelity**: no arbitrary colors or fonts. Colors come from `colors` / `gradients` in `theme.ts`, fonts from `typography`, text styles from `typographyPresets`.
-2. **Spacing**: `spacing.section` (24dp) between stacked sections, `spacing.screenHorizontal` (20dp) side margins.
+2. **Spacing**: `spacing.sectionGap` (40dp) between page sections, `spacing.section` (24dp) between stacked cards, `spacing.screenHorizontal` (20dp) side margins.
 3. **No native-linking dependencies** for icons/gradients — use `src/components/icons` and `src/components/LinearGradient.tsx`.
 4. **Responsive scaling**: `moderateScale()` for margins, padding, sizes, radii; `scaleFont()` for font sizes.
 5. **Structure**: features in `src/features/<name>/` with `components/`, `screens/`, `index.ts`; export publicly via the feature barrel and `src/features/index.ts`.
@@ -522,6 +573,8 @@ Supports two operational modes:
 - `colors.buttonGradientStart` in `theme.ts` is `#032B57` while `gradients.button` uses `#03264C` — keep them consistent.
 - Poppins fonts are still in `src/assets/fonts/` though deprecated.
 - `useAppTheme` exposes `isDarkMode`, but there is no dark palette yet.
+- `heroTitle` should be Playfair Display ExtraBold (800): add `PlayfairDisplay-ExtraBold.ttf`, link it, and switch the preset's font.
+- Guest home: hero has only one design image (repeated for the 3 dots); `rental_glass_villa.png` has the Premium badge baked in; need a text-free hero export; featured carousel and city tiles still use remote placeholder images; Search / categories / See More / guides / cities buttons have no destination yet.
 
 ---
 
