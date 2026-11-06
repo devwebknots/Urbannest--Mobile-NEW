@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { HomeIcon } from '@/components/icons';
+import { BrandLockup } from '@/components/BrandLogo';
 import { colors, spacing, typography, typographyPresets } from '@/config/theme';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 
@@ -19,10 +19,13 @@ interface Props {
 export const RenterHeader: React.FC<Props> = ({ topInset, initials, onProfilePress }) => (
   <View style={[styles.root, { paddingTop: topInset + spacing.md }]}>
     <View style={styles.topRow}>
-      <View style={styles.brand}>
-        <HomeIcon size={ms(24)} color={colors.white} />
-        <Text style={styles.brandText}>URBAN NEST</Text>
-      </View>
+      <BrandLockup
+        label="URBAN NEST"
+        logoSize={ms(20)}
+        gap={spacing.sm}
+        textStyle={styles.brandText}
+        style={styles.brand}
+      />
       <Pressable
         onPress={onProfilePress}
         style={styles.avatar}
@@ -55,9 +58,6 @@ const styles = StyleSheet.create({
   },
   brand: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm + 2,
   },
   brandText: {
     fontFamily: typography.fontFamily.body.bold,

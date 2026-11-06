@@ -16,7 +16,8 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { HomeIcon, SearchIcon, UserIcon } from '@/components/icons';
+import { BrandLockup } from '@/components/BrandLogo';
+import { SearchIcon, UserIcon } from '@/components/icons';
 import {
   borderRadius,
   colors,
@@ -79,8 +80,12 @@ export const HeroSection: React.FC<Props> = ({
       >
         <View style={styles.header}>
           <View style={styles.brand} pointerEvents="none">
-            <HomeIcon size={ms(26)} color={colors.primaryLight} />
-            <Text style={styles.brandText}>Urban Nest</Text>
+            <BrandLockup
+              label="Urban Nest"
+              logoSize={ms(24)}
+              gap={spacing.sm}
+              textStyle={styles.brandText}
+            />
           </View>
           <Pressable
             onPress={onSearchPress}
@@ -159,7 +164,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   brandText: {
-    marginLeft: spacing.sm,
     fontFamily: typography.fontFamily.heading.bold,
     fontSize: scaleFont(21),
     color: colors.white,

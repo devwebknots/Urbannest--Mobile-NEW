@@ -396,6 +396,11 @@ Hero accent word "Simple": `PlayfairDisplay-SemiBold` + `fontStyle: 'italic'` (s
 Crisp, anti-aliased icon components using pure React Native Views or base64 assets to prevent native binary linking bugs:
 - Core icons: `SearchIcon`, `BellIcon`, `CalendarIcon`, `BookmarkIcon`, `ChatTabIcon`, `SettingsIcon`, `ChevronDownIcon`, `ChevronRightIcon`, `ChevronLeftIcon`, `PlusIcon`, `UploadIcon`, `BriefcaseIcon`, `RefreshIcon`, `EditIcon`, `MoreVerticalIcon`, `CloseIcon`, `ClockIcon`, `CheckmarkIcon`, `MapPinIcon`, `MessageBubbleIcon`.
 
+### 2b. Brand Logo (`src/components/BrandLogo.tsx`)
+- `<BrandLogo size={ms(26)} />`: full-colour Urban Nest house mark (blue ribbon house, ice-blue → royal-blue gradient, folded right leg). Never tint it. The PNG has no padding (house touches every edge).
+- `<BrandLockup label logoSize gap textStyle />`: logo + wordmark with the house's flat bottom sitting on the text **baseline** (row `flex-end`; logo `marginBottom` = measured descender from `onTextLayout`). Used in the Guest Home header (`HeroSection`, logo 24) and the My Residences header (`RenterHeader`, logo 20). Don't centre the logo against the text.
+- PNG: `src/assets/images/brand/urban_nest_logo.png` (480 × 464, transparent), redrawn as vectors by `scripts/brand/draw_logo.ps1` from the user's reference; re-run that script (e.g. `-Scale 4`) for a bigger export.
+
 ### 3. Bottom Navigation Bar (`src/features/home/components/BottomNavBar.tsx`)
 Supports two operational modes:
 - **`variant="home"`**: Displays `HOME` (active), `CALENDAR` (with status dot), `BOOKINGS` (badge 4), `MESSAGES` (badge 2).
