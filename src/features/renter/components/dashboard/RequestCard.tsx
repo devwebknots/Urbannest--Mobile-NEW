@@ -28,7 +28,7 @@ export const RequestCard: React.FC<{ request: ServiceRequest; onPress: () => voi
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View style={styles.icon}>
-        <RenterIcon name="faucet" size={ms(28)} color={colors.goldIcon} />
+        <RenterIcon name="faucet" size={ms(28)} color={colors.navy} />
       </View>
       <View style={styles.text}>
         <Text style={styles.category}>{request.category}</Text>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg + 2,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.sandTile,
+    backgroundColor: colors.tileBlue,
   },
   text: {
     flex: 1,

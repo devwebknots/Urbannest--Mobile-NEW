@@ -436,16 +436,17 @@ Supports two operational modes:
 - **Pieces** (page bg `pageTint`):
   0. `ResidenceHero`: full-bleed photo of that residence (width × 1.08) with parallax (half-speed drift, stretch on pull-down), top + bottom navy `Scrim`s; gold "WELCOME HOME, ALEX" eyebrow, Playfair 34 name, gold pin + street/city, glass pills "• Your Residence" + lease status. Title block fades/drifts up on scroll.
   1. `DetailTopBar` (floating): glass back button + avatar; a navy bar with the residence name fades in once the photo scrolls away.
-  2. Content sheet (`pageTint`, top radius 30) overlaps the photo by 30; starts with `LeaseSummaryCard` — Monthly Rent / Renewal / Your Unit with `blueTile` icon circles.
-  3. `DashboardSection` (Playfair Bold 22 navy title, subtitle, gold `goldText` "Explore All →") wraps each block below.
-  4. `ConciergeGrid`: 3 + 2 tiles, alternating `blueTile` / `sandTile`, navy or `goldIcon` line icons.
-  5. `FinancialCard`: `gradients.button` panel (Rental Amount Due, "Due in 3 Days" chip, white Pay Now pill, faint skyline towers) + white HOA row (bank tile, amount, "Scheduled" chip, View Details pill).
-  6. `RequestCard`: sand faucet tile, category / title / ticket meta, status pill (In Progress = warning tones).
-  7. `EventCard`: photo with white "★ Featured Event" pill, Playfair title + `blueTile` date box, description, overlapping initials avatars + "+12", outlined View Details.
-  8. Shared `RenterTabBar` (via `useRenterTabs`).
+  2. Content sheet (`pageTint`, top radius 30) overlaps the photo by 30; starts with `LeaseSummaryCard` — Monthly Rent / Renewal / Your Unit with `tileBlue` icon circles.
+  3. `DashboardSection` (Playfair Bold 22 navy title, subtitle, "Explore All →" in the `sectionLink` preset — theme blue) wraps each block below.
+  4. `ConciergeGrid`: 2-column grid of white cards (radius 20) — soft-tinted rounded-square icon with its own accent (Maintenance amber, Invoices blue, Amenities green, Documents violet, Lease navy; from theme status/avatar palettes), small arrow chip top-right, left-aligned label + hint. Chip uses `ArrowUpRightIcon` (↗). 6th card "All Services" in `chipBlue` with navy arrow chip.
+  5. `FinancialCard`: `gradients.button` panel (Rental Amount Due, "Due in 3 Days" chip, white Pay Now pill, faint skyline towers) + white HOA row (`tileBlue` bank tile, amount, "Scheduled" chip, `chipBlue` View Details pill).
+  6. `RequestCard`: `tileBlue` faucet tile (navy icon), category / title / ticket meta, status pill (In Progress = warning tones).
+  7. `EventCard`: photo with white "★ Featured Event" pill, Playfair title + `tileBlue` date box, description, overlapping initials avatars + "+12", primary gradient View Details.
+  8. No bottom tab bar (pushed detail page; back button / system back to leave).
 - **Logic**: `useResidenceDashboard(residenceId, navigation)`; scroll is an `Animated.ScrollView` with a native-driver `scrollY` shared by hero + top bar; mock data in `renter/constants.ts` (`CONCIERGE_SERVICES`, `FINANCIAL_SUMMARY`, `RECENT_REQUESTS`, `FEATURED_EVENT`). Actions show "coming soon" for now.
+- **Arrows**: `ArrowRightIcon` (app-wide, in `guest/components/GuestIcons.tsx`) and `ArrowUpRightIcon` are tinted rounded-stroke PNGs in `src/assets/icons/common/` — use these for every arrow.
 - **Assets**: hero uses the residence card photo; `event_sky_lounge.jpg` (Unsplash 1572116469696, cropped to avoid a bar's signage); line icons drawn as white PNGs in `src/assets/icons/renter/` (`renterIcons`, tinted via `RenterIcon`).
-- **Theme tokens added**: `goldText`, `goldIcon`, `sandTile`, `blueTile`.
+- **Colours**: only existing theme tokens (`navy`, `tileBlue`, `chipBlue`, `primary`, `gradients.button`, warning/success tones for status). Button rules: primary = `gradients.button` + white text; secondary = `chipBlue` + navy text; on dark panels = white + navy text; links = `sectionLink` (blue) or navy text + arrow.
 - **Shared renter pieces**: `Reveal` (fade-up), `useRenterTabs` (tab state + coming-soon slide-back), `RenterTabBar`.
 
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)

@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, spacing, typography } from '@/config/theme';
+import { colors, spacing, typography, typographyPresets } from '@/config/theme';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 
@@ -32,7 +32,7 @@ export const DashboardSection: React.FC<Props> = ({ title, subtitle, onExplore, 
           accessibilityLabel={`Explore all ${title}`}
         >
           <Text style={styles.linkText}>Explore All</Text>
-          <ArrowRightIcon size={ms(14)} color={colors.goldText} />
+          <ArrowRightIcon size={ms(14)} color={colors.primary} />
         </Pressable>
       ) : null}
     </View>
@@ -42,7 +42,7 @@ export const DashboardSection: React.FC<Props> = ({ title, subtitle, onExplore, 
 
 const styles = StyleSheet.create({
   root: {
-    marginTop: spacing.sectionGap - spacing.sm,
+    marginTop: spacing.sectionGap,
   },
   head: {
     flexDirection: 'row',
@@ -73,9 +73,8 @@ const styles = StyleSheet.create({
     marginTop: ms(6),
   },
   linkText: {
+    ...typographyPresets.sectionLink,
     fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(13),
-    color: colors.goldText,
   },
   body: {
     marginTop: spacing.lg,

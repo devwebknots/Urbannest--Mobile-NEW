@@ -36,12 +36,16 @@ export type RenterTab = 'residences' | 'search' | 'alerts' | 'profile';
 
 export type ConciergeIcon = 'wrench' | 'invoice' | 'amenities' | 'folder' | 'lease';
 
+export type ConciergeAccent = 'amber' | 'blue' | 'green' | 'violet' | 'navy';
+
 export interface ConciergeService {
   readonly id: string;
   readonly label: string;
   readonly icon: ConciergeIcon;
-  /** Tile tint: cool blue or warm sand (alternates like the design) */
-  readonly tone: 'blue' | 'sand';
+  /** Short helper line under the label */
+  readonly hint: string;
+  /** Icon tint (theme status / avatar palettes) */
+  readonly accent: ConciergeAccent;
 }
 
 export interface FinancialSummary {

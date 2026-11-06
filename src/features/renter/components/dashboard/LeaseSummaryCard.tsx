@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     borderRadius: ms(18),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.blueTile,
+    backgroundColor: colors.tileBlue,
   },
   label: {
     fontFamily: typography.fontFamily.body.regular,

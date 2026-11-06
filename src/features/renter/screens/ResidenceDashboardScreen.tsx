@@ -3,7 +3,8 @@
  * My Residences. Full-bleed parallax photo with name/address, a rounded
  * content sheet rising over it (lease summary, concierge, finances,
  * requests, community) and a floating glass top bar that turns solid
- * once the photo scrolls away.
+ * once the photo scrolls away. No bottom tab bar: this is a pushed detail
+ * page, so the back button is the way out.
  */
 
 import React, { useRef } from 'react';
@@ -11,7 +12,6 @@ import { Animated, StatusBar, StyleSheet, View, useWindowDimensions } from 'reac
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing } from '@/config/theme';
 import { moderateScale as ms } from '@/utils/responsive';
-import { RENTER_TAB_BAR_HEIGHT, RenterTabBar } from '../components/RenterTabBar';
 import { Reveal } from '../components/Reveal';
 import { ConciergeGrid } from '../components/dashboard/ConciergeGrid';
 import { DashboardSection } from '../components/dashboard/DashboardSection';
@@ -23,7 +23,6 @@ import { RequestCard } from '../components/dashboard/RequestCard';
 import { ResidenceHero } from '../components/dashboard/ResidenceHero';
 import { STATUS_LABEL } from '../constants';
 import { DashboardNavigation, useResidenceDashboard } from '../hooks/useResidenceDashboard';
-import { useRenterTabs } from '../hooks/useRenterTabs';
 
 interface Props {
   navigation?: DashboardNavigation;
@@ -36,7 +35,6 @@ export const ResidenceDashboardScreen: React.FC<Props> = ({ navigation, route })
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const vm = useResidenceDashboard(route?.params?.residenceId, navigation);
-  const tabs = useRenterTabs();
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const cardWidth = width - spacing.screenHorizontal * 2;
@@ -53,8 +51,7 @@ export const ResidenceDashboardScreen: React.FC<Props> = ({ navigation, route })
           useNativeDriver: true,
         })}
         contentContainerStyle={{
-          paddingBottom:
-            RENTER_TAB_BAR_HEIGHT + Math.max(insets.bottom, spacing.md) + spacing.xxl,
+          paddingBottom: Math.max(insets.bottom, spacing.md) + spacing.xxl,
         }}
       >
         <ResidenceHero
@@ -86,7 +83,11 @@ export const ResidenceDashboardScreen: React.FC<Props> = ({ navigation, route })
               subtitle="Everything you need for a comfortable stay."
               onExplore={() => vm.exploreAll('Concierge Services')}
             >
-              <ConciergeGrid services={vm.services} onPress={vm.openService} />
+              <ConciergeGrid
+                services={vm.services}
+                onPress={vm.openService}
+                onViewAll={() => vm.exploreAll('Concierge Services')}
+              />
             </DashboardSection>
           </Reveal>
 
@@ -131,13 +132,6 @@ export const ResidenceDashboardScreen: React.FC<Props> = ({ navigation, route })
         onBack={vm.back}
         onProfilePress={vm.openProfile}
       />
-
-      <RenterTabBar
-        active={tabs.tab}
-        bottomInset={insets.bottom}
-        hasAlerts={vm.profile.unreadAlerts > 0}
-        onChange={tabs.onTabChange}
-      />
     </View>
   );
 };
@@ -155,7 +149,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.pageTint,
   },
   list: {
-    gap: spacing.md,
+    gap: spacing.lg,
   },
 });
 

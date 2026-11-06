@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 interface Props {
   size?: number;
@@ -18,34 +18,26 @@ const Box: React.FC<{ size: number; children: React.ReactNode }> = ({
   children,
 }) => <View style={[styles.box, { width: size, height: size }]}>{children}</View>;
 
-export const ArrowRightIcon: React.FC<Props> = ({ size = 16, color = '#fff' }) => {
-  const s = stroke(size, 0.11);
-  const head = size * 0.4;
-  return (
-    <Box size={size}>
-      <View
-        style={[
-          styles.abs,
-          { left: size * 0.12, right: size * 0.16, height: s, backgroundColor: color, borderRadius: s / 2 },
-        ]}
-      />
-      <View
-        style={[
-          styles.abs,
-          {
-            right: size * 0.16,
-            width: head,
-            height: head,
-            borderTopWidth: s,
-            borderRightWidth: s,
-            borderColor: color,
-            transform: [{ rotate: '45deg' }],
-          },
-        ]}
-      />
-    </Box>
-  );
-};
+const ARROW_RIGHT = require('@/assets/icons/common/arrow_right.png');
+const ARROW_UP_RIGHT = require('@/assets/icons/common/arrow_up_right.png');
+
+/** Modern rounded-stroke arrow (tinted PNG). */
+export const ArrowRightIcon: React.FC<Props> = ({ size = 16, color = '#fff' }) => (
+  <Image
+    source={ARROW_RIGHT}
+    style={{ width: size, height: size, tintColor: color }}
+    resizeMode="contain"
+  />
+);
+
+/** Diagonal "open" arrow for card corner chips. */
+export const ArrowUpRightIcon: React.FC<Props> = ({ size = 16, color = '#fff' }) => (
+  <Image
+    source={ARROW_UP_RIGHT}
+    style={{ width: size, height: size, tintColor: color }}
+    resizeMode="contain"
+  />
+);
 
 /** Heart; outline mode draws a smaller heart in `fillColor` on top. */
 export const HeartIcon: React.FC<Props & { filled?: boolean; fillColor?: string }> = ({

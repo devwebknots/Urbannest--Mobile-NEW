@@ -5,7 +5,8 @@
 
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { borderRadius, colors, spacing, typography } from '@/config/theme';
+import { LinearGradient } from '@/components/LinearGradient';
+import { borderRadius, colors, gradients, spacing, typography } from '@/config/theme';
 import { ArrowRightIcon, StarGlyph } from '@/features/guest/components/GuestIcons';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 import type { CommunityEvent } from '../../types';
@@ -18,7 +19,7 @@ interface Props {
 
 const AVATAR_TINTS = [
   { bg: colors.chipBlue, fg: colors.navy },
-  { bg: colors.sandTile, fg: colors.goldIcon },
+  { bg: colors.successLight, fg: colors.successDark },
   { bg: colors.avatarPurple.bg, fg: colors.avatarPurple.text },
 ];
 
@@ -75,10 +76,17 @@ export const EventCard: React.FC<Props> = ({ event, width, onPress }) => {
           onPress={onPress}
           accessibilityRole="button"
           accessibilityLabel={`View details for ${event.title}`}
-          style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+          style={({ pressed }) => [styles.buttonWrap, pressed && styles.pressed]}
         >
-          <Text style={styles.buttonText}>View Details</Text>
-          <ArrowRightIcon size={ms(15)} color={colors.navy} />
+          <LinearGradient
+            colors={gradients.button}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>View Details</Text>
+            <ArrowRightIcon size={ms(15)} color={colors.white} />
+          </LinearGradient>
         </Pressable>
       </View>
     </View>
@@ -141,7 +149,7 @@ const styles = StyleSheet.create({
     paddingVertical: ms(6),
     alignItems: 'center',
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.blueTile,
+    backgroundColor: colors.tileBlue,
   },
   month: {
     fontFamily: typography.fontFamily.body.semiBold,
@@ -201,24 +209,25 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(12.5),
     color: colors.textSecondary,
   },
+  buttonWrap: {
+    marginTop: spacing.xl,
+  },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
     height: ms(48),
-    marginTop: spacing.xl,
     borderRadius: borderRadius.pill,
-    borderWidth: 1.5,
-    borderColor: 'rgba(11,42,91,0.35)',
   },
   pressed: {
-    backgroundColor: colors.pageTint,
+    opacity: 0.92,
+    transform: [{ scale: 0.985 }],
   },
   buttonText: {
     fontFamily: typography.fontFamily.body.semiBold,
     fontSize: scaleFont(14),
-    color: colors.navy,
+    color: colors.white,
   },
 });
 

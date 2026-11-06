@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     ...shadows.md,
   },
   actionSoft: {
-    backgroundColor: colors.pageTint,
+    backgroundColor: colors.chipBlue,
   },
   link: {
     flexDirection: 'row',

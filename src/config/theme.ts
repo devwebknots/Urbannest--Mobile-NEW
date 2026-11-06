@@ -111,12 +111,6 @@ export const colors = {
   gold: '#F5B83D',
   goldBadgeBg: 'rgba(58, 40, 6, 0.85)',
   favorite: '#EF4444',
-
-  // Renter residence dashboard
-  goldText: '#A87516',
-  goldIcon: '#8A5A12',
-  sandTile: '#F6EFE4',
-  blueTile: '#EAF1FB',
 } as const;
 
 export const gradients = {

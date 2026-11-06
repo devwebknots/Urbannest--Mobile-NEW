@@ -94,11 +94,11 @@ export const RESIDENCE_IMAGE_RATIO = 0.46;
 /* ---------- Residence dashboard (mock) ---------- */
 
 export const CONCIERGE_SERVICES: readonly ConciergeService[] = [
-  { id: 'maintenance', label: 'Maintenance', icon: 'wrench', tone: 'blue' },
-  { id: 'invoices', label: 'Invoices', icon: 'invoice', tone: 'sand' },
-  { id: 'amenities', label: 'Amenities', icon: 'amenities', tone: 'blue' },
-  { id: 'documents', label: 'Documents', icon: 'folder', tone: 'sand' },
-  { id: 'lease', label: 'Lease Management', icon: 'lease', tone: 'blue' },
+  { id: 'maintenance', label: 'Maintenance', icon: 'wrench', hint: 'Report an issue', accent: 'amber' },
+  { id: 'invoices', label: 'Invoices', icon: 'invoice', hint: 'Bills & receipts', accent: 'blue' },
+  { id: 'amenities', label: 'Amenities', icon: 'amenities', hint: 'Book facilities', accent: 'green' },
+  { id: 'documents', label: 'Documents', icon: 'folder', hint: 'Your files', accent: 'violet' },
+  { id: 'lease', label: 'Lease', icon: 'lease', hint: 'Renew & terms', accent: 'navy' },
 ];
 
 export const FINANCIAL_SUMMARY: FinancialSummary = {

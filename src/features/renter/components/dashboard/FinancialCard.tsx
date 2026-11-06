@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg + 2,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.blueTile,
+    backgroundColor: colors.tileBlue,
   },
   hoaText: {
     flex: 1,
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     height: ms(38),
     paddingHorizontal: spacing.md + 2,
     borderRadius: borderRadius.pill,
-    backgroundColor: colors.blueTile,
+    backgroundColor: colors.chipBlue,
   },
   viewText: {
     fontFamily: typography.fontFamily.body.semiBold,
