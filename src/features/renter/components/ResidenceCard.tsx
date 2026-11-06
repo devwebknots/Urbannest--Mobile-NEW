@@ -17,7 +17,10 @@ import {
   spacing,
   typographyPresets,
 } from '@/config/theme';
-import { ArrowRightIcon, StarGlyph } from '@/features/guest/components/GuestIcons';
+import {
+  ArrowCircleIcon,
+  StarGlyph,
+} from '@/features/guest/components/GuestIcons';
 import { Scrim } from '@/features/persona/components/Scrim';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 import { ACTION_LABEL, RESIDENCE_IMAGE_RATIO, STATUS_LABEL } from '../constants';
@@ -78,7 +81,7 @@ const ActionButton: React.FC<{ status: LeaseStatus; onPress: () => void }> = ({
           style={[styles.action, styles.actionSolid]}
         >
           <Text style={[styles.actionText, styles.actionTextLight]}>{label}</Text>
-          <ArrowRightIcon size={ms(15)} color={colors.white} />
+          <ArrowCircleIcon size={ms(30)} background={colors.white} color={colors.navy} />
         </LinearGradient>
       </Pressable>
     );
@@ -93,7 +96,7 @@ const ActionButton: React.FC<{ status: LeaseStatus; onPress: () => void }> = ({
         style={styles.link}
       >
         <Text style={styles.actionText}>{label}</Text>
-        <ArrowRightIcon size={ms(13)} color={colors.navy} />
+        <ArrowCircleIcon size={ms(22)} background={colors.navy} color={colors.white} />
       </Pressable>
     );
   }
@@ -105,7 +108,7 @@ const ActionButton: React.FC<{ status: LeaseStatus; onPress: () => void }> = ({
       style={[styles.action, styles.actionSoft]}
     >
       <Text style={styles.actionText}>{label}</Text>
-      <ArrowRightIcon size={ms(15)} color={colors.navy} />
+      <ArrowCircleIcon size={ms(30)} background={colors.navy} color={colors.white} />
     </Pressable>
   );
 };
@@ -330,12 +333,16 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.md - 2,
     backgroundColor: colors.border,
   },
+  // Same width for "Check-In Now" and "Manage"; text left, arrow circle right
   action: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: ms(6),
+    justifyContent: 'space-between',
+    minWidth: ms(150),
+    gap: spacing.sm,
     height: ms(42),
-    paddingHorizontal: spacing.lg,
+    paddingLeft: spacing.lg,
+    paddingRight: ms(6),
     borderRadius: borderRadius.pill,
   },
   actionSolid: {
@@ -347,7 +354,7 @@ const styles = StyleSheet.create({
   link: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: ms(5),
+    gap: ms(6),
   },
   actionText: {
     ...typographyPresets.button,

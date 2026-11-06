@@ -81,7 +81,7 @@ export const STATUS_LABEL: Record<LeaseStatus, string> = {
 
 export const ACTION_LABEL: Record<LeaseStatus, string> = {
   moveInReady: 'Check-In Now',
-  active: 'Manage Residence',
+  active: 'Manage',
   expired: 'Details',
 };
 

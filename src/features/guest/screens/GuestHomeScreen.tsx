@@ -19,7 +19,7 @@ import { moderateScale as ms } from '@/utils/responsive';
 import { CategoryRow } from '../components/CategoryRow';
 import { CitiesSection } from '../components/CitiesSection';
 import { FeaturedCarousel } from '../components/FeaturedCarousel';
-import { ArrowUpRightIcon } from '../components/GuestIcons';
+import { ArrowCircleIcon } from '../components/GuestIcons';
 import { GuidesSection } from '../components/GuidesSection';
 import { HeroSection } from '../components/HeroSection';
 import { RentalCard } from '../components/RentalCard';
@@ -120,9 +120,7 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
           </View>
           <Pressable style={styles.seeMore} accessibilityRole="button">
             <Text style={styles.seeMoreText}>See More Properties</Text>
-            <View style={styles.seeMoreArrow}>
-              <ArrowUpRightIcon size={ms(12)} color={colors.white} />
-            </View>
+            <ArrowCircleIcon size={ms(30)} background={colors.navy} color={colors.white} />
           </Pressable>
         </View>
 
@@ -186,14 +184,6 @@ const styles = StyleSheet.create({
     height: ms(42),
     borderRadius: borderRadius.pill,
     backgroundColor: colors.chipBlue,
-  },
-  seeMoreArrow: {
-    width: ms(30),
-    height: ms(30),
-    borderRadius: ms(15),
-    backgroundColor: colors.navy,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   seeMoreText: {
     ...typographyPresets.button,

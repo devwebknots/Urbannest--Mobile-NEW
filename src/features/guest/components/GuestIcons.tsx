@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { colors } from '@/config/theme';
 
 interface Props {
   size?: number;
@@ -37,6 +38,26 @@ export const ArrowUpRightIcon: React.FC<Props> = ({ size = 16, color = '#fff' })
     style={{ width: size, height: size, tintColor: color }}
     resizeMode="contain"
   />
+);
+
+/**
+ * Modern button arrow: a filled circle with a diagonal arrow inside.
+ * Sits at the right end of pill buttons ("See More Properties",
+ * "Check-In Now", "Manage"). Pair with paddingRight ≈ 6 on the button.
+ */
+export const ArrowCircleIcon: React.FC<{
+  size?: number;
+  background?: string;
+  color?: string;
+}> = ({ size = 30, background = colors.navy, color = colors.white }) => (
+  <View
+    style={[
+      styles.box,
+      { width: size, height: size, borderRadius: size / 2, backgroundColor: background },
+    ]}
+  >
+    <ArrowUpRightIcon size={size * 0.4} color={color} />
+  </View>
 );
 
 /** Heart; outline mode draws a smaller heart in `fillColor` on top. */
