@@ -17,7 +17,7 @@ const unsplash = (id: string, w = 800) => ({
 });
 
 // One slide per page dot. Only the first slide has a design image so far.
-export const HERO_IMAGES = [guestAssets.hero, guestAssets.hero, guestAssets.hero];
+export const HERO_IMAGES = [guestAssets.hero, guestAssets.heroDuskHouse, guestAssets.heroPoolVilla];
 
 export const SEARCH_FILTERS = {
   location: 'California',

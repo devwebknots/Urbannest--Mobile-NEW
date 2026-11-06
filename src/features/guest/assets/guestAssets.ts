@@ -5,6 +5,10 @@
  */
 export const guestAssets = {
   hero: require('@/assets/images/guest/hero_bg.png'),
+  // Extra hero slides, same 1170 x 1215 navy-sky layout (scripts/brand/hero_grade.ps1):
+  // Unsplash 1600585154340 (dusk house) and 1613490493576 (pool villa, graded to blue hour)
+  heroDuskHouse: require('@/assets/images/guest/hero_dusk_house.jpg'),
+  heroPoolVilla: require('@/assets/images/guest/hero_pool_villa.jpg'),
   rentalBrotherHomes: require('@/assets/images/guest/rental_brother_homes.png'),
   // Note: this export already includes the "Premium" badge
   rentalGlassVilla: require('@/assets/images/guest/rental_glass_villa.png'),

@@ -1,9 +1,10 @@
 /**
  * Hero: swipeable house photos (already navy-graded in the design export),
  * with the header, headline, Explore button and page dots on top.
+ * Auto-advances every AUTO_MS and loops; a swipe resets the timer.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Image,
   ImageSourcePropType,
@@ -11,6 +12,7 @@ import {
   NativeSyntheticEvent,
   Pressable,
   ScrollView,
+  ScrollViewInstance,
   StyleSheet,
   Text,
   View,
@@ -30,6 +32,12 @@ import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 import { GUEST_IMAGE_ASPECT } from '../assets/guestAssets';
 import { ArrowRightIcon } from './GuestIcons';
 
+declare const process: { env: { NODE_ENV?: string } };
+const IS_TEST = process.env.NODE_ENV === 'test';
+
+/** Time each slide stays before moving on */
+const AUTO_MS = 5000;
+
 interface Props {
   images: ImageSourcePropType[];
   topInset: number;
@@ -47,17 +55,42 @@ export const HeroSection: React.FC<Props> = ({
 }) => {
   const { width } = useWindowDimensions();
   const [index, setIndex] = useState(0);
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  const dragging = useRef(false);
   // Show the whole design image; never shorter than the content needs
   const height = Math.max(width / GUEST_IMAGE_ASPECT.hero, ms(360) + topInset);
 
-  const onScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) =>
+  const onScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    dragging.current = false;
     setIndex(Math.round(e.nativeEvent.contentOffset.x / width));
+  };
+
+  // Auto-slide: restarts whenever the slide changes (also after a swipe)
+  useEffect(() => {
+    if (IS_TEST || images.length < 2) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      if (dragging.current) {
+        return;
+      }
+      const next = (index + 1) % images.length;
+      scrollRef.current?.scrollTo({ x: next * width, animated: true });
+      // Android may not fire momentum end for programmatic scrolls
+      setIndex(next);
+    }, AUTO_MS);
+    return () => clearTimeout(timer);
+  }, [index, images.length, width]);
 
   return (
     <View style={[styles.root, { height }]}>
       <ScrollView
+        ref={scrollRef}
         horizontal
         pagingEnabled
+        onScrollBeginDrag={() => {
+          dragging.current = true;
+        }}
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={onScrollEnd}
         style={StyleSheet.absoluteFill}
