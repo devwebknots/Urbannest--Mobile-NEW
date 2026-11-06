@@ -5,6 +5,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GuestHomeScreen } from '@/features/guest';
 import { HomeScreen } from '@/features/home';
 import { PersonaSelectScreen } from '@/features/persona';
 import { SplashScreen } from '@/features/splash';
@@ -28,6 +29,11 @@ export const RootNavigator: React.FC = () => (
           // Let the native splash picture show through until JS draws its copy
           contentStyle: { backgroundColor: 'transparent' },
         }}
+      />
+      <Stack.Screen
+        name="GuestHome"
+        component={GuestHomeScreen}
+        options={{ gestureEnabled: false }}
       />
       <Stack.Screen
         name="PersonaSelect"

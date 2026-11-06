@@ -1,6 +1,6 @@
 /**
  * SplashScreen: plays the ambient motion video (arc light sweep, flowing
- * silk wave, warm villa glow) once, then fades to persona selection. Tap to skip.
+ * silk wave, warm villa glow) once, then fades to the guest home page. Tap to skip.
  */
 
 import React, { useCallback, useState } from 'react';
@@ -19,15 +19,15 @@ import { SPLASH_COLORS } from '../constants';
 import { useSplashSequence } from '../hooks/useSplashSequence';
 
 interface Props {
-  navigation?: { replace: (route: 'PersonaSelect') => void };
+  navigation?: { replace: (route: 'GuestHome') => void };
 }
 
 export const SplashScreen: React.FC<Props> = ({ navigation }) => {
   const goNext = useCallback(() => {
     if (navigation?.replace) {
-      navigation.replace('PersonaSelect');
+      navigation.replace('GuestHome');
     } else if (navigationRef.isReady()) {
-      navigationRef.reset({ index: 0, routes: [{ name: 'PersonaSelect' }] });
+      navigationRef.reset({ index: 0, routes: [{ name: 'GuestHome' }] });
     }
   }, [navigation]);
 

@@ -16,6 +16,7 @@ export type MainStackParamList = {
 
 export type RootStackParamList = {
   Splash: undefined;
+  GuestHome: undefined;
   PersonaSelect: undefined;
   Auth: undefined;
   Main: undefined;

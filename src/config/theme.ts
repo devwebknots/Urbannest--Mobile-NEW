@@ -100,6 +100,16 @@ export const colors = {
   textInverse: '#FFFFFF',
   textInverseMuted: 'rgba(255, 255, 255, 0.75)',
   textBlue: '#2563EB',
+
+  // Guest home
+  pageTint: '#EEF3F9',
+  navy: '#0B2A5B',
+  tileBlue: '#DCE6F4',
+  chipBlue: '#DCE8FB',
+  heroAccent: '#8DB8FF',
+  gold: '#F5B83D',
+  goldBadgeBg: 'rgba(58, 40, 6, 0.85)',
+  favorite: '#EF4444',
 } as const;
 
 export const gradients = {
@@ -126,6 +136,8 @@ export const spacing = {
   xxl: moderateScale(24),
   xxxl: moderateScale(32),
   section: moderateScale(24),
+  // Vertical gap between page sections
+  sectionGap: moderateScale(40),
   screenHorizontal: 20,
 } as const;
 
@@ -338,6 +350,65 @@ export const typographyPresets: Record<string, TextStyle> = {
     color: colors.white,
     letterSpacing: 0,
     textAlign: 'center',
+  },
+  // Hero headline: Playfair Display ExtraBold (800) 30 / 35.4, -0.75 tracking.
+  // Uses Bold until PlayfairDisplay-ExtraBold.ttf is added to assets/fonts.
+  heroTitle: {
+    fontFamily: typography.fontFamily.heading.bold,
+    fontSize: scaleFont(30),
+    lineHeight: scaleFont(35.4),
+    letterSpacing: -0.75,
+    color: colors.white,
+    fontWeight: typography.fontWeight.bold,
+  },
+  // Centered section title, e.g. "Most Exclusive Homes Just For You"
+  displayTitle: {
+    fontFamily: typography.fontFamily.heading.semiBold,
+    fontSize: scaleFont(18),
+    lineHeight: scaleFont(24.75),
+    letterSpacing: 0,
+    color: colors.textPrimary,
+    fontWeight: typography.fontWeight.semibold,
+    textAlign: 'center',
+  },
+  // Centered paragraph under a section title
+  sectionDescription: {
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: scaleFont(10),
+    lineHeight: scaleFont(17.88),
+    letterSpacing: 0,
+    color: colors.textSecondary,
+    fontWeight: typography.fontWeight.regular,
+    textAlign: 'center',
+  },
+  sectionHeading: {
+    fontFamily: typography.fontFamily.heading.medium,
+    fontSize: scaleFont(19),
+    lineHeight: scaleFont(26),
+    color: colors.textPrimary,
+    fontWeight: typography.fontWeight.medium,
+  },
+  eyebrow: {
+    fontFamily: typography.fontFamily.body.medium,
+    fontSize: scaleFont(11),
+    lineHeight: scaleFont(14),
+    letterSpacing: 1.4,
+    color: colors.textMuted,
+    fontWeight: typography.fontWeight.medium,
+    textTransform: 'uppercase',
+  },
+  price: {
+    fontFamily: typography.fontFamily.body.bold,
+    fontSize: scaleFont(16),
+    lineHeight: scaleFont(22),
+    color: colors.textPrimary,
+    fontWeight: typography.fontWeight.bold,
+  },
+  caption: {
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: scaleFont(10.5),
+    lineHeight: scaleFont(14),
+    color: colors.textMuted,
   },
   tabLabel: {
     fontFamily: typography.fontFamily.body.medium,
