@@ -45,7 +45,7 @@ export const RentalCard: React.FC<Props> = ({ item, favorite, onToggleFavorite, 
     accessibilityLabel={item.name}
   >
     <View style={styles.media}>
-      <Image source={item.image} style={StyleSheet.absoluteFill} resizeMode="cover" />
+      <Image source={item.image} style={styles.image} resizeMode="cover" />
       {item.badgeInImage ? null : (
         <View style={styles.badge}>
           <StarGlyph size={scaleFont(9)} color={colors.gold} />
@@ -120,6 +120,14 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     backgroundColor: colors.surfaceMuted,
+  },
+  // Explicit size so large photos scale down to the thumbnail on Android
+  image: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: IMAGE_W,
+    height: '100%',
   },
   badge: {
     position: 'absolute',

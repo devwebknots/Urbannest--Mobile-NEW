@@ -27,11 +27,11 @@ export const SEARCH_FILTERS = {
 };
 
 export const CATEGORIES: Category[] = [
-  { key: 'single', label: 'Single Family' },
-  { key: 'multi', label: 'Multi Family' },
+  { key: 'single', label: 'Single' },
+  { key: 'multi', label: 'Multi' },
   { key: 'apartments', label: 'Apartments' },
   { key: 'condos', label: 'Condos' },
-  { key: 'townhomes', label: 'Town Homes' },
+  { key: 'townhomes', label: 'Townhome' },
 ];
 
 export const FEATURED_PROPERTIES: FeaturedProperty[] = [
@@ -90,7 +90,6 @@ export const RENTALS_NEAR_YOU: RentalListing[] = [
     sqft: '1056 Sq Ft',
     address: '617 Live Oak Cir, Austin, TX 78701',
     image: guestAssets.rentalGlassVilla,
-    badgeInImage: true,
   },
   {
     id: 'r3',

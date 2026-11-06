@@ -9,10 +9,10 @@ export const guestAssets = {
   // Unsplash 1600585154340 (dusk house) and 1613490493576 (pool villa, graded to blue hour)
   heroDuskHouse: require('@/assets/images/guest/hero_dusk_house.jpg'),
   heroPoolVilla: require('@/assets/images/guest/hero_pool_villa.jpg'),
-  rentalBrotherHomes: require('@/assets/images/guest/rental_brother_homes.png'),
-  // Note: this export already includes the "Premium" badge
-  rentalGlassVilla: require('@/assets/images/guest/rental_glass_villa.png'),
-  rentalCenterton: require('@/assets/images/guest/rental_centerton.png'),
+  // Rental thumbnails reuse the sharp 1080px renter residence photos
+  rentalBrotherHomes: require('@/assets/images/renter/residence_sterling.jpg'),
+  rentalGlassVilla: require('@/assets/images/renter/residence_obsidian.jpg'),
+  rentalCenterton: require('@/assets/images/renter/residence_azure.jpg'),
   guideLivingRoom: require('@/assets/images/guest/guide_living_room.png'),
   guideKitchen: require('@/assets/images/guest/guide_kitchen.png'),
   guideModernExterior: require('@/assets/images/guest/guide_modern_exterior.png'),
