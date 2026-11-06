@@ -1,3 +1,5 @@
+import type { ImageSourcePropType } from 'react-native';
+
 export type ListingMode = 'rent' | 'buy' | 'agents';
 
 export type CategoryKey =
@@ -21,7 +23,7 @@ export interface FeaturedProperty {
   beds: number;
   baths: number;
   sqft: number;
-  image: string;
+  image: ImageSourcePropType;
 }
 
 export interface RentalListing {
@@ -34,7 +36,9 @@ export interface RentalListing {
   baths: string;
   sqft: string;
   address: string;
-  image: string;
+  image: ImageSourcePropType;
+  /** The image file already shows the Premium badge */
+  badgeInImage?: boolean;
 }
 
 export interface Guide {
@@ -42,12 +46,12 @@ export interface Guide {
   title: string;
   audience: string;
   readTime: string;
-  image: string;
+  image: ImageSourcePropType;
 }
 
 export interface City {
   id: string;
   name: string;
   listings: string;
-  image: string;
+  image: ImageSourcePropType;
 }

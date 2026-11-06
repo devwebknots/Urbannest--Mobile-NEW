@@ -65,6 +65,7 @@ export const FeaturedCarousel: React.FC<Props> = ({ items, favorites, onToggleFa
           <Animated.View style={{ width: interval, paddingHorizontal: GAP / 2, opacity, transform: [{ scale }] }}>
             <FeaturedCard
               item={item}
+              imageWidth={cardWidth}
               imageHeight={cardWidth * 0.78}
               favorite={favorites.has(item.id)}
               onToggleFavorite={() => onToggleFavorite(item.id)}
@@ -78,12 +79,13 @@ export const FeaturedCarousel: React.FC<Props> = ({ items, favorites, onToggleFa
 
 const FeaturedCard: React.FC<{
   item: FeaturedProperty;
+  imageWidth: number;
   imageHeight: number;
   favorite: boolean;
   onToggleFavorite: () => void;
-}> = ({ item, imageHeight, favorite, onToggleFavorite }) => (
+}> = ({ item, imageWidth, imageHeight, favorite, onToggleFavorite }) => (
   <View style={styles.card}>
-    <Image source={{ uri: item.image }} style={[styles.image, { height: imageHeight }]} resizeMode="cover" />
+    <Image source={item.image} style={[styles.image, { width: imageWidth, height: imageHeight }]} resizeMode="cover" />
     <View style={styles.badge}>
       <StarGlyph size={scaleFont(11)} color={colors.gold} />
       <Text style={styles.badgeText}>Exclusive</Text>
@@ -134,7 +136,6 @@ const styles = StyleSheet.create({
     ...shadows.md,
   },
   image: {
-    width: '100%',
     backgroundColor: colors.surfaceMuted,
   },
   badge: {

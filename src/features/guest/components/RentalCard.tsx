@@ -11,6 +11,7 @@ import {
 } from '@/config/theme';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 import type { RentalListing } from '../types';
+import { GUEST_IMAGE_ASPECT } from '../assets/guestAssets';
 import { HeartIcon, StarGlyph } from './GuestIcons';
 
 interface Props {
@@ -23,11 +24,13 @@ interface Props {
 export const RentalCard: React.FC<Props> = ({ item, favorite, onToggleFavorite, onPress }) => (
   <Pressable style={styles.card} onPress={onPress} accessibilityRole="button">
     <View>
-      <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
-      <View style={styles.badge}>
-        <StarGlyph size={scaleFont(9)} color={colors.gold} />
-        <Text style={styles.badgeText}>Premium</Text>
-      </View>
+      <Image source={item.image} style={styles.image} resizeMode="cover" />
+      {item.badgeInImage ? null : (
+        <View style={styles.badge}>
+          <StarGlyph size={scaleFont(9)} color={colors.gold} />
+          <Text style={styles.badgeText}>Premium</Text>
+        </View>
+      )}
     </View>
 
     <View style={styles.body}>
@@ -88,7 +91,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: IMAGE_W,
-    height: IMAGE_W * 0.9,
+    height: IMAGE_W / GUEST_IMAGE_ASPECT.rental,
     borderRadius: borderRadius.lg,
     backgroundColor: colors.surfaceMuted,
   },

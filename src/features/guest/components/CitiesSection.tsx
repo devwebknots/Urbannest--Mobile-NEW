@@ -10,6 +10,9 @@ interface Props {
   onPress?: (id: string) => void;
 }
 
+const TILE_W = ms(100);
+const TILE_H = ms(116);
+
 export const CitiesSection: React.FC<Props> = ({ cities, onPress }) => (
   <ScrollView
     horizontal
@@ -23,7 +26,7 @@ export const CitiesSection: React.FC<Props> = ({ cities, onPress }) => (
         onPress={() => onPress?.(city.id)}
         accessibilityRole="button"
       >
-        <Image source={{ uri: city.image }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        <Image source={city.image} style={styles.image} resizeMode="cover" />
         <Scrim edge="bottom" extent={0.6} maxOpacity={0.85} color={colors.black} />
         <View style={styles.body}>
           <Text style={styles.name} numberOfLines={1}>
@@ -42,12 +45,19 @@ const styles = StyleSheet.create({
     gap: spacing.sm + 2,
   },
   tile: {
-    width: ms(100),
-    height: ms(116),
+    width: TILE_W,
+    height: TILE_H,
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     backgroundColor: colors.headerDarkBlue,
     justifyContent: 'flex-end',
+  },
+  image: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: TILE_W,
+    height: TILE_H,
   },
   body: {
     padding: spacing.sm + 2,

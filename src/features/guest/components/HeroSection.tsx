@@ -1,11 +1,12 @@
 /**
- * Hero: swipeable house photos under a navy tint, with the header,
- * headline, Explore button and page dots on top.
+ * Hero: swipeable house photos (already navy-graded in the design export),
+ * with the header, headline, Explore button and page dots on top.
  */
 
 import React, { useState } from 'react';
 import {
   Image,
+  ImageSourcePropType,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -25,12 +26,11 @@ import {
 } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { GUEST_IMAGE_ASPECT } from '../assets/guestAssets';
 import { ArrowRightIcon } from './GuestIcons';
 
-export const HERO_HEIGHT = ms(380);
-
 interface Props {
-  images: string[];
+  images: ImageSourcePropType[];
   topInset: number;
   onLoginPress: () => void;
   onSearchPress: () => void;
@@ -46,7 +46,8 @@ export const HeroSection: React.FC<Props> = ({
 }) => {
   const { width } = useWindowDimensions();
   const [index, setIndex] = useState(0);
-  const height = HERO_HEIGHT + topInset;
+  // Show the whole design image; never shorter than the content needs
+  const height = Math.max(width / GUEST_IMAGE_ASPECT.hero, ms(360) + topInset);
 
   const onScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) =>
     setIndex(Math.round(e.nativeEvent.contentOffset.x / width));
@@ -60,19 +61,17 @@ export const HeroSection: React.FC<Props> = ({
         onMomentumScrollEnd={onScrollEnd}
         style={StyleSheet.absoluteFill}
       >
-        {images.map(uri => (
+        {images.map((source, i) => (
           <Image
-            key={uri}
-            source={{ uri }}
+            key={i}
+            source={source}
             style={{ width, height }}
             resizeMode="cover"
           />
         ))}
       </ScrollView>
 
-      <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.tint]} />
-      <Scrim edge="top" extent={0.6} maxOpacity={0.9} color={colors.headerDarkBlue} />
-      <Scrim edge="bottom" extent={0.3} maxOpacity={1} color={colors.pageTint} />
+      <Scrim edge="bottom" extent={0.22} maxOpacity={1} color={colors.pageTint} />
 
       <View
         pointerEvents="box-none"
@@ -103,9 +102,16 @@ export const HeroSection: React.FC<Props> = ({
         </View>
 
         <View pointerEvents="none" style={styles.copy}>
-          <Text style={typographyPresets.heroTitle}>
-            Finding New{'\n'}Home is <Text style={styles.titleAccent}>Simple</Text>
-          </Text>
+          <Text style={typographyPresets.heroTitle}>Finding New</Text>
+          <View style={styles.titleLine}>
+            <Text style={typographyPresets.heroTitle}>Home is </Text>
+            <View>
+              <Text style={[typographyPresets.heroTitle, styles.titleAccent]}>
+                Simple
+              </Text>
+              <View style={styles.accentUnderline} />
+            </View>
+          </View>
           <Text style={styles.subtitle}>
             Find your perfect home, all in one place.{'\n'}Discover a space that
             feels like yours.
@@ -122,9 +128,9 @@ export const HeroSection: React.FC<Props> = ({
         </Pressable>
 
         <View pointerEvents="none" style={styles.dots}>
-          {images.map((uri, i) => (
+          {images.map((_, i) => (
             <View
-              key={uri}
+              key={i}
               style={[styles.dot, i === index && styles.dotActive]}
             />
           ))}
@@ -138,9 +144,6 @@ const styles = StyleSheet.create({
   root: {
     backgroundColor: colors.headerDarkBlue,
     overflow: 'hidden',
-  },
-  tint: {
-    backgroundColor: 'rgba(3, 27, 61, 0.35)',
   },
   content: {
     ...StyleSheet.absoluteFill,
@@ -186,10 +189,22 @@ const styles = StyleSheet.create({
   copy: {
     marginTop: ms(36),
   },
+  titleLine: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
   titleAccent: {
     fontFamily: typography.fontFamily.heading.semiBold,
     fontStyle: 'italic',
     color: colors.heroAccent,
+  },
+  accentUnderline: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: ms(3),
+    height: 3,
+    backgroundColor: colors.heroAccentUnderline,
   },
   subtitle: {
     marginTop: spacing.md,

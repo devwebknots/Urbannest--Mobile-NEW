@@ -1,8 +1,9 @@
 /**
- * Guest home placeholder content.
- * Images are remote placeholders until the final assets are provided.
+ * Guest home content. Design images live in assets/guestAssets; the
+ * featured carousel and city tiles still use remote placeholders.
  */
 
+import { guestAssets } from './assets/guestAssets';
 import type {
   Category,
   City,
@@ -11,14 +12,13 @@ import type {
   RentalListing,
 } from './types';
 
-const unsplash = (id: string, w = 800) =>
-  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
+const unsplash = (id: string, w = 800) => ({
+  uri: `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`,
+});
+const picsum = (seed: string) => ({ uri: `https://picsum.photos/seed/${seed}/400/500` });
 
-export const HERO_IMAGES = [
-  unsplash('1600596542815-ffad4c1539a9', 1200),
-  unsplash('1613490493576-7fde63acd811', 1200),
-  unsplash('1512917774080-9991f1c4c750', 1200),
-];
+// One slide per page dot. Only the first slide has a design image so far.
+export const HERO_IMAGES = [guestAssets.hero, guestAssets.hero, guestAssets.hero];
 
 export const SEARCH_FILTERS = {
   location: 'California',
@@ -80,7 +80,7 @@ export const RENTALS_NEAR_YOU: RentalListing[] = [
     baths: '2 Bath',
     sqft: '1056 Sq Ft',
     address: '482 Pecan Grove Ln, Austin, TX 78701',
-    image: unsplash('1570129477492-45c003edd2be', 400),
+    image: guestAssets.rentalBrotherHomes,
   },
   {
     id: 'r2',
@@ -90,7 +90,8 @@ export const RENTALS_NEAR_YOU: RentalListing[] = [
     baths: '2 Bath',
     sqft: '1056 Sq Ft',
     address: '617 Live Oak Cir, Austin, TX 78701',
-    image: unsplash('1512917774080-9991f1c4c750', 400),
+    image: guestAssets.rentalGlassVilla,
+    badgeInImage: true,
   },
   {
     id: 'r3',
@@ -101,7 +102,7 @@ export const RENTALS_NEAR_YOU: RentalListing[] = [
     baths: '2-4 Bath',
     sqft: '1780-2100 SqFt',
     address: '1203 Bluebonnet Trl, Austin, TX 78701',
-    image: unsplash('1545324418-cc1a3fa10c00', 400),
+    image: guestAssets.rentalCenterton,
   },
 ];
 
@@ -110,7 +111,7 @@ export const FEATURED_GUIDE: Guide = {
   title: '5 Ways to Improve\nYour Rental Listing',
   audience: 'Landlords',
   readTime: '3 min read',
-  image: unsplash('1586023492125-27b2c045efd7'),
+  image: guestAssets.guideLivingRoom,
 };
 
 export const GUIDES: Guide[] = [
@@ -119,14 +120,14 @@ export const GUIDES: Guide[] = [
     title: 'Renting Your First Home: What to Know',
     audience: 'Renters',
     readTime: '4 min read',
-    image: unsplash('1556911220-bff31c812dba', 500),
+    image: guestAssets.guideKitchen,
   },
   {
     id: 'g3',
     title: 'How to Market a Property Effectively',
     audience: 'Property Owners',
     readTime: '5 min read',
-    image: unsplash('1600607687939-ce8a6c25118c', 500),
+    image: guestAssets.guideModernExterior,
   },
 ];
 
@@ -141,19 +142,19 @@ export const TOP_CITIES: City[] = [
     id: 'c2',
     name: 'San Diego',
     listings: '8,200+',
-    image: 'https://picsum.photos/seed/sandiego/400/500',
+    image: picsum('sandiego'),
   },
   {
     id: 'c3',
     name: 'Philadelphia',
     listings: '6,400+',
-    image: 'https://picsum.photos/seed/philadelphia/400/500',
+    image: picsum('philadelphia'),
   },
   {
     id: 'c4',
     name: 'Houston',
     listings: '9,100+',
-    image: 'https://picsum.photos/seed/houston/400/500',
+    image: picsum('houston'),
   },
 ];
 
