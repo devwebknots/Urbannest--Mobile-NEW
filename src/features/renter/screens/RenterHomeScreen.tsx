@@ -71,7 +71,7 @@ const Reveal: React.FC<{ delay: number; children: React.ReactNode }> = ({
 const comingSoon = (what: string) => Alert.alert(what, 'Coming soon.');
 
 const TAB_TITLES: Record<RenterTab, string> = {
-  residences: 'Residences',
+  residences: 'Homes',
   search: 'Search',
   alerts: 'Alerts',
   profile: 'Profile',
@@ -86,12 +86,20 @@ export const RenterHomeScreen: React.FC = () => {
   // so the page continues seamlessly below it.
   const headerArtHeight = Math.round(width / RENTER_HEADER_ASPECT);
 
+  // Other tabs have no page yet: the capsule slides there, a "coming soon"
+  // note shows once it lands, and closing it glides back to Residences.
   const onTabChange = (tab: RenterTab) => {
+    vm.setTab(tab);
     if (tab === 'residences') {
-      vm.setTab(tab);
-    } else {
-      comingSoon(TAB_TITLES[tab]);
+      return;
     }
+    setTimeout(
+      () =>
+        Alert.alert(TAB_TITLES[tab], 'Coming soon.', [
+          { text: 'OK', onPress: () => vm.setTab('residences') },
+        ], { cancelable: true, onDismiss: () => vm.setTab('residences') }),
+      280,
+    );
   };
 
   return (

@@ -424,9 +424,9 @@ Supports two operational modes:
 - **Pieces** (top → bottom, page bg `pageTint`):
   0. Header art `residences_header.jpg` (1290×1150: the design’s dusk-house image `012.png`, fitted to width; bottom fades navy → light blue → `pageTint` with stops sampled from the mockup, so the filter bar sits on the pale band), absolutely positioned at `width × width/1.12`.
   1. `RenterHeader`: house icon + "URBAN NEST", initials avatar, "MY RENTALS" eyebrow, "My Residences" (Playfair 34), two-line subtitle.
-  2. `ResidenceFilterBar`: white segmented track — All Rentals / Active / Past with count bubbles; active segment = `navy` pill.
+  2. `ResidenceFilterBar`: frosted white track — All Rentals / Active / Past with count bubbles (fixed widths 1.3 : 1 : 1). One glass pill (solid `navy` + smooth white `Scrim` sheen from the top + light hairline rim) springs between segments (`Animated.spring`, JS driver since it animates left/width); labels and badges cross-fade navy ↔ white as it passes.
   3. `ResidenceCard`s (24dp apart): fully rounded photo (same height on every card: width × 0.46, `RESIDENCE_IMAGE_RATIO`) with dark status pill (green / grey dot) and frosted "…" menu; Playfair Bold navy name + gold "PREMIUM HOME" badge; navy pin + address; footer: calendar/clock icon circles with label + bold value (divider between two facts) and action (footer wraps, so dates never truncate; the action drops to its own line, right-aligned, when space is short) — gradient "Check-In Now", `pageTint` "Manage Residence", text link "Details →".
-  4. `RenterTabBar`: floating white bar (radius 28) — Residences / Search / Alerts (blue dot) / Profile, icon above label; active = navy rounded tile.
+  4. `RenterTabBar`: floating frosted capsule bar — Homes / Search / Alerts (dot) / Profile, icon above label. Same glass capsule as the filter (navy + white `Scrim` sheen + rim) springs between tabs; icons/labels cross-fade navy ↔ white. Tabs without a page slide over, show "coming soon", and glide back to Homes on close.
 - **Logic**: `useRenterHome` (filter, tab, counts, card + menu actions — "coming soon" alerts for now). Mock data in `renter/constants.ts`; photos in `src/assets/images/renter/` (cropped from the design) via `renterAssets.ts`. Cards fade up in sequence (off in tests).
 
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
