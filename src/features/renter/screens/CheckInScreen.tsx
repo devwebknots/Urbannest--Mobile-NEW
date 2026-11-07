@@ -10,13 +10,14 @@ import React, { useRef } from 'react';
 import { Animated, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing } from '@/config/theme';
+import { SectionHeader } from '@/features/guest/components/SectionHeader';
+import { Scrim } from '@/features/persona/components/Scrim';
 import { moderateScale as ms } from '@/utils/responsive';
 import { Reveal } from '../components/Reveal';
 import { CheckInChecklist } from '../components/checkin/CheckInChecklist';
 import { CheckInStatusCard } from '../components/checkin/CheckInStatusCard';
 import { CuratedLivingCard } from '../components/checkin/CuratedLivingCard';
 import { NeighborhoodCard } from '../components/checkin/NeighborhoodCard';
-import { DashboardSection } from '../components/dashboard/DashboardSection';
 import { DetailTopBar } from '../components/dashboard/DetailTopBar';
 import { ResidenceHero } from '../components/dashboard/ResidenceHero';
 import { STATUS_LABEL } from '../constants';
@@ -58,51 +59,65 @@ export const CheckInScreen: React.FC<Props> = ({ navigation, route }) => {
           city={vm.residence.city}
           statusLabel={vm.residence.unit}
           primaryPill={STATUS_LABEL[vm.residence.status]}
-          eyebrow={`Almost home, ${vm.profile.firstName}`}
+          // eyebrow={`Almost home, ${vm.profile.firstName}`}
+          eyebrow=""
           firstName={vm.profile.firstName}
           width={width}
           height={heroHeight}
           sheetOverlap={SHEET_OVERLAP}
           scrollY={scrollY}
+          glass
         />
 
         <View style={styles.sheet}>
+          {/* Soft fade from the glass into the page (like the guest hero) */}
+          <View pointerEvents="none" style={styles.fade}>
+            <Scrim edge="bottom" extent={1} maxOpacity={1} color={colors.pageTint} />
+          </View>
+          {/* Solid page below the fade: hides the photo as it drifts down on scroll */}
+          <View pointerEvents="none" style={styles.sheetFill} />
           <Reveal delay={80}>
             <CheckInStatusCard summary={vm.summary} onAccessKey={vm.openKey} />
           </Reveal>
 
           <Reveal delay={160}>
-            <DashboardSection
-              title="Move-In Checklist"
-              subtitle="Confirm each item before you collect your keys."
-            >
-              <CheckInChecklist
-                tasks={vm.tasks}
-                confirmed={vm.confirmed}
-                done={vm.done}
-                total={vm.total}
-                canSubmit={vm.canSubmit}
-                submitted={vm.submitted}
-                onToggle={vm.toggleTask}
-                onSubmit={vm.submit}
+            <View style={styles.section}>
+              <SectionHeader
+                title="Move-In Checklist"
+                subtitle="Tick each item before you get your keys."
               />
-            </DashboardSection>
+              <View style={styles.sectionBody}>
+                <CheckInChecklist
+                  tasks={vm.tasks}
+                  confirmed={vm.confirmed}
+                  done={vm.done}
+                  total={vm.total}
+                  canSubmit={vm.canSubmit}
+                  submitted={vm.submitted}
+                  onToggle={vm.toggleTask}
+                  onSubmit={vm.submit}
+                />
+              </View>
+            </View>
           </Reveal>
 
-          <DashboardSection
-            title="Around Your Home"
-            subtitle={`Top schools, hospitals and parks within ${vm.radius}.`}
-          >
-            <NeighborhoodCard
-              categories={vm.neighborhood}
-              selectedId={vm.placeTab}
-              onSelect={vm.setPlaceTab}
-              onPlacePress={vm.openPlace}
-              onOpenMap={vm.openMap}
+          <View style={styles.section}>
+            <SectionHeader
+              title="Around Your Home"
+              subtitle={`Schools, hospitals and parks within ${vm.radius}`}
             />
-          </DashboardSection>
+            <View style={styles.sectionBody}>
+              <NeighborhoodCard
+                categories={vm.neighborhood}
+                selectedId={vm.placeTab}
+                onSelect={vm.setPlaceTab}
+                onPlacePress={vm.openPlace}
+                onOpenMap={vm.openMap}
+              />
+            </View>
+          </View>
 
-          <View style={styles.curated}>
+          <View style={styles.section}>
             <CuratedLivingCard
               eyebrow={vm.curated.eyebrow}
               title={vm.curated.title}
@@ -134,13 +149,32 @@ const styles = StyleSheet.create({
   },
   sheet: {
     marginTop: -SHEET_OVERLAP,
-    paddingTop: spacing.xl,
-    borderTopLeftRadius: ms(30),
-    borderTopRightRadius: ms(30),
+    // Status card starts below the fade strip
+    paddingTop: SHEET_OVERLAP + spacing.xxl,
+    // Only the top fade strip is see-through; sheetFill paints the rest
+    backgroundColor: 'transparent',
+  },
+  sheetFill: {
+    position: 'absolute',
+    top: SHEET_OVERLAP,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: colors.pageTint,
   },
-  curated: {
+  fade: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: SHEET_OVERLAP,
+  },
+  // Same section rhythm as the guest home page
+  section: {
     marginTop: spacing.sectionGap,
+  },
+  sectionBody: {
+    marginTop: spacing.lg,
   },
 });
 

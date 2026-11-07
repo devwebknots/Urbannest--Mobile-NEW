@@ -1,16 +1,17 @@
 /**
- * CheckInChecklist: one white card holding the whole move-in checklist —
- * progress (n of 4 + gradient bar), a 2 x 2 grid of tappable task tiles
- * and the primary "Submit Check-In" button. Tiles are pale (pageTint) with
- * a navy icon; confirmed tiles turn into navy gradient tiles with white
- * text. Submit is enabled once every item is confirmed, then becomes a
- * soft "submitted" bar and the tiles lock.
+ * CheckInChecklist: move-in checklist laid out on the page (no outer box,
+ * like the guest home sections): progress (n of 4 + gradient bar), a 2 x 2
+ * grid of light task tiles and the primary "Submit Check-In" button.
+ * Tiles are white with a hairline border; confirmed tiles turn soft blue
+ * with a navy tick. Submit is enabled once every item is confirmed, then
+ * becomes a soft "submitted" bar and the tiles lock.
  */
 
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from '@/components/LinearGradient';
-import { borderRadius, colors, gradients, spacing, typographyPresets } from '@/config/theme';
+import { borderRadius, colors, gradients, shadows, spacing, typographyPresets } from '@/config/theme';
+import { CARD_BG } from '@/features/guest/components/CardBackground';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
 import { moderateScale as ms } from '@/utils/responsive';
 import type { CheckInTask } from '../../types';
@@ -39,25 +40,17 @@ const Tile: React.FC<{
     accessibilityRole="checkbox"
     accessibilityState={{ checked, disabled: locked }}
     accessibilityLabel={task.label}
-    style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
+    style={({ pressed }) => [styles.tile, checked && styles.tileOn, pressed && styles.pressed]}
   >
-    {checked ? (
-      <LinearGradient
-        colors={gradients.button}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
-    ) : null}
     <View style={styles.tileTop}>
       <View style={[styles.iconBox, checked && styles.iconBoxOn]}>
-        <RenterIcon name={task.icon} size={ms(19)} color={checked ? colors.white : colors.navy} />
+        <RenterIcon name={task.icon} size={ms(20)} color={colors.navy} />
       </View>
       <View style={[styles.tick, checked && styles.tickOn]}>
-        {checked ? <RenterIcon name="check" size={ms(11)} color={colors.navy} /> : null}
+        {checked ? <RenterIcon name="check" size={ms(10)} color={colors.white} /> : null}
       </View>
     </View>
-    <Text style={[styles.tileLabel, checked && styles.textOn]} numberOfLines={1}>
+    <Text style={styles.tileLabel} numberOfLines={1}>
       {task.label}
     </Text>
     <Text style={[styles.tileHint, checked && styles.hintOn]} numberOfLines={1}>
@@ -153,19 +146,14 @@ export const CheckInChecklist: React.FC<Props> = ({
   );
 };
 
-const RADIUS = borderRadius.xxl + 2;
+/** Light blue tile edge, visible on the pale page */
+const TILE_BORDER = '#C9DAF6';
+/** Plain light tile fill (lighter than the page tint) */
+const TILE_BG = '#F7FAFF';
 
 const styles = StyleSheet.create({
   card: {
-    marginHorizontal: spacing.screenHorizontal,
-    padding: spacing.xl,
-    borderRadius: RADIUS,
-    backgroundColor: colors.surface,
-    shadowColor: colors.headerDarkBlue,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    elevation: 4,
+    paddingHorizontal: spacing.screenHorizontal,
   },
   progressRow: {
     flexDirection: 'row',
@@ -173,11 +161,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   progressLabel: {
-    ...typographyPresets.bodyMedium,
+    ...typographyPresets.body,
     color: colors.textSecondary,
   },
   progressCount: {
-    ...typographyPresets.price,
+    ...typographyPresets.bodyBold,
     color: colors.navy,
   },
   progressPct: {
@@ -185,18 +173,18 @@ const styles = StyleSheet.create({
     color: colors.navy,
   },
   track: {
-    height: ms(5),
-    marginTop: spacing.md,
-    borderRadius: ms(3),
+    height: ms(4),
+    marginTop: spacing.sm,
+    borderRadius: ms(2),
     backgroundColor: colors.chipBlue,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
-    borderRadius: ms(3),
+    borderRadius: ms(2),
   },
   grid: {
-    marginTop: spacing.xl,
+    marginTop: spacing.lg,
     gap: spacing.lg,
   },
   row: {
@@ -205,10 +193,20 @@ const styles = StyleSheet.create({
   },
   tile: {
     flex: 1,
-    padding: spacing.lg,
+    padding: spacing.md,
     borderRadius: borderRadius.xl,
-    backgroundColor: colors.pageTint,
-    overflow: 'hidden',
+    // Plain light fill with a clear blue edge so it stands out on the page
+    backgroundColor: TILE_BG,
+    borderWidth: 1,
+    borderColor: TILE_BORDER,
+    ...shadows.md,
+    shadowColor: CARD_BG.shadow,
+    shadowOpacity: 0.16,
+    shadowRadius: 8,
+  },
+  tileOn: {
+    backgroundColor: colors.chipBlue,
+    borderColor: colors.navy,
   },
   tileTop: {
     flexDirection: 'row',
@@ -218,48 +216,46 @@ const styles = StyleSheet.create({
   iconBox: {
     width: ms(38),
     height: ms(38),
-    borderRadius: ms(12),
+    borderRadius: ms(10),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.chipBlue,
   },
   iconBoxOn: {
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: colors.white,
   },
   tick: {
-    width: ms(22),
-    height: ms(22),
-    borderRadius: ms(11),
+    width: ms(20),
+    height: ms(20),
+    borderRadius: ms(10),
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: colors.textSubtle,
+    borderColor: colors.textMuted,
   },
   tickOn: {
-    borderColor: colors.white,
-    backgroundColor: colors.white,
+    borderColor: colors.navy,
+    backgroundColor: colors.navy,
   },
   tileLabel: {
-    ...typographyPresets.listingTitle,
-    marginTop: spacing.lg,
+    ...typographyPresets.bodyBold,
+    color: colors.navy,
+    marginTop: spacing.md,
   },
   tileHint: {
     ...typographyPresets.cardSubtitle,
     marginTop: spacing.xs,
   },
-  textOn: {
-    color: colors.white,
-  },
   hintOn: {
-    color: colors.textInverseMuted,
+    color: colors.navy,
   },
   submit: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    height: ms(52),
-    marginTop: spacing.xxl,
+    height: ms(48),
+    marginTop: spacing.xl,
     borderRadius: borderRadius.button,
   },
   submitText: {

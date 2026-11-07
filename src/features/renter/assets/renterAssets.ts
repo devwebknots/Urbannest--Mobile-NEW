@@ -16,6 +16,13 @@ export const renterAssets = {
   eventSkyLounge: require('@/assets/images/renter/event_sky_lounge.jpg'),
   // Check-in "Curated Living" photo (Unsplash 1600210492486)
   livingCurated: require('@/assets/images/renter/living_curated.jpg'),
+  // Check-in "Around Your Home" place photos (Unsplash; coaster: Wikimedia CC0)
+  placeSchoolClassroom: require('@/assets/images/renter/place_school_classroom.jpg'),
+  placeSchoolCampus: require('@/assets/images/renter/place_school_campus.jpg'),
+  placeHospitalBuilding: require('@/assets/images/renter/place_hospital_building.jpg'),
+  placeHospitalLobby: require('@/assets/images/renter/place_hospital_lobby.jpg'),
+  placeParkSwing: require('@/assets/images/renter/place_park_swing.jpg'),
+  placeParkCoaster: require('@/assets/images/renter/place_park_coaster.jpg'),
 };
 
 /** Line icons drawn for the dashboard (white PNGs, tinted in the app). */

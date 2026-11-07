@@ -1,6 +1,7 @@
 /**
  * CheckInStatusCard: navy "Current Status" panel for a move-in-ready home.
- * Verified chip, Playfair "Move-In Ready", short note, lease facts
+ * Verified chip, Playfair "Move-In Ready" (section-heading size, like the
+ * guest home titles), short note, lease facts
  * (lease ID, move-in date, key window) and the white "Access Digital Key"
  * button (white on dark panels, per the button rules).
  */
@@ -8,7 +9,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from '@/components/LinearGradient';
-import { borderRadius, colors, gradients, spacing, typographyPresets } from '@/config/theme';
+import { borderRadius, colors, gradients, shadows, spacing, typographyPresets } from '@/config/theme';
 import { moderateScale as ms } from '@/utils/responsive';
 import type { CheckInSummary } from '../../types';
 import { RenterIcon } from '../dashboard/RenterIcon';
@@ -65,7 +66,7 @@ export const CheckInStatusCard: React.FC<Props> = ({ summary, onAccessKey }) => 
         style={({ pressed }) => [styles.keyButton, pressed && styles.pressed]}
       >
         <View style={styles.keyIcon}>
-          <RenterIcon name="key" size={ms(17)} color={colors.white} />
+          <RenterIcon name="key" size={ms(15)} color={colors.white} />
         </View>
         <View style={styles.keyText}>
           <Text style={styles.keyTitle}>Access Digital Key</Text>
@@ -76,21 +77,17 @@ export const CheckInStatusCard: React.FC<Props> = ({ summary, onAccessKey }) => 
   </View>
 );
 
-const RADIUS = borderRadius.xxl + 2;
+const RADIUS = borderRadius.xxl;
 
 const styles = StyleSheet.create({
   card: {
     marginHorizontal: spacing.screenHorizontal,
     borderRadius: RADIUS,
     backgroundColor: colors.navy,
-    shadowColor: colors.headerDarkBlue,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.18,
-    shadowRadius: 22,
-    elevation: 6,
+    ...shadows.lg,
   },
   panel: {
-    padding: spacing.xl,
+    padding: spacing.lg + 2,
     borderRadius: RADIUS,
     overflow: 'hidden',
   },
@@ -148,18 +145,18 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   title: {
-    ...typographyPresets.heroTitle,
+    ...typographyPresets.sectionHeading,
+    color: colors.white,
     marginTop: spacing.md,
   },
   body: {
-    ...typographyPresets.body,
-    color: colors.textInverseMuted,
-    marginTop: spacing.sm,
+    ...typographyPresets.heroSubtitle,
+    marginTop: spacing.xs,
   },
   facts: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: spacing.xl,
+    marginTop: spacing.lg,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     borderRadius: borderRadius.xl,
@@ -177,28 +174,28 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.16)',
   },
   factLabel: {
-    ...typographyPresets.eyebrow,
+    ...typographyPresets.caption,
     color: 'rgba(255,255,255,0.6)',
   },
   factValue: {
     ...typographyPresets.bodyBold,
     color: colors.white,
-    marginTop: ms(4),
+    marginTop: ms(2),
   },
   keyButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    marginTop: spacing.xl,
-    padding: ms(6),
-    paddingRight: spacing.xl,
+    marginTop: spacing.lg,
+    padding: ms(5),
+    paddingRight: spacing.lg,
     borderRadius: borderRadius.button,
     backgroundColor: colors.white,
   },
   keyIcon: {
-    width: ms(42),
-    height: ms(42),
-    borderRadius: ms(21),
+    width: ms(36),
+    height: ms(36),
+    borderRadius: ms(18),
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.navy,
@@ -207,7 +204,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   keyTitle: {
-    ...typographyPresets.cardTitle,
+    ...typographyPresets.button,
     color: colors.navy,
   },
   keyHint: {

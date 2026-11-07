@@ -103,6 +103,7 @@ export interface NeighborhoodPlace {
   readonly name: string;
   readonly meta: string;
   readonly distance: string;
+  readonly image: ImageSourcePropType;
 }
 
 export interface NeighborhoodCategory {

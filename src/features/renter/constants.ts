@@ -161,8 +161,8 @@ export const NEIGHBORHOOD: readonly NeighborhoodCategory[] = [
     icon: 'school',
     accent: 'blue',
     places: [
-      { name: 'Miracle International School', meta: 'Elite Preparatory', distance: '0.8 km' },
-      { name: 'Maple Grove Elementary', meta: 'Public Excellence', distance: '1.2 km' },
+      { name: 'Miracle International School', meta: 'Elite Preparatory', distance: '0.8 km', image: renterAssets.placeSchoolCampus },
+      { name: 'Maple Grove Elementary', meta: 'Public Excellence', distance: '1.2 km', image: renterAssets.placeSchoolClassroom },
     ],
   },
   {
@@ -171,8 +171,8 @@ export const NEIGHBORHOOD: readonly NeighborhoodCategory[] = [
     icon: 'hospital',
     accent: 'green',
     places: [
-      { name: 'Cedarwood Memorial Hospital', meta: '24/7 Emergency', distance: '1.5 km' },
-      { name: 'Evergreen Health Institute', meta: 'Specialized Care', distance: '2.1 km' },
+      { name: 'Cedarwood Memorial Hospital', meta: '24/7 Emergency', distance: '1.5 km', image: renterAssets.placeHospitalBuilding },
+      { name: 'Evergreen Health Institute', meta: 'Specialized Care', distance: '2.1 km', image: renterAssets.placeHospitalLobby },
     ],
   },
   {
@@ -181,8 +181,8 @@ export const NEIGHBORHOOD: readonly NeighborhoodCategory[] = [
     icon: 'park',
     accent: 'amber',
     places: [
-      { name: 'StormRider Theme Park', meta: 'Entertainment Hub', distance: '3.4 km' },
-      { name: 'Everland Adventure Park', meta: 'Family Recreation', distance: '4.2 km' },
+      { name: 'StormRider Theme Park', meta: 'Entertainment Hub', distance: '3.4 km', image: renterAssets.placeParkCoaster },
+      { name: 'Everland Adventure Park', meta: 'Family Recreation', distance: '4.2 km', image: renterAssets.placeParkSwing },
     ],
   },
 ];

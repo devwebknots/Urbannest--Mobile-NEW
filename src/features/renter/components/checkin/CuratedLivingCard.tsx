@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
-import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
+import { borderRadius, colors, shadows, spacing, typographyPresets } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
 import { moderateScale as ms } from '@/utils/responsive';
 
@@ -42,18 +42,16 @@ export const CuratedLivingCard: React.FC<Props> = ({ eyebrow, title, body, image
   );
 };
 
-const RADIUS = borderRadius.xxl + 2;
+const RADIUS = borderRadius.xl;
 
 const styles = StyleSheet.create({
   card: {
     alignSelf: 'center',
     borderRadius: RADIUS,
     backgroundColor: colors.surface,
-    shadowColor: colors.headerDarkBlue,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    ...shadows.sm,
   },
   media: {
     borderTopLeftRadius: RADIUS,
@@ -76,7 +74,7 @@ const styles = StyleSheet.create({
     marginTop: ms(6),
   },
   body: {
-    padding: spacing.xl,
+    padding: spacing.lg,
   },
   text: {
     ...typographyPresets.body,
@@ -86,7 +84,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    marginTop: spacing.lg,
+    marginTop: spacing.md,
   },
   rule: {
     width: ms(32),

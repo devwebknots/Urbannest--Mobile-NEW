@@ -2,9 +2,11 @@
  * ResidenceHero: full-bleed photo of the chosen residence with parallax
  * (drifts slower than the page, stretches on pull-down), soft navy fades,
  * status pills, name and address. The content sheet overlaps its bottom.
+ * Behind the text, the bottom of the photo is frosted (a blurred copy of
+ * the same photo, lined up and moving with it) for a glass effect.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Animated, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
 import { MapPinIcon } from '@/components/icons';
 import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
@@ -27,6 +29,8 @@ interface Props {
   /** How far the sheet below overlaps the photo */
   sheetOverlap: number;
   scrollY: Animated.Value;
+  /** Frosted-glass blur behind the text */
+  glass?: boolean;
 }
 
 export const ResidenceHero: React.FC<Props> = ({
@@ -42,6 +46,7 @@ export const ResidenceHero: React.FC<Props> = ({
   height,
   sheetOverlap,
   scrollY,
+  glass = false,
 }) => {
   const imageStyle = {
     transform: [
@@ -81,6 +86,10 @@ export const ResidenceHero: React.FC<Props> = ({
     ],
   };
 
+  // Height of the frosted area (text block + a little room above it)
+  const [measured, setGlassHeight] = useState(0);
+  const glassHeight = glass ? measured : 0;
+
   return (
     <View style={{ width, height }}>
       <Animated.Image
@@ -89,12 +98,39 @@ export const ResidenceHero: React.FC<Props> = ({
         resizeMode="cover"
       />
       <Scrim edge="top" extent={0.32} maxOpacity={0.6} />
-      <Scrim edge="bottom" extent={0.62} maxOpacity={0.94} />
+      {/* With glass: light neutral fade instead of the navy one */}
+      {glass ? (
+        <Scrim edge="bottom" extent={0.62} maxOpacity={0.35} color="#000000" />
+      ) : (
+        <Scrim edge="bottom" extent={0.62} maxOpacity={0.94} />
+      )}
+
+      {/* Frosted glass behind the text: blurred photo, same position and motion */}
+      {glassHeight > 0 ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.glass, { height: glassHeight }, { opacity: copyStyle.opacity }]}
+        >
+          <Animated.Image
+            source={image}
+            blurRadius={20}
+            style={[{ width, height, top: glassHeight - height }, styles.glassImage, imageStyle]}
+            resizeMode="cover"
+          />
+          {/* White frost over the blur (plain View: the app's LinearGradient
+              only draws its preset brand gradients) */}
+          <View style={styles.glassFrost} />
+          <View style={styles.glassEdge} />
+        </Animated.View>
+      ) : null}
 
       <Animated.View
-        style={[styles.copy, { paddingBottom: sheetOverlap + spacing.xl }, copyStyle]}
+        onLayout={e => setGlassHeight(Math.round(e.nativeEvent.layout.height + GLASS_TOP))}
+        style={[styles.copy, { paddingBottom: sheetOverlap + (glass ? spacing.sm : spacing.xl) }, copyStyle]}
       >
-        <Text style={styles.eyebrow}>{eyebrow ?? `Welcome home, ${firstName}`}</Text>
+        {eyebrow === '' ? null : (
+          <Text style={styles.eyebrow}>{eyebrow ?? `Welcome home, ${firstName}`}</Text>
+        )}
         <Text style={styles.name}>{name}</Text>
         <View style={styles.addressRow}>
           <MapPinIcon size={ms(15)} color={colors.heroAccent} style={styles.pin} />
@@ -116,7 +152,37 @@ export const ResidenceHero: React.FC<Props> = ({
   );
 };
 
+// Glass starts this far above the first line of text
+const GLASS_TOP = 0;
+
 const styles = StyleSheet.create({
+  glass: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    overflow: 'hidden',
+    // App card radius; the bottom edge is hidden under the sheet
+    borderTopLeftRadius: borderRadius.xxl,
+    borderTopRightRadius: borderRadius.xxl,
+  },
+  glassImage: {
+    position: 'absolute',
+    left: 0,
+  },
+  glassFrost: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
+  // Thin light line along the top of the glass
+  glassEdge: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(255,255,255,0.35)',
+  },
   copy: {
     position: 'absolute',
     left: spacing.screenHorizontal + 4,
