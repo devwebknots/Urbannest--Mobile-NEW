@@ -142,7 +142,7 @@ export const SearchCard: React.FC<Props> = ({
           accessibilityLabel="Ask Orbitl AI"
           accessibilityState={{ expanded: orbitlOpen }}
         >
-          <OrbitlOrb size={ORBITL_SIZE} animate={animate} />
+          <OrbitlOrb size={ORBITL_SIZE} animate={animate} rippleSpread={1.5} />
         </Pressable>
 
         <Pressable

@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CloseIcon } from '@/components/icons';
 import { borderRadius, colors, spacing, typography, typographyPresets } from '@/config/theme';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
-import { OrbitlSphere, pulse, useLoop, useOrbitlMotion } from './OrbitlOrb';
+import { OrbitlOrb, pulse, useLoop, useOrbitlMotion } from './OrbitlOrb';
 
 /** Sphere diameter on the listening screen */
 const CORE = ms(150);
@@ -25,52 +25,14 @@ interface Props {
   onClose: () => void;
 }
 
-const Ripple: React.FC<{ progress: Animated.Value }> = ({ progress }) => (
-  <Animated.View
-    pointerEvents="none"
-    style={[
-      styles.ripple,
-      {
-        opacity: progress.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 0.45, 0] }),
-        transform: [{ scale: progress.interpolate({ inputRange: [0, 1], outputRange: [1, 1.9] }) }],
-      },
-    ]}
-  />
-);
-
-/** Big Orbitl sphere (same as the AI button, with its 3 rings) plus ripples */
+/** Big Orbitl orb: the exact same animated orb as the AI button, larger */
 const BigOrb: React.FC<{ animate: boolean }> = ({ animate }) => {
   const breathe = useLoop(2400, animate, Easing.inOut(Easing.sin));
-  const rippleA = useLoop(2800, animate, Easing.out(Easing.quad));
-  const rippleB = useRef(new Animated.Value(0)).current;
-
-  // Second ripple runs half a cycle behind the first
-  useEffect(() => {
-    if (!animate) {
-      return;
-    }
-    const anim = Animated.sequence([
-      Animated.delay(1400),
-      Animated.loop(
-        Animated.timing(rippleB, {
-          toValue: 1,
-          duration: 2800,
-          easing: Easing.out(Easing.quad),
-          useNativeDriver: true,
-        }),
-      ),
-    ]);
-    anim.start();
-    return () => anim.stop();
-  }, [animate, rippleB]);
-
   return (
     <View style={styles.stage} pointerEvents="none">
       <Animated.View style={[styles.glow, { opacity: pulse(breathe, 0.55, 1) }]} />
-      <Ripple progress={rippleA} />
-      <Ripple progress={rippleB} />
-      {/* OrbitlSphere draws the sphere at 80% of its size */}
-      <OrbitlSphere size={CORE / 0.8} animate={animate} onDark />
+      {/* The orb draws the sphere at 80% of its size */}
+      <OrbitlOrb size={CORE / 0.8} animate={animate} onDark />
     </View>
   );
 };
@@ -260,14 +222,6 @@ const styles = StyleSheet.create({
     height: CORE * 1.8,
     borderRadius: CORE * 0.9,
     backgroundColor: 'rgba(139, 92, 246, 0.18)',
-  },
-  ripple: {
-    position: 'absolute',
-    width: CORE,
-    height: CORE,
-    borderRadius: CORE / 2,
-    borderWidth: 1.5,
-    borderColor: '#A78BFA',
   },
   title: {
     ...typographyPresets.sectionHeading,

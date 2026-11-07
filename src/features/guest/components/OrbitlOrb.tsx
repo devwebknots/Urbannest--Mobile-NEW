@@ -163,8 +163,9 @@ const Ring: React.FC<{
   layer: 'back' | 'front';
 }> = ({ spec, sphere, precess, orbit, layer }) => {
   const d = sphere * spec.d;
-  const stroke = Math.max(1.5, sphere * 0.028);
-  const dot = Math.max(4, sphere * 0.09);
+  // Minimums keep rings and dots readable on the small AI button
+  const stroke = Math.max(2, sphere * 0.028);
+  const dot = Math.max(6, sphere * 0.09);
 
   const body = (
     <>
@@ -344,12 +345,79 @@ export const OrbitlSphere: React.FC<OrbProps & { onDark?: boolean }> = ({
   );
 };
 
-/** The AI button icon */
-export const OrbitlOrb: React.FC<OrbProps> = ({ size, animate }) => (
-  <OrbitlSphere size={size} animate={animate} />
+const Ripple: React.FC<{ progress: Animated.Value; base: number; spread: number }> = ({
+  progress,
+  base,
+  spread,
+}) => (
+  <Animated.View
+    pointerEvents="none"
+    style={[
+      styles.center,
+      styles.ripple,
+      {
+        width: base,
+        height: base,
+        borderRadius: base / 2,
+        marginLeft: -base / 2,
+        marginTop: -base / 2,
+        opacity: progress.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 0.5, 0] }),
+        transform: [{ scale: progress.interpolate({ inputRange: [0, 1], outputRange: [1, spread] }) }],
+      },
+    ]}
+  />
 );
 
+/**
+ * The full Orbitl orb: sphere + orbits + two violet ripples spreading
+ * out from it. Used for the AI button and the listening screen so both
+ * animate the same way. `rippleSpread` is how far a ripple grows
+ * (multiple of the sphere); keep it smaller where space is tight.
+ */
+export const OrbitlOrb: React.FC<OrbProps & { onDark?: boolean; rippleSpread?: number }> = ({
+  size,
+  animate,
+  onDark = false,
+  rippleSpread = 1.9,
+}) => {
+  const rippleA = useLoop(2800, animate, Easing.out(Easing.quad));
+  const rippleB = useRef(new Animated.Value(0)).current;
+
+  // Second ripple runs half a cycle behind the first
+  useEffect(() => {
+    if (!animate) {
+      return;
+    }
+    const anim = Animated.sequence([
+      Animated.delay(1400),
+      Animated.loop(
+        Animated.timing(rippleB, {
+          toValue: 1,
+          duration: 2800,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ),
+    ]);
+    anim.start();
+    return () => anim.stop();
+  }, [animate, rippleB]);
+
+  const sphere = size * SPHERE_SHARE;
+  return (
+    <View pointerEvents="none" style={{ width: size, height: size }}>
+      <Ripple progress={rippleA} base={sphere} spread={rippleSpread} />
+      <Ripple progress={rippleB} base={sphere} spread={rippleSpread} />
+      <OrbitlSphere size={size} animate={animate} onDark={onDark} />
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
+  ripple: {
+    borderWidth: 1.5,
+    borderColor: '#A78BFA',
+  },
   centerBox: {
     alignItems: 'center',
     justifyContent: 'center',
