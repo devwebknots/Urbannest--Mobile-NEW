@@ -259,13 +259,11 @@ export const SearchCard: React.FC<Props> = ({
           {/* Tail pointing up at the Orbitl button */}
           <View style={styles.bubbleTail} />
           <View style={styles.bubbleHeader}>
-            <Sparkle size={ms(14)} color={colors.gold} />
-            <Text style={styles.bubbleTitle}>Hi, I'm Orbitl, your home assistant</Text>
+            <Sparkle size={ms(14)} color={colors.primary} />
+            <Text style={styles.bubbleTitle}>Just say what you need</Text>
           </View>
           <Text style={styles.bubbleText}>
-            Skip the filters and just talk to me. Say something like{' '}
-            <Text style={styles.bubbleQuote}>“3 bed home in California under $3,000”</Text> and
-            I'll find homes that match.
+            Try <Text style={styles.bubbleQuote}>“2 bed in Austin under $2,000”</Text>
           </Text>
           <Pressable onPress={onTalkToOrbitl} accessibilityRole="button" style={styles.talkPress}>
             <LinearGradient
