@@ -355,24 +355,66 @@ The application strictly uses **2 font families** (Poppins was deprecated and re
    - `Inter-Medium`: Links (`"View All"`, `"View Calendar"`), badges (`"LIVE"`, `"82% BOOKED"`), segment tabs, inactive bottom tabs.
    - `Inter-SemiBold` / `Bold`: Card titles, prospect names (`"Marcus Reed"`), button text, price labels, active bottom tabs.
 
-**Finalized text presets** (`typographyPresets` in `theme.ts`; sizes go through `scaleFont`, exact at 390pt width):
+**All text presets** (`typographyPresets` in `theme.ts`). Sizes go through `scaleFont` (exact at 390pt width). These are the **only** text styles screens may use.
 
-| Preset | Font | Weight | Size / Line height | Extra | Used for |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `heroTitle` | Playfair Display | 800 ExtraBold in Figma → **Bold (700) until `PlayfairDisplay-ExtraBold.ttf` is added** | 30 / 35.4 | letterSpacing -0.75, white | **The one page-headline style for the whole app**: "Finding New Home is *Simple*" (guest hero), "Choose your persona", renter hero / header / check-in status titles |
-| `heroAccent` | Playfair Display | 600 SemiBold | 30 / 35.4 | letterSpacing -0.75, `heroAccent` gold | Accent word inside a `heroTitle` line ("*Simple*"); slant with `transform: [{ skewX: "-10deg" }]` |
-| `displayTitle` | Playfair Display | 600 SemiBold | 18 / 24.75 | letterSpacing 0, center | Centered section titles ("Most Exclusive Homes Just For You") |
-| `sectionDescription` | Inter | 400 Regular | 10 / 17.88 | letterSpacing 0, center, `textSecondary` | Paragraph under a centered section title |
-| `sectionHeading` | Playfair Display | 500 Medium | 19 / 26 | — | Left-aligned section titles ("Rentals Near You", "Resources & Guides") |
-| `eyebrow` | Inter | 500 Medium | 11 / 14 | uppercase, letterSpacing 1.4, `textMuted` | "FEATURED PROPERTIES", "TOP CITIES" |
-| `price` | Inter | 700 Bold | 16 / 22 | — | Listing prices |
-| `caption` | Inter | 400 Regular | 10.5 / 14 | `textMuted` | Meta text ("Renters • 4 min read", stats) |
-| `brandTitle` | Playfair Display | 700 Bold | 21 | white | Logo text in page headers (pass as `BrandLockup` `textStyle`) |
-| `heroSubtitle` | Inter | 400 Regular | 12 / 18 (`fontSize.sm` / `lineHeight.sm`) | white 88% | Paragraph under `heroTitle` on a dark header |
-| `listingTitle` | Inter | 600 SemiBold | 15 / 20 | `navy` | Property name on listing / residence cards |
-| `premiumBadge` | Inter | 500 Medium | 9 | white | "Premium" text; container is `commonStyles.premiumBadge` (navy pill) + gold `StarGlyph` |
+Headings (Playfair Display — weight comes from the font file, never add `fontWeight`):
 
-All presets above (plus `cardTitle`, `cardSubtitle`, `body*`, `label`, `badge`, `button`, `segmentLabel` in `theme.ts`) are the **only** text styles screens may use. Apply them directly, e.g. `style={[typographyPresets.listingTitle, styles.name]}`, where the local style holds layout only.
+| Preset | Font file | Size / Line height | Extra | Used for |
+| :--- | :--- | :--- | :--- | :--- |
+| `heroTitle` | `PlayfairDisplay-Bold` (800 ExtraBold in Figma, Bold until the ExtraBold .ttf is added) | 30 / 35.4 | letterSpacing -0.75, white | The one page-headline style: guest hero "Finding New Home is *Simple*", "Choose your persona", "My Residences", residence name in `ResidenceHero` |
+| `heroAccent` | `PlayfairDisplay-SemiBold` | 30 / 35.4 | letterSpacing -0.75, gold `heroAccent` | Highlighted word inside a `heroTitle` line ("*Simple*"); slant with `skewX(-10deg)` |
+| `greetingTitle` | `PlayfairDisplay-Regular` | 23 / 30 | white | Greeting headline on the old Home dashboard |
+| `sectionHeading` | `PlayfairDisplay-Medium` | 19 / 26 | `textPrimary` | **Left-aligned section titles** ("Rentals Near You", "Move-In Checklist", "Around Your Home"); also titles on dark cards ("Move-In Ready" status card, white) |
+| `displayTitle` | `PlayfairDisplay-SemiBold` | 18 / 24.75 | center | Centered section titles ("Most Exclusive Homes Just For You") |
+| `sectionTitle` | `PlayfairDisplay-Medium` | 17 / 24 | letterSpacing -0.3 | Top-bar titles (`DetailTopBar`) |
+| `brandTitle` | `PlayfairDisplay-Bold` | 21 | white | "Urban Nest" logo text in page headers |
+
+Body (Inter):
+
+| Preset | Font file / weight | Size / Line height | Extra | Used for |
+| :--- | :--- | :--- | :--- | :--- |
+| `listingTitle` | `Inter-SemiBold` 600 | 15 / 20 | `navy` | Property / residence card names |
+| `cardTitle` | `Inter-SemiBold` 600 | 14.5 / 20 | `textPrimary` | Titles inside small cards |
+| `price` | `Inter-Bold` 700 | 16 / 22 | — | Listing prices only |
+| `body` | `Inter-Regular` 400 | 13.5 / 19 | `#334155` | Paragraphs, descriptions, progress labels |
+| `bodyMedium` | `Inter-Medium` 500 | 13.5 / 19 | `#334155` | Medium-emphasis body text |
+| `bodyBold` | `Inter-SemiBold` 600 | 13.5 / 19 | `textPrimary` | Fact values (Lease ID, dates), checklist tile labels, counts |
+| `button` | `Inter-SemiBold` 600 | 13.5 / 18 | colour set by the button | **All button text** (built into `Button`) |
+| `cardSubtitle` | `Inter-Regular` 400 | 11.5 / 16 | `textSecondary` | Section subtitles, addresses, hints under labels |
+| `heroSubtitle` | `Inter-Regular` 400 | 12 / 18 | white 88% | Text under a `heroTitle` or on dark panels (hero address, status card note) |
+| `greetingSubtitle` | `Inter-Regular` 400 | 11.5 / 16 | periwinkle 75% | Under `greetingTitle` |
+| `sectionLink` | `Inter-Medium` 500 | 12.5 | `primary` blue | "Explore All →", "View All" text links |
+| `segmentLabel` | `Inter-Medium` 500 | 12 | — | Every tab label (Rent / Buy, All / Active / Past, bottom tab bar, Schools / Hospitals / Parks); same weight when selected, only colour changes |
+| `eyebrow` | `Inter-Medium` 500 | 11 / 14 | uppercase, letterSpacing 1.4, `textMuted` | "FEATURED PROPERTIES", "CURRENT STATUS", place type on photo cards |
+| `label` | `Inter-Regular` 400 | 11 / 14 | `textSecondary` | Small labels, guide meta |
+| `badge` | `Inter-Medium` 500 | 10.5 / 13 | — | Pills, chips, status and distance badges, count bubbles |
+| `caption` | `Inter-Regular` 400 | 10.5 / 14 | `textMuted` | Meta text, footnotes, small fact labels |
+| `sectionDescription` | `Inter-Regular` 400 | 10 / 17.88 | center, `textSecondary` | Paragraph under a centered `displayTitle` |
+| `premiumBadge` | `Inter-Medium` 500 | 9 | white | "Premium" text in `commonStyles.premiumBadge` + gold `StarGlyph` |
+| `quickActionLabel` / `floatingButtonLabel` | `Inter-Medium` 500 | 11.5 / 6 | — | Old Home dashboard only |
+
+**Which preset for which element** (same element = same style on every screen):
+
+| Element | Preset |
+| :--- | :--- |
+| Logo text | `brandTitle` |
+| Page headline | `heroTitle` (+ `heroAccent`) |
+| Text under a page headline / on a dark panel | `heroSubtitle` |
+| Section title + subtitle | `SectionHeader` component (`sectionHeading` + `cardSubtitle`) or `CenteredHeader` (`eyebrow` + `displayTitle` + `sectionDescription`) — both in `guest/components/SectionHeader.tsx` |
+| Top bar title | `sectionTitle` |
+| Card / property name | `listingTitle` (small cards: `cardTitle`; photo-card names: `bodyMedium` at caption size, see `GuidesSection` / `NeighborhoodCard`) |
+| Address, hint, secondary line | `cardSubtitle` |
+| Paragraph | `body` |
+| Fact value / bold inline value | `bodyBold` |
+| Price | `price` |
+| Button text | `button` (automatic with `Button`) |
+| Text link | `sectionLink` |
+| Tab label | `segmentLabel` |
+| Eyebrow / uppercase meta | `eyebrow` |
+| Pill / chip / badge text | `badge` |
+| Footnote / tiny meta | `caption` |
+
+Apply presets directly, e.g. `style={[typographyPresets.listingTitle, styles.name]}`; the local style holds layout and colour only. Don't override `fontSize` / `lineHeight` / `fontFamily`. Avoid making text heavier than these presets (the check-in screen was reworked because `heroTitle` / `price` / Playfair numbers were used on cards and looked bulky).
 
 Hero accent word "Simple": `heroAccent` preset (Playfair SemiBold, gold) slanted with `transform: [{ skewX: '-10deg' }]`, with the `heroAccentUnderline` bar.
 
@@ -382,6 +424,9 @@ Hero accent word "Simple": `heroAccent` preset (Playfair SemiBold, gold) slanted
 - Never use `fontStyle: 'italic'` with Playfair: there is no italic file, so Android may render the system font. Use `skewX` for a slanted look.
 
 ### 4. Spacing Conventions
+Tokens (`spacing` in `theme.ts`, all `moderateScale` except `screenHorizontal`): `xxs` 2 · `xs` 4 · `sm` 8 · `md` 12 · `lg` 16 · `xl` 20 · `xxl` 24 · `xxxl` 32 · `section` 24 · `sectionGap` 40 · `screenHorizontal` 20.
+
+- **Section rhythm (copy the guest home)**: each section is `marginTop: spacing.sectionGap`; header → body gap `spacing.lg`; cards in a grid / list `spacing.lg` apart.
 - **`spacing.screenHorizontal`**: `20dp` standard side padding on all screens.
 - **`spacing.section`**: `24dp` (`moderateScale(24)`) standard vertical distance between stacked cards (dashboard screens).
 - **`spacing.sectionGap`**: `40dp` (`moderateScale(40)`) — **finalized vertical gap between page sections** on the guest home (search card → categories → featured → rentals → guides → cities → trust bar).
@@ -390,12 +435,47 @@ Hero accent word "Simple": `heroAccent` preset (Playfair SemiBold, gold) slanted
 - **Inner elements gap**: `moderateScale(10)` to `moderateScale(12)`.
 
 ### 5. Border Radii & Shadows
+Tokens (`borderRadius` in `theme.ts`): `xs` 4 · `sm` 6 · `md` 8 · `lg` 12 · `xl` 16 · `xxl` 20 · `header` 28 · `button` 10 · `pill` 9999.
+
+- **Cards (guest style, use this for new screens)**: white `surface`, `borderRadius.xl` (16) or `xxl` (20), 1px `borderLight` border, `shadows.sm`. **No big soft drop shadows** (`shadowRadius` 20+ / opacity 0.1+): the check-in screen's old boxed style with heavy shadows was replaced for looking dated. Prefer laying sections directly on the page over wrapping them in one big card.
+- **Glass on photos**: blurred copy of the same photo (`Image blurRadius`) + white 12% frost + white hairline top edge (see `ResidenceHero` `glass`). No navy tint boxes behind hero text.
+- **`LinearGradient` only draws its preset gradients** (`gradients.header`, `gradients.button`, `gradients.propertyBanner`, scrim, selected card). Any other colours silently fall back to the **blue button gradient**. For white sheens / fades use a plain `View` with an rgba colour or `Scrim` (`persona/components/Scrim.tsx`, any colour).
 - **Card border radius**: `moderateScale(16)` to `moderateScale(20)`.
 - **Button border radius**: **`borderRadius.button` (10) for every text button**: CTAs, Log In, Search, Explore Homes, See More, Tap to talk, Continue, Submit, card actions. Same as Airbnb / Zillow / Booking.com: slightly rounded, never pills. Pills (`borderRadius.pill`) are only for chips, badges, tags, small tabs and progress bars; icon-only buttons stay circular.
 - **Tab bars / segmented controls** (renter top filter, bottom tab bar): rounded rectangles, not pills. Container `borderRadius.xl` (16) for the top filter, `borderRadius.xxl` (20) for the bottom bar; the sliding highlight uses `borderRadius.lg` (12) so its corners run parallel to the container.
 - **Tab text**: all tabs use `typographyPresets.segmentLabel` (Inter Medium 12): guest Rent / Buy, renter All / Active / Past, and the bottom tab bar labels. Selected tabs keep the same weight; only the colour changes (`textSecondary` → white).
 - **Badge / Pill radius**: `moderateScale(10)` or `9999` (full pill).
-- **Shadows**: Pure platform-friendly shadow definitions in `shadows.sm`, `shadows.md`.
+- **Shadows**: Pure platform-friendly shadow definitions in `shadows.sm`, `shadows.md`, `shadows.lg`.
+
+### 6. Buttons — always use `Button` (`src/components/Button.tsx`)
+**Every text button in the app must be the shared `Button`. Never build a button from `Pressable` / `LinearGradient` / `Text` in a screen.** It uses `TouchableOpacity` (`activeOpacity` 0.7), so every button fades when tapped.
+
+| Variant | Look | Use for | Examples |
+| :--- | :--- | :--- | :--- |
+| `brand` | `gradients.button` navy gradient, white text | Main action of a card / screen | "Check-In Now", "Submit Check-In", "View Details", "Tap to talk", "Search Rentals" |
+| `soft` | `chipBlue` fill, navy text | Secondary action | "Manage", "View on Map", "See More Properties" |
+| `light` | white fill, navy text | Buttons on dark panels or photos | Hero "Explore Homes" |
+| `link` | no fill, navy text (+ arrow) | Inline text action | Expired lease action on `ResidenceCard` |
+| `primary` / `secondary` / `outline` / `danger` | old styles | Login screen only — don't use on new screens | — |
+
+Shared look: radius `borderRadius.button` (10), text `typographyPresets.button` (Inter SemiBold 13.5), horizontal padding `spacing.xl`, icon gap `spacing.sm`, disabled = 45% opacity.
+
+| Prop | Values |
+| :--- | :--- |
+| `size` | `md` = 44 high (buttons inside cards), `lg` = 48 high (default; full-width form / submit buttons) |
+| `leftIcon` / `rightIcon` | any icon node. Arrows: `ArrowRightIcon` (`guest/components/GuestIcons.tsx`) size `ms(14–16)`, navy on `soft` / `light` / `link`, white on `brand`. Search / mic icons go on the left |
+| `disabled`, `isLoading` | disabled dims to 45%; loading shows a spinner |
+| `style` | layout only: `marginTop`, `alignSelf`, `minWidth` (e.g. `ResidenceCard` gives "Check-In Now" and "Manage" `minWidth` 130 so they match) |
+| `accessibilityLabel`, `hitSlop` | defaults to the title |
+
+```tsx
+<Button title="Submit Check-In" variant="brand" onPress={submit} disabled={!canSubmit}
+  rightIcon={<ArrowRightIcon size={ms(16)} color={colors.white} />} />
+<Button title="View on Map" variant="soft" size="md" onPress={openMap}
+  rightIcon={<ArrowRightIcon size={ms(14)} color={colors.navy} />} style={{ alignSelf: 'center' }} />
+```
+
+Not yet on `Button` (special layouts — move them over if a variant fits): "Access Digital Key" (white pill with navy key circle, `CheckInStatusCard`), Pay Now / HOA buttons (`FinancialCard`), "Continue as …" (persona), side-menu Log In, icon-only round buttons (back, burger, Orbitl, search toggle — these stay circular).
 
 ---
 
@@ -435,7 +515,7 @@ Supports two operational modes:
   3. `CategoryRow`: 5 `tileBlue` icon tiles.
   4. Featured: `CenteredHeader` (`eyebrow` / `displayTitle` / `sectionDescription`) + `FeaturedCarousel`: portrait cards (74% of screen width, max 340, height = width × 1.22) so both neighbours peek in; snapping and endless; side cards scale 0.92 + fade 0.8. **Auto-slides** to the next card every 4.5 s (timer resets after a swipe, paused while dragging; near the end of the repeated list it jumps invisibly back to the middle copy). The card is filled edge to edge by a muted, looping **video tour** (`react-native-video`, `FeaturedProperty.video`, free Mixkit 720p clips) over its poster photo; the centered card **and both neighbours** keep their videos loaded and playing (`VIDEO_RANGE`), so the next card is already playing when it slides in. Each video stays at opacity 0 over its poster photo until `onReadyForDisplay`, then fades in (no black frame); failed loads keep the photo.
      - **Android video patch** (`patches/react-native-video+6.19.3.patch`, applied by `patch-package` on `postinstall`): `react-native-video` 6.19.3 ignores `viewType` on Android and always draws into a SurfaceView, which ignores parent clipping, rounded corners and opacity. The cover-scaled videos spilled over neighbouring cards ("split" video) and the fade-in could not hide the black first frame. The patch inflates the PlayerView with `app:surface_type="texture_view"` (`res/layout/rnv_texture_player_view.xml`). Remove it once the library honours `viewType`. Rebuild the Android app after changing it. Over it: top / bottom navy `Scrim`s, gold "Exclusive" badge, glass "▶ Video Tour" pill, glass heart button, and a frosted **glass panel** at the bottom (white 16% fill, white 38% border) with type (light blue), white price, address and bed / bath / area.
-  5. Rentals Near You: `SectionHeader` + 3 `RentalCard`s (image 448:384, "★ Premium" navy badge unless `badgeInImage`) + "See More Properties" `chipBlue` pill.
+  5. Rentals Near You: `SectionHeader` + 3 `RentalCard`s (image 448:384, "★ Premium" navy badge unless `badgeInImage`) + `Button` `soft` "See More Properties →" (plain `ArrowRightIcon`).
   6. `GuidesSection`: large card (1432:806) + two thumbs (696:338), 20dp spacing.
   7. `CitiesSection`: horizontal city tiles (100×116).
   8. `TrustBar`: Verified / Secure / Support.
@@ -452,7 +532,7 @@ Supports two operational modes:
   0. Header art `residences_header.jpg` (1290×1150: the design’s dusk-house image `012.png`, fitted to width; bottom fades navy → light blue → `pageTint` with stops sampled from the mockup, so the filter bar sits on the pale band), absolutely positioned at `width × width/1.12`.
   1. `RenterHeader`: `HeaderBrand` (same logo + "Urban Nest" as the guest hero; shared in `BrandLogo.tsx`, every page header uses it), `ProfileAvatar` (shared in `src/components/ProfileAvatar.tsx`: 36 white circle, navy initials, used by every header that shows the user), "My Residences" (`heroTitle`, 30), two-line subtitle. The "MY RENTALS" eyebrow is commented out. Logo text and subtitle match the guest hero.
   2. `ResidenceFilterBar`: solid white track, no border (radius `xl`, highlight `lg`; a see-through track let Android's elevation shadow show through as a line) — All Rentals / Active / Past with count bubbles (fixed widths 1.3 : 1 : 1). One glass pill (solid `navy` + smooth white `Scrim` sheen from the top + light hairline rim) springs between segments (`Animated.spring`, JS driver since it animates left/width); labels and badges cross-fade navy ↔ white as it passes.
-  3. `ResidenceCard`s (24dp apart): fully rounded photo (same height on every card: width × 0.46, `RESIDENCE_IMAGE_RATIO`) with dark status pill (green / grey dot) and frosted "…" menu; `listingTitle` navy name + navy "Premium" badge (same as the guest rental card); navy pin + `cardSubtitle` address; footer: calendar/clock icon circles with label + bold value (divider between two facts) and action (footer wraps, so dates never truncate; the action drops to its own line, right-aligned, when space is short) — gradient "Check-In Now" and `chipBlue` "Manage" (no arrows; same as the guest "Tap to talk" button: 44 high, radius 10, centred `button` text, no shadow), text link "Details" + navy `ArrowRightIcon` (16, same as the guest "Explore Homes" arrow).
+  3. `ResidenceCard`s (24dp apart): fully rounded photo (same height on every card: width × 0.46, `RESIDENCE_IMAGE_RATIO`) with dark status pill (green / grey dot) and frosted "…" menu; `listingTitle` navy name + navy "Premium" badge (same as the guest rental card); navy pin + `cardSubtitle` address; footer: calendar/clock icon circles with label + bold value (divider between two facts) and action (footer wraps, so dates never truncate; the action drops to its own line, right-aligned, when space is short) — `Button` `brand` "Check-In Now" and `soft` "Manage" (size `md`, `minWidth` 130), `link` + navy `ArrowRightIcon` for expired leases.
   4. `RenterTabBar`: floating frosted capsule bar — Homes / Search / Alerts (dot) / Profile, icon above label. Same glass capsule as the filter (navy + white `Scrim` sheen + rim) springs between tabs; icons/labels cross-fade navy ↔ white. Tabs without a page slide over, show "coming soon", and glide back to Homes on close.
 - **Logic**: `useRenterHome` (filter, tab, counts, card + menu actions — "coming soon" alerts for now). Mock data in `renter/constants.ts`; photos in `src/assets/images/renter/` (cropped from the design) via `renterAssets.ts`. Cards fade up in sequence (off in tests).
 
@@ -476,13 +556,15 @@ Supports two operational modes:
 
 
 ### 0e. Check-In (`src/features/renter/screens/CheckInScreen.tsx`)
-- **Opened by**: "Check-In Now" on a Move-In Ready residence card (route `CheckIn`, param `residenceId`). Same shell as the dashboard: `ResidenceHero` (eyebrow "Almost home, Alex", pills "• Move-In Ready" + unit), `DetailTopBar` (title "Check-In"), rounded `pageTint` sheet, no tab bar.
+- **Opened by**: "Check-In Now" on a Move-In Ready residence card (route `CheckIn`, param `residenceId`). Same shell as the dashboard: `ResidenceHero` with `glass` on (eyebrow hidden via `eyebrow=""`; "Almost home, Alex" commented out), `DetailTopBar` (title "Check-In"), no tab bar.
+- **Hero glass**: `ResidenceHero glass` frosts the photo behind the name / address / pills: blurred copy of the same photo (`blurRadius` 20, lined up and moving with the parallax), white 12% frost, white hairline top edge, top corners `borderRadius.xxl`; starts right at the title and fades with the text on scroll; the bottom navy scrim becomes a light black one. No blue tint.
+- **Sheet**: straight top edge (no radius). Its top `SHEET_OVERLAP` strip is a `Scrim` fade into `pageTint` (same idea as the guest hero → page fade); `sheetFill` paints the rest solid so the parallax photo never shows through while scrolling. Status card starts `SHEET_OVERLAP + spacing.xxl` down.
+- **Sections** use the guest section rhythm: `SectionHeader` + `spacing.sectionGap` / `spacing.lg`, content laid on the page (no big wrapping cards).
 - **Pieces** (`components/checkin/`):
-  1. `CheckInStatusCard`: `gradients.button` panel with faint light rings, gold "CURRENT STATUS" eyebrow, white "Verified" chip, `heroTitle` "Move-In Ready", note, glass facts strip (Lease ID | Move-In date), white "Access Digital Key" pill (navy key circle + key window hint).
-  2. `CheckInChecklist` (in `DashboardSection` "Move-In Checklist"): ONE white card holding progress ("n of 4 confirmed", %, gradient bar on `chipBlue` track), a 2 × 2 grid of tappable tiles and the submit button. Tiles are `pageTint` with a white icon box + navy icon (single navy palette — no multi-colour accents); confirmed tiles turn into `gradients.button` tiles with white text + white tick. Primary gradient "Submit Check-In" — disabled (45% opacity) until all 4 are confirmed; after submit becomes a `chipBlue` "✓ Check-In Submitted" bar and the tiles lock. Footnote under the button.
-  3. `NeighborhoodCard`: ONE white card; pill tab row (Schools / Hospitals / Parks, navy when selected, on a `pageTint` track) switches the list; numbered place rows (Playfair "01", name, uppercase meta, `chipBlue` distance pill with pin), hairline dividers. Tab state `placeTab` in `useCheckIn`. No header link (long title); a centred blue "View on Map →" link (`sectionLink`) closes the card → map (coming soon).
-  4. `CuratedLivingCard` (photo = width × 0.56): interior photo (`living_curated.jpg`, Unsplash 1600210492486) with navy fade + gold kicker + Playfair title, white body with story and gold rule + "THE DIGITAL CURATOR STANDARD".
-- **Typography** (standardised to Guest Home, presets only): hero name `heroTitle`, hero address `heroSubtitle`, pills / chips / distance `badge`, top bar title `sectionTitle`, section titles `sectionHeading` + `cardSubtitle` subtitle + `sectionLink`, status title `heroTitle`, body text `body`, fact values `bodyBold`, all eyebrows / meta `eyebrow` (no letterSpacing overrides), tile / place names `listingTitle`, hints `cardSubtitle`, progress count `price`, buttons `button`, tabs `bodyMedium`, footnote `caption`, curated title `sectionHeading`.
+  1. `CheckInStatusCard`: `gradients.button` panel (`borderRadius.xxl`, `shadows.lg`), faint light rings, gold "CURRENT STATUS" eyebrow, white "Verified" chip, `sectionHeading` "Move-In Ready" (white), `heroSubtitle` note, glass facts strip (`caption` labels, `bodyBold` values), white "Access Digital Key" pill (`button` text).
+  2. `CheckInChecklist`: progress (`body` label, `bodyBold` count, % in `sectionLink`, gradient bar on a `chipBlue` track), 2 × 2 tiles: plain light fill `#F7FAFF`, `#C9DAF6` border, soft blue shadow, navy icon on a `chipBlue` square, `bodyBold` label, `cardSubtitle` hint, grey tick ring. Ticked: `chipBlue` fill, navy border, white icon square, navy filled tick. `Button` `brand` "Submit Check-In →" (disabled until all 4 are ticked) → `chipBlue` "✓ Check-In Submitted" bar; `caption` footnote.
+  3. `NeighborhoodCard` ("Around Your Home"): `segmentLabel` pill tabs (Schools / Hospitals / Parks; navy when selected) switch a 2-column grid of **photo cards** styled like the guest guide cards (white, hairline border): photo with white distance pill, eyebrow-style type in `primary`, 2-line name. `Button` `soft` "View on Map →". Photos `place_*.jpg` in `src/assets/images/renter/` (Unsplash; coaster = Wikimedia Commons CC0) via `NeighborhoodPlace.image`.
+  4. `CuratedLivingCard`: photo with fade + gold kicker + `sectionHeading` title, white body (`body`), gold rule signature; `borderRadius.xl`, hairline border, `shadows.sm`.
 - **Logic**: `useCheckIn(residenceId, navigation)` — confirmed set, `canSubmit`, `submitted`, `toggleTask`, `submit` (Alert); key / places / map / profile show "coming soon". Mock data: `CHECK_IN_SUMMARY`, `CHECK_IN_TASKS`, `NEIGHBORHOOD`, `NEIGHBORHOOD_RADIUS`, `CURATED_LIVING`.
 - **Icons** added to `src/assets/icons/renter/`: inspect, bolt, wifi, shield, key, check, school, hospital, park (white 128px line PNGs drawn with System.Drawing, tinted via `RenterIcon`).
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
@@ -603,7 +685,8 @@ Supports two operational modes:
    - **Typography is standardised to the Guest Home screen.** Every screen must reuse the same text styles the guest screen uses for the same kind of element. Never pick a font, weight or size because it looks nice.
    - Use a `typographyPresets` entry directly in the component (never copy its values into a local style). Do not override its `fontSize` / `lineHeight` / `letterSpacing`; only `color` and layout props (margin, flex, textAlign) may be added.
    - Same element = same style: logo text = `brandTitle`; big page title = `heroTitle` (30); title subtitle = `heroSubtitle`; section titles = `sectionHeading` / `displayTitle`; property card name = `listingTitle`; address / secondary text = `cardSubtitle`; meta values = `bodyBold`; prices = `price`; button text = `button`; segment labels = `bodyMedium`; status / count badges = `badge`; "Premium" badge = `commonStyles.premiumBadge` + gold `StarGlyph` + `premiumBadge` text; eyebrows = `eyebrow` (letterSpacing 1.4).
-   - Pill button arrows = `ArrowCircleIcon` (`guest/components/GuestIcons.tsx`): navy circle + white ↗ on light buttons, white circle + navy ↗ on gradient buttons; button gets `paddingRight` ≈ 6. Do not use the bare `ArrowRightIcon` in buttons.
+   - **Buttons = the shared `Button` component** (Section 8.6). Pick the variant (`brand` / `soft` / `light` / `link`) and size; never copy button styles into a screen. Button arrows = plain `ArrowRightIcon` (navy, or white on `brand`); `ArrowCircleIcon` is no longer used in buttons.
+   - **Cards / sections look like the guest home**: sections on the page with `SectionHeader`, light cards (hairline border + `shadows.sm`), no heavy shadows or big boxed wrappers.
    - If no preset fits, add a new preset to `theme.ts` and list it in Section 8.3 first. Do not hand-write a one-off style.
 2. **Spacing**: `spacing.sectionGap` (40dp) between page sections, `spacing.section` (24dp) between stacked cards, `spacing.screenHorizontal` (20dp) side margins.
 3. **No native-linking dependencies** for icons/gradients — use `src/components/icons` and `src/components/LinearGradient.tsx`.
@@ -660,7 +743,7 @@ Supports two operational modes:
 When a user requests the next screen:
 1. **Read `project.md` first**.
 2. **Inspect the reference screenshot** to identify sections, card hierarchy, buttons and state indicators.
-3. **Reuse existing styles and components** (`BottomNavBar`, `LinearGradient`, icons, `theme.ts`, `responsive.ts`).
+3. **Reuse existing styles and components** — `Button` for every button (Section 8.6), `typographyPresets` for every text (Section 8.3 "Which preset for which element"), `SectionHeader` / `CenteredHeader` for section titles, `spacing` / `borderRadius` / `shadows` tokens, `BottomNavBar`, `LinearGradient` (preset gradients only), icons, `responsive.ts`. Never hand-write a font, size, weight or button style.
 4. **Place new feature code** in `src/features/<new-feature>/`.
 5. **Connect navigation** via `RootNavigator.tsx` and `src/types/navigation.ts` (checklist in Section 4).
 6. **Run** `npx tsc --noEmit` and `npm test`.

@@ -20,6 +20,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { HeaderBrand } from '@/components/BrandLogo';
+import { Button } from '@/components/Button';
 import {
   borderRadius,
   colors,
@@ -183,14 +184,14 @@ export const HeroSection: React.FC<Props> = ({
           */}
           </View>
 
-          <Pressable
+          <Button
+            title="Explore Homes"
+            variant="light"
+            size="md"
             onPress={onExplorePress}
+            rightIcon={<ArrowRightIcon size={ms(16)} color={colors.navy} />}
             style={styles.exploreButton}
-            accessibilityRole="button"
-          >
-            <Text style={styles.exploreText}>Explore Homes</Text>
-            <ArrowRightIcon size={ms(16)} color={colors.navy} />
-          </Pressable>
+          />
         </View>
 
         {/* Page dots, centered, just above the fade into the page */}
@@ -290,17 +291,6 @@ const styles = StyleSheet.create({
   exploreButton: {
     marginTop: spacing.xl,
     alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.xl,
-    height: ms(44),
-    borderRadius: borderRadius.button,
-    backgroundColor: colors.white,
-  },
-  exploreText: {
-    ...typographyPresets.button,
-    color: colors.navy,
   },
   dots: {
     position: 'absolute',

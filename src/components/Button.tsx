@@ -6,6 +6,8 @@
  * App button styles (use these for new screens):
  *  - brand: navy gradient, white text (main action, e.g. "Check-In Now")
  *  - soft:  light blue fill, navy text (secondary action, e.g. "Manage")
+ *  - light: white fill, navy text, for dark / photo backgrounds
+ *           (e.g. hero "Explore Homes")
  *  - link:  no fill, navy text, usually with an arrow (e.g. "Renew")
  * All share radius 10, the `button` text preset and optional icons.
  * Sizes: md = 44 high, lg = 48 high.
@@ -44,6 +46,7 @@ export type ButtonVariant =
   | 'danger'
   | 'brand'
   | 'soft'
+  | 'light'
   | 'link';
 
 export type ButtonSize = 'md' | 'lg';
@@ -67,7 +70,7 @@ export interface ButtonProps {
   readonly testID?: string;
 }
 
-const APP_VARIANTS: readonly ButtonVariant[] = ['brand', 'soft', 'link'];
+const APP_VARIANTS: readonly ButtonVariant[] = ['brand', 'soft', 'light', 'link'];
 
 export const Button: React.FC<ButtonProps> = ({
   title,
@@ -93,6 +96,8 @@ export const Button: React.FC<ButtonProps> = ({
         return [styles.appContainer, styles[size]];
       case 'soft':
         return [styles.appContainer, styles[size], styles.softContainer];
+      case 'light':
+        return [styles.appContainer, styles[size], styles.lightContainer];
       case 'link':
         return styles.linkContainer;
       case 'secondary':
@@ -112,6 +117,7 @@ export const Button: React.FC<ButtonProps> = ({
       case 'brand':
         return [styles.appText, styles.lightText];
       case 'soft':
+      case 'light':
       case 'link':
         return styles.appText;
       case 'outline':
@@ -127,7 +133,7 @@ export const Button: React.FC<ButtonProps> = ({
   const spinnerColor =
     variant === 'outline'
       ? colors.primary
-      : variant === 'soft' || variant === 'link'
+      : variant === 'soft' || variant === 'light' || variant === 'link'
         ? colors.navy
         : colors.white;
 
@@ -186,6 +192,9 @@ const styles = StyleSheet.create({
   },
   softContainer: {
     backgroundColor: colors.chipBlue,
+  },
+  lightContainer: {
+    backgroundColor: colors.white,
   },
   linkContainer: {
     alignSelf: 'flex-start',
