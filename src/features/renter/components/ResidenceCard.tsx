@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     height: ms(42),
     paddingLeft: spacing.lg,
     paddingRight: ms(6),
-    borderRadius: borderRadius.pill,
+    borderRadius: borderRadius.button,
   },
   actionSolid: {
     ...shadows.md,

@@ -14,13 +14,19 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
+import {
+  borderRadius,
+  colors,
+  spacing,
+  typographyPresets,
+} from '@/config/theme';
 import { moderateScale as ms } from '@/utils/responsive';
 import { CategoryRow } from '../components/CategoryRow';
 import { CitiesSection } from '../components/CitiesSection';
 import { FeaturedCarousel } from '../components/FeaturedCarousel';
 import { ArrowCircleIcon } from '../components/GuestIcons';
 import { GuidesSection } from '../components/GuidesSection';
+import { GuestMenuKey, GuestSideMenu } from '../components/GuestSideMenu';
 import { HeroSection } from '../components/HeroSection';
 import { OrbitlListeningOverlay } from '../components/OrbitlListeningOverlay';
 import { RentalCard } from '../components/RentalCard';
@@ -54,8 +60,50 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
   // Full-screen Orbitl AI listening view
   const [orbitlListening, setOrbitlListening] = useState(false);
 
-  const scrollToSearch = () =>
-    scrollRef.current?.scrollTo({ y: Math.max(0, searchY.current - insets.top), animated: true });
+  // Right-side menu opened by the hero burger button
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Section positions, for menu shortcuts
+  const sectionY = useRef<Record<'featured' | 'guides' | 'cities', number>>({
+    featured: 0,
+    guides: 0,
+    cities: 0,
+  });
+
+  const scrollToY = (y: number) =>
+    scrollRef.current?.scrollTo({
+      y: Math.max(0, y - insets.top),
+      animated: true,
+    });
+  const scrollToSearch = () => scrollToY(searchY.current);
+
+  const onMenuSelect = (key: GuestMenuKey) => {
+    switch (key) {
+      case 'login':
+      // Both start with the persona picker; split when sign-up has its own flow
+      case 'register':
+        vm.goToSignIn();
+        break;
+      case 'home':
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+        break;
+      case 'search':
+        scrollToSearch();
+        break;
+      case 'rent':
+      case 'buy':
+        vm.setMode(key);
+        scrollToSearch();
+        break;
+      case 'featured':
+      case 'guides':
+      case 'cities':
+        scrollToY(sectionY.current[key]);
+        break;
+      default:
+        // help / about / terms: screens not built yet
+        break;
+    }
+  };
 
   return (
     <View style={styles.root}>
@@ -63,12 +111,14 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: insets.bottom + spacing.sectionGap }}
+        contentContainerStyle={{
+          paddingBottom: insets.bottom + spacing.sectionGap,
+        }}
       >
         <HeroSection
           images={HERO_IMAGES}
           topInset={insets.top}
-          onLoginPress={vm.goToSignIn}
+          onMenuPress={() => setMenuOpen(true)}
           onExplorePress={scrollToSearch}
         />
 
@@ -91,7 +141,12 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
           <CategoryRow categories={CATEGORIES} />
         </View>
 
-        <View style={styles.section}>
+        <View
+          style={styles.section}
+          onLayout={e => {
+            sectionY.current.featured = e.nativeEvent.layout.y;
+          }}
+        >
           <CenteredHeader
             eyebrow="Featured Properties"
             title="Most Exclusive Homes Just For You"
@@ -125,11 +180,20 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
           </View>
           <Pressable style={styles.seeMore} accessibilityRole="button">
             <Text style={styles.seeMoreText}>See More Properties</Text>
-            <ArrowCircleIcon size={ms(30)} background={colors.navy} color={colors.white} />
+            <ArrowCircleIcon
+              size={ms(30)}
+              background={colors.navy}
+              color={colors.white}
+            />
           </Pressable>
         </View>
 
-        <View style={styles.section}>
+        <View
+          style={styles.section}
+          onLayout={e => {
+            sectionY.current.guides = e.nativeEvent.layout.y;
+          }}
+        >
           <SectionHeader
             title="Resources & Guides"
             subtitle="Helpful ideas for renters, buyers and property owners."
@@ -140,7 +204,12 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
 
-        <View style={styles.section}>
+        <View
+          style={styles.section}
+          onLayout={e => {
+            sectionY.current.cities = e.nativeEvent.layout.y;
+          }}
+        >
           <SectionHeader title="Explore Real Estate In Popular Cities" />
           <View style={styles.sectionBody}>
             <CitiesSection cities={TOP_CITIES} />
@@ -153,6 +222,12 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
         </View>
         */}
       </ScrollView>
+
+      <GuestSideMenu
+        visible={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onSelect={onMenuSelect}
+      />
 
       <OrbitlListeningOverlay
         visible={orbitlListening}
@@ -193,7 +268,7 @@ const styles = StyleSheet.create({
     paddingLeft: spacing.xl,
     paddingRight: ms(6),
     height: ms(42),
-    borderRadius: borderRadius.pill,
+    borderRadius: borderRadius.button,
     backgroundColor: colors.chipBlue,
   },
   seeMoreText: {

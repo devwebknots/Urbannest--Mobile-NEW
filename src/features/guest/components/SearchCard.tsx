@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   },
   talkButton: {
     height: ms(44),
-    borderRadius: borderRadius.pill,
+    borderRadius: borderRadius.button,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     height: ms(48),
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.button,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

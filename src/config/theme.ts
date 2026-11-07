@@ -151,6 +151,10 @@ export const borderRadius = {
   xl: 16,
   xxl: 20,
   header: 28,
+  // Standard radius for every text button (CTAs, Log In, Search, See More…).
+  // Like Airbnb / Zillow / Booking: slightly rounded, not pills. Pills are
+  // only for chips, badges and tags; icon buttons stay circular.
+  button: 10,
   pill: 9999,
   full: 9999,
 } as const;

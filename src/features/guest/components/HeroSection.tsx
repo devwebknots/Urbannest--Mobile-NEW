@@ -1,6 +1,6 @@
 /**
  * Hero: swipeable house photos (already navy-graded in the design export),
- * with the header (logo + burger menu holding Log In / Sign Up), headline,
+ * with the header (logo + burger button that opens the side menu), headline,
  * Explore button and page dots on top.
  * Auto-advances every AUTO_MS and loops; a swipe resets the timer.
  */
@@ -9,7 +9,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Image,
   ImageSourcePropType,
-  Modal,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -21,11 +20,9 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { BrandLockup } from '@/components/BrandLogo';
-import { UserIcon } from '@/components/icons';
 import {
   borderRadius,
   colors,
-  shadows,
   spacing,
   typographyPresets,
 } from '@/config/theme';
@@ -50,20 +47,19 @@ const DOTS_PAD = ms(6);
 interface Props {
   images: ImageSourcePropType[];
   topInset: number;
-  /** "Log In / Sign Up" in the burger menu */
-  onLoginPress: () => void;
+  /** Burger button: opens the side menu (GuestSideMenu) */
+  onMenuPress: () => void;
   onExplorePress: () => void;
 }
 
 export const HeroSection: React.FC<Props> = ({
   images,
   topInset,
-  onLoginPress,
+  onMenuPress,
   onExplorePress,
 }) => {
   const { width } = useWindowDimensions();
   const [index, setIndex] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
   const scrollRef = useRef<ScrollViewInstance>(null);
   const dragging = useRef(false);
   // Show the whole design image; never shorter than the content needs
@@ -154,14 +150,13 @@ export const HeroSection: React.FC<Props> = ({
             <SearchIcon size={ms(20)} color={colors.white} />
           </Pressable>
           */}
-          {/* Log In / Sign Up now lives in the burger menu */}
+          {/* Opens the side menu (Log In / Sign Up and more) */}
           <Pressable
-            onPress={() => setMenuOpen(true)}
+            onPress={onMenuPress}
             hitSlop={8}
             style={styles.menuButton}
             accessibilityRole="button"
             accessibilityLabel="Open menu"
-            accessibilityState={{ expanded: menuOpen }}
           >
             <BurgerIcon size={ms(18)} color={colors.white} />
           </Pressable>
@@ -218,40 +213,6 @@ export const HeroSection: React.FC<Props> = ({
           </View>
         </View>
       </View>
-
-      {/* Burger menu dropdown; tapping outside closes it */}
-      <Modal
-        visible={menuOpen}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-        onRequestClose={() => setMenuOpen(false)}
-      >
-        <Pressable
-          style={styles.menuBackdrop}
-          onPress={() => setMenuOpen(false)}
-          accessibilityLabel="Close menu"
-        >
-          <View style={[styles.menu, { top: topInset + spacing.md + ms(44) }]}>
-            <Pressable
-              onPress={() => {
-                setMenuOpen(false);
-                onLoginPress();
-              }}
-              style={({ pressed }) => [
-                styles.menuItem,
-                pressed && styles.menuItemPressed,
-              ]}
-              accessibilityRole="button"
-            >
-              <View style={styles.menuIcon}>
-                <UserIcon size={ms(15)} color={colors.navy} />
-              </View>
-              <Text style={styles.menuText}>Log In / Sign Up</Text>
-            </Pressable>
-          </View>
-        </Pressable>
-      </Modal>
     </View>
   );
 };
@@ -308,42 +269,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  menuBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(11, 29, 58, 0.25)',
-  },
-  menu: {
-    position: 'absolute',
-    right: spacing.screenHorizontal,
-    minWidth: ms(200),
-    padding: spacing.xs,
-    borderRadius: borderRadius.xl,
-    backgroundColor: colors.surface,
-    ...shadows.lg,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.lg,
-  },
-  menuItemPressed: {
-    backgroundColor: colors.surfaceMuted,
-  },
-  menuIcon: {
-    width: ms(30),
-    height: ms(30),
-    borderRadius: ms(15),
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.chipBlue,
-  },
-  menuText: {
-    ...typographyPresets.bodyMedium,
-    color: colors.navy,
-  },
   middle: {
     flex: 1,
     justifyContent: 'center',
@@ -375,7 +300,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.xl,
     height: ms(44),
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.button,
     backgroundColor: colors.white,
   },
   exploreText: {

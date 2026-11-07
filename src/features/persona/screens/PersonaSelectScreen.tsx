@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   },
   cta: {
     height: 56,
-    borderRadius: borderRadius.xl,
+    borderRadius: borderRadius.button,
     backgroundColor: colors.white,
     flexDirection: 'row',
     alignItems: 'center',

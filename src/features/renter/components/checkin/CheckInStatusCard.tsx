@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     padding: ms(6),
     paddingRight: spacing.xl,
-    borderRadius: borderRadius.pill,
+    borderRadius: borderRadius.button,
     backgroundColor: colors.white,
   },
   keyIcon: {

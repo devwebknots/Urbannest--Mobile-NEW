@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     height: ms(52),
     marginTop: spacing.xxl,
-    borderRadius: borderRadius.pill,
+    borderRadius: borderRadius.button,
   },
   submitText: {
     ...typographyPresets.button,
