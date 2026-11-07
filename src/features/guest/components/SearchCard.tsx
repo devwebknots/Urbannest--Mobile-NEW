@@ -8,8 +8,8 @@
  * Only one panel is open at a time. Overlaps the bottom of the hero.
  */
 
-import React, { useState } from 'react';
-import { LayoutAnimation, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from '@/components/LinearGradient';
 import {
   ChevronDownIcon,
@@ -30,6 +30,7 @@ import {
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 import type { ListingMode } from '../types';
 import { BedIcon, BuildingIcon, DollarIcon, SlidersIcon } from './GuestIcons';
+import { Collapsible } from './Collapsible';
 import { MicIcon, OrbitlOrb, Sparkle, useOrbitlMotion } from './OrbitlOrb';
 
 interface Filters {
@@ -77,6 +78,70 @@ const TabIcon: React.FC<{ tab: ListingMode; color: string }> = ({ tab, color }) 
   // return <UsersIcon size={size} color={color} />;
 };
 
+/** Frosted light-blue card colors, built on the secondary blue #518EF9 */
+const CARD_BG = {
+  base: '#EEF4FF',
+  edge: 'rgba(255, 255, 255, 0.95)',
+  shadow: colors.headerGradientEnd, // #518EF9
+  lavender: colors.chipBlue, // #DCE8FB, light-blue wash on the right
+  waveLight: 'rgba(147, 187, 252, 0.30)',
+  waveMid: 'rgba(81, 142, 249, 0.16)',
+  waveDeep: 'rgba(81, 142, 249, 0.12)',
+  waveEdge: 'rgba(255, 255, 255, 0.75)',
+};
+
+/**
+ * Card background: white glow top-left, light-blue wash on the right and
+ * soft blue waves flowing in from the bottom-right corner. Big circles
+ * clipped by the card's rounded corners; sits behind the card content.
+ */
+const CardBackground: React.FC = () => (
+  <View pointerEvents="none" style={styles.bgClip}>
+    {/* Light wash */}
+    <View
+      style={[
+        styles.bgBlob,
+        { width: ms(300), height: ms(300), borderRadius: ms(150), left: -ms(110), top: -ms(170), backgroundColor: '#FFFFFF', opacity: 0.75 },
+      ]}
+    />
+    <View
+      style={[
+        styles.bgBlob,
+        { width: ms(320), height: ms(320), borderRadius: ms(160), right: -ms(170), top: -ms(120), backgroundColor: CARD_BG.lavender, opacity: 0.85 },
+      ]}
+    />
+    {/* Waves: overlapping circles whose tops read as flowing curves */}
+    <View
+      style={[
+        styles.bgBlob,
+        { width: ms(520), height: ms(520), borderRadius: ms(260), left: '30%', bottom: -ms(436), backgroundColor: CARD_BG.waveMid },
+      ]}
+    />
+    <View
+      style={[
+        styles.bgBlob,
+        {
+          width: ms(460),
+          height: ms(460),
+          borderRadius: ms(230),
+          left: '48%',
+          bottom: -ms(392),
+          backgroundColor: CARD_BG.waveLight,
+          borderTopWidth: 1.5,
+          borderLeftWidth: 1.5,
+          borderColor: CARD_BG.waveEdge,
+        },
+      ]}
+    />
+    <View
+      style={[
+        styles.bgBlob,
+        { width: ms(400), height: ms(400), borderRadius: ms(200), left: '64%', bottom: -ms(346), backgroundColor: CARD_BG.waveDeep },
+      ]}
+    />
+  </View>
+);
+
 const Field: React.FC<{ label: string; value: string; icon: React.ReactNode }> = ({
   label,
   value,
@@ -96,6 +161,39 @@ const Field: React.FC<{ label: string; value: string; icon: React.ReactNode }> =
   </Pressable>
 );
 
+/** Search icon that turns into the filter icon with a quick spin-in */
+const SearchToggleIcon: React.FC<{ open: boolean }> = ({ open }) => {
+  const swap = useRef(new Animated.Value(1)).current;
+  const first = useRef(true);
+
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    swap.setValue(0);
+    Animated.spring(swap, { toValue: 1, friction: 6, tension: 120, useNativeDriver: true }).start();
+  }, [open, swap]);
+
+  return (
+    <Animated.View
+      style={{
+        opacity: swap.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, 1, 1] }),
+        transform: [
+          { rotate: swap.interpolate({ inputRange: [0, 1], outputRange: ['-90deg', '0deg'] }) },
+          { scale: swap.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }) },
+        ],
+      }}
+    >
+      {open ? (
+        <SlidersIcon size={ms(17)} color={colors.navy} />
+      ) : (
+        <SearchIcon size={ms(19)} color={colors.navy} />
+      )}
+    </Animated.View>
+  );
+};
+
 export const SearchCard: React.FC<Props> = ({
   mode,
   onModeChange,
@@ -109,7 +207,6 @@ export const SearchCard: React.FC<Props> = ({
   const iconColor = colors.textSecondary;
 
   const toggle = (next: Panel) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setPanel(current => (current === next ? 'none' : next));
   };
 
@@ -119,6 +216,7 @@ export const SearchCard: React.FC<Props> = ({
 
   return (
     <View style={styles.card}>
+      <CardBackground />
       <View style={styles.header}>
         {/* Title explains the card; tapping it opens the search too */}
         <Pressable
@@ -152,15 +250,11 @@ export const SearchCard: React.FC<Props> = ({
           accessibilityLabel={filtersOpen ? 'Hide filters' : 'Search with filters'}
           accessibilityState={{ expanded: filtersOpen }}
         >
-          {filtersOpen ? (
-            <SlidersIcon size={ms(17)} color={colors.navy} />
-          ) : (
-            <SearchIcon size={ms(19)} color={colors.navy} />
-          )}
+          <SearchToggleIcon open={filtersOpen} />
         </Pressable>
       </View>
 
-      {orbitlOpen && (
+      <Collapsible open={orbitlOpen}>
         <View style={styles.bubble}>
           {/* Tail pointing up at the Orbitl button */}
           <View style={styles.bubbleTail} />
@@ -185,9 +279,9 @@ export const SearchCard: React.FC<Props> = ({
             </LinearGradient>
           </Pressable>
         </View>
-      )}
+      </Collapsible>
 
-      {filtersOpen && (
+      <Collapsible open={filtersOpen}>
         <View style={styles.filters}>
           {/* Rent / Buy decides which homes are searched and the fields below */}
           <View style={styles.segment} accessibilityRole="tablist">
@@ -246,7 +340,7 @@ export const SearchCard: React.FC<Props> = ({
             </LinearGradient>
           </Pressable>
         </View>
-      )}
+      </Collapsible>
     </View>
   );
 };
@@ -256,8 +350,22 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.lg,
     padding: spacing.lg,
     borderRadius: borderRadius.xxl,
-    backgroundColor: colors.surface,
+    backgroundColor: CARD_BG.base,
+    // Glassy white edge
+    borderWidth: 1.5,
+    borderColor: CARD_BG.edge,
     ...shadows.lg,
+    shadowColor: CARD_BG.shadow,
+    shadowOpacity: 0.16,
+    shadowRadius: 16,
+  },
+  bgClip: {
+    ...StyleSheet.absoluteFill,
+    borderRadius: borderRadius.xxl,
+    overflow: 'hidden',
+  },
+  bgBlob: {
+    position: 'absolute',
   },
   header: {
     flexDirection: 'row',
@@ -315,6 +423,8 @@ const styles = StyleSheet.create({
   searchButtonSmall: {
     borderWidth: 1,
     borderColor: colors.border,
+    // Stays white on the tinted card, as before
+    backgroundColor: colors.surface,
   },
   actionActive: {
     backgroundColor: colors.chipBlue,
