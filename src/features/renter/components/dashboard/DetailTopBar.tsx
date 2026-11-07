@@ -5,8 +5,9 @@
  */
 
 import React from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, View } from 'react-native';
 import { ChevronLeftIcon } from '@/components/icons';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
 import { colors, spacing, typographyPresets } from '@/config/theme';
 import { moderateScale as ms } from '@/utils/responsive';
 
@@ -54,14 +55,7 @@ export const DetailTopBar: React.FC<Props> = ({
           {title}
         </Animated.Text>
 
-        <Pressable
-          onPress={onProfilePress}
-          style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}
-          accessibilityRole="button"
-          accessibilityLabel="Profile"
-        >
-          <Text style={styles.avatarText}>{initials}</Text>
-        </Pressable>
+        <ProfileAvatar initials={initials} onPress={onProfilePress} />
       </View>
     </View>
   );
@@ -104,20 +98,6 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.md,
     textAlign: 'center',
     color: colors.white,
-  },
-  avatar: {
-    width: BTN,
-    height: BTN,
-    borderRadius: BTN / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.6)',
-  },
-  avatarText: {
-    ...typographyPresets.button,
-    color: colors.navy,
   },
   pressed: {
     transform: [{ scale: 0.94 }],

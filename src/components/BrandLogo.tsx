@@ -21,6 +21,8 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { spacing, typographyPresets } from '@/config/theme';
+import { moderateScale } from '@/utils/responsive';
 
 const LOGO = require('@/assets/images/brand/urban_nest_logo.png');
 
@@ -76,6 +78,20 @@ export const BrandLockup: React.FC<LockupProps> = ({ label, logoSize, gap, textS
     </View>
   );
 };
+
+/**
+ * HeaderBrand: the standard page-header logo ("Urban Nest", 24 logo,
+ * brandTitle). Every screen header uses this, so they all match the guest hero.
+ */
+export const HeaderBrand: React.FC<{ style?: StyleProp<ViewStyle> }> = ({ style }) => (
+  <BrandLockup
+    label="Urban Nest"
+    logoSize={moderateScale(24)}
+    gap={spacing.sm}
+    textStyle={typographyPresets.brandTitle}
+    style={style}
+  />
+);
 
 const styles = StyleSheet.create({
   row: {

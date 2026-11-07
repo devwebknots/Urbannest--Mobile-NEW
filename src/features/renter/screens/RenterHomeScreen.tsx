@@ -20,7 +20,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, typographyPresets } from '@/config/theme';
 import { RENTER_HEADER_ASPECT, renterAssets } from '../assets/renterAssets';
 import { RenterHeader } from '../components/RenterHeader';
-import { RENTER_TAB_BAR_HEIGHT, RenterTabBar } from '../components/RenterTabBar';
+import {
+  RENTER_TAB_BAR_HEIGHT,
+  RenterTabBar,
+  renterTabBarBottomGap,
+} from '../components/RenterTabBar';
 import { ResidenceCard } from '../components/ResidenceCard';
 import { ResidenceFilterBar } from '../components/ResidenceFilterBar';
 import { Reveal } from '../components/Reveal';
@@ -50,7 +54,7 @@ export const RenterHomeScreen: React.FC<Props> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingBottom:
-            RENTER_TAB_BAR_HEIGHT + Math.max(insets.bottom, spacing.md) + spacing.xxl,
+            RENTER_TAB_BAR_HEIGHT + renterTabBarBottomGap(insets.bottom) + spacing.xxl,
         }}
       >
         <Image
@@ -113,7 +117,7 @@ const styles = StyleSheet.create({
     left: 0,
   },
   filter: {
-    marginTop: spacing.xxl,
+    marginTop: spacing.sectionGap + spacing.lg,
   },
   list: {
     marginTop: spacing.xxl,

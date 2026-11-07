@@ -403,9 +403,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.navy,
   },
   segmentText: {
-    fontFamily: typography.fontFamily.body.medium,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.medium,
+    ...typographyPresets.segmentLabel,
   },
   action: {
     width: ACTION_SIZE,

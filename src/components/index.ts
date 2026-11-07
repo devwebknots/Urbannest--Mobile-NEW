@@ -13,4 +13,7 @@ export * from './LoadingIndicator';
 export { default as LinearGradient } from './LinearGradient';
 export * from './LinearGradient';
 
+export { default as ProfileAvatar } from './ProfileAvatar';
+export * from './ProfileAvatar';
+
 export * from './icons';

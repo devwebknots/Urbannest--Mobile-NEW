@@ -13,7 +13,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { borderRadius, colors, spacing, typography, typographyPresets } from '@/config/theme';
+import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
 import { moderateScale as ms } from '@/utils/responsive';
 import { FILTERS } from '../constants';
@@ -145,11 +145,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: spacing.screenHorizontal,
     padding: TRACK_PAD,
-    borderRadius: borderRadius.pill,
-    // Frosted track
-    backgroundColor: 'rgba(255,255,255,0.78)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.95)',
+    // Rounded rectangle like the guest cards (not a pill)
+    borderRadius: borderRadius.xl,
+    // Solid white, no border: a see-through track lets Android's elevation
+    // shadow show through as a line behind the unselected tabs
+    backgroundColor: colors.white,
     shadowColor: colors.headerDarkBlue,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
@@ -160,7 +160,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: TRACK_PAD,
     height: PILL_H,
-    borderRadius: borderRadius.pill,
+    // Track radius minus its padding, so the corners run parallel
+    borderRadius: borderRadius.lg,
     overflow: 'hidden',
     backgroundColor: colors.navy,
     shadowColor: colors.navy,
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
   },
   pillEdge: {
     ...StyleSheet.absoluteFill,
-    borderRadius: borderRadius.pill,
+    borderRadius: borderRadius.lg,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.22)',
   },
@@ -189,12 +190,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: ms(7),
   },
+  // Same text as the guest Rent / Buy tabs: grey when unselected, white
+  // when selected, same weight in both
   label: {
-    ...typographyPresets.bodyMedium,
-    color: colors.navy,
+    ...typographyPresets.segmentLabel,
+    color: colors.textSecondary,
   },
   labelActive: {
-    fontFamily: typography.fontFamily.body.semiBold,
     color: colors.white,
   },
   badge: {

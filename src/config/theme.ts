@@ -423,12 +423,12 @@ export const typographyPresets: Record<string, TextStyle> = {
     lineHeight: scaleFont(14),
     color: colors.textMuted,
   },
-  tabLabel: {
+  // Every tab label: guest Rent / Buy, renter All / Active / Past and the
+  // bottom tab bar. Same weight when selected; only the colour changes.
+  segmentLabel: {
     fontFamily: typography.fontFamily.body.medium,
-    fontSize: scaleFont(9.5),
-    lineHeight: scaleFont(12),
+    fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.medium,
-    letterSpacing: 0.5,
   },
   // Logo text next to the house icon in page headers ("URBAN NEST")
   brandTitle: {

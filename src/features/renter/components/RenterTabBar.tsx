@@ -8,15 +8,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   LayoutChangeEvent,
+  PixelRatio,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import { BellIcon, HomeIcon, SearchIcon, UserIcon } from '@/components/icons';
-import { borderRadius, colors, spacing, typography } from '@/config/theme';
+import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { moderateScale as ms } from '@/utils/responsive';
 import type { RenterTab } from '../types';
 
 interface Props {
@@ -65,6 +66,20 @@ const TabContent: React.FC<{
 
 /** Height of the bar itself, without the bottom inset. */
 export const RENTER_TAB_BAR_HEIGHT = ms(68);
+
+/** Insets this tall mean Android's 3-button nav bar (gesture handles are ~16-34dp). */
+const BUTTON_NAV_MIN_INSET = 40;
+
+/** 20 physical screen pixels, converted to dp for this phone's density. */
+const GAP_20PX = 20 / PixelRatio.get();
+
+/**
+ * Space under the floating bar: 20 physical pixels from the screen edge,
+ * so the bar sits over the gesture-handle strip. With 3-button nav it stays
+ * the same 20px above the buttons instead.
+ */
+export const renterTabBarBottomGap = (bottomInset: number) =>
+  bottomInset >= BUTTON_NAV_MIN_INSET ? bottomInset + GAP_20PX : GAP_20PX;
 
 // Capsule is centred in the bar with even room on every side
 const PILL_H = ms(52);
@@ -121,7 +136,7 @@ export const RenterTabBar: React.FC<Props> = ({
     : null;
 
   return (
-    <View style={[styles.wrap, { paddingBottom: Math.max(bottomInset, spacing.md) }]}>
+    <View style={[styles.wrap, { paddingBottom: renterTabBarBottomGap(bottomInset) }]}>
       <View style={styles.bar}>
         {pillStyle ? (
           <Animated.View pointerEvents="none" style={[styles.pill, pillStyle]}>
@@ -178,7 +193,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: RENTER_TAB_BAR_HEIGHT,
     paddingHorizontal: BAR_PAD_X,
-    borderRadius: borderRadius.pill,
+    // Same corner as the guest cards and side menu (not a pill)
+    borderRadius: borderRadius.xxl,
     // Frosted bar (no border, so the capsule maths stays exact)
     backgroundColor: 'rgba(255,255,255,0.96)',
     shadowColor: colors.headerDarkBlue,
@@ -191,7 +207,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: PILL_TOP,
     height: PILL_H,
-    borderRadius: borderRadius.pill,
+    // Bar radius minus its 8dp inset, so the corners run parallel
+    borderRadius: borderRadius.lg,
     overflow: 'hidden',
     backgroundColor: colors.navy,
     shadowColor: colors.navy,
@@ -202,7 +219,7 @@ const styles = StyleSheet.create({
   },
   pillEdge: {
     ...StyleSheet.absoluteFill,
-    borderRadius: borderRadius.pill,
+    borderRadius: borderRadius.lg,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.22)',
   },
@@ -220,14 +237,11 @@ const styles = StyleSheet.create({
     gap: ms(4),
   },
   label: {
-    fontFamily: typography.fontFamily.body.medium,
-    fontSize: scaleFont(11),
-    lineHeight: scaleFont(14),
-    letterSpacing: 0.2,
+    ...typographyPresets.segmentLabel,
     color: colors.textSecondary,
   },
+  // Same weight as unselected (like the guest tabs); only the colour changes
   labelActive: {
-    fontFamily: typography.fontFamily.body.semiBold,
     color: colors.white,
   },
   alertDot: {

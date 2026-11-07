@@ -19,7 +19,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { BrandLockup } from '@/components/BrandLogo';
+import { HeaderBrand } from '@/components/BrandLogo';
 import {
   borderRadius,
   colors,
@@ -132,12 +132,7 @@ export const HeroSection: React.FC<Props> = ({
       >
         <View style={styles.header}>
           <View style={styles.brand} pointerEvents="none">
-            <BrandLockup
-              label="Urban Nest"
-              logoSize={ms(24)}
-              gap={spacing.sm}
-              textStyle={typographyPresets.brandTitle}
-            />
+            <HeaderBrand />
           </View>
           {/* Search icon removed from the header for now
           <Pressable

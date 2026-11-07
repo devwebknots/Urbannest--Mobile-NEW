@@ -13,12 +13,11 @@ import {
   colors,
   commonStyles,
   gradients,
-  shadows,
   spacing,
   typographyPresets,
 } from '@/config/theme';
 import {
-  ArrowCircleIcon,
+  ArrowRightIcon,
   StarGlyph,
 } from '@/features/guest/components/GuestIcons';
 import { Scrim } from '@/features/persona/components/Scrim';
@@ -78,10 +77,9 @@ const ActionButton: React.FC<{ status: LeaseStatus; onPress: () => void }> = ({
           colors={gradients.button}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
-          style={[styles.action, styles.actionSolid]}
+          style={styles.action}
         >
           <Text style={[styles.actionText, styles.actionTextLight]}>{label}</Text>
-          <ArrowCircleIcon size={ms(30)} background={colors.white} color={colors.navy} />
         </LinearGradient>
       </Pressable>
     );
@@ -96,7 +94,8 @@ const ActionButton: React.FC<{ status: LeaseStatus; onPress: () => void }> = ({
         style={styles.link}
       >
         <Text style={styles.actionText}>{label}</Text>
-        <ArrowCircleIcon size={ms(22)} background={colors.navy} color={colors.white} />
+        {/* Same arrow as the guest "Explore Homes" button */}
+        <ArrowRightIcon size={ms(16)} color={colors.navy} />
       </Pressable>
     );
   }
@@ -108,7 +107,6 @@ const ActionButton: React.FC<{ status: LeaseStatus; onPress: () => void }> = ({
       style={[styles.action, styles.actionSoft]}
     >
       <Text style={styles.actionText}>{label}</Text>
-      <ArrowCircleIcon size={ms(30)} background={colors.navy} color={colors.white} />
     </Pressable>
   );
 };
@@ -144,7 +142,7 @@ export const ResidenceCard: React.FC<Props> = ({
 
         <Pressable
           onPress={onMenuPress}
-          hitSlop={8}
+          hitSlop={12}
           style={styles.menu}
           accessibilityRole="button"
           accessibilityLabel={`More options for ${residence.name}`}
@@ -243,23 +241,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: spacing.md + 2,
     right: spacing.md + 2,
-    width: ms(34),
-    height: ms(34),
-    borderRadius: borderRadius.md + 2,
+    width: ms(28),
+    height: ms(28),
+    borderRadius: borderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.22)',
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.75)',
   },
   dots: {
     flexDirection: 'row',
-    gap: ms(3),
+    gap: ms(2),
   },
   dotSmall: {
-    width: ms(4),
-    height: ms(4),
-    borderRadius: ms(2),
+    width: ms(3),
+    height: ms(3),
+    borderRadius: ms(1.5),
     backgroundColor: colors.white,
   },
   body: {
@@ -333,20 +331,16 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.md - 2,
     backgroundColor: colors.border,
   },
-  // Same width for "Check-In Now" and "Manage"; text left, arrow circle right
+  // Same as the guest "Tap to talk" button: 44 high, radius 10, centred
+  // text, no arrow, no shadow. Same width for "Check-In Now" and "Manage".
   action: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    minWidth: ms(150),
-    gap: spacing.sm,
-    height: ms(42),
-    paddingLeft: spacing.lg,
-    paddingRight: ms(6),
+    justifyContent: 'center',
+    minWidth: ms(130),
+    height: ms(44),
+    paddingHorizontal: spacing.xl,
     borderRadius: borderRadius.button,
-  },
-  actionSolid: {
-    ...shadows.md,
   },
   actionSoft: {
     backgroundColor: colors.chipBlue,
@@ -354,7 +348,7 @@ const styles = StyleSheet.create({
   link: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: ms(6),
+    gap: spacing.sm,
   },
   actionText: {
     ...typographyPresets.button,

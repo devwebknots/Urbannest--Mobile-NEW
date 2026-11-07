@@ -5,10 +5,10 @@
  */
 
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { BrandLockup } from '@/components/BrandLogo';
-import { colors, spacing, typographyPresets } from '@/config/theme';
-import { moderateScale as ms } from '@/utils/responsive';
+import { StyleSheet, Text, View } from 'react-native';
+import { HeaderBrand } from '@/components/BrandLogo';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
+import { spacing, typographyPresets } from '@/config/theme';
 
 interface Props {
   topInset: number;
@@ -19,25 +19,12 @@ interface Props {
 export const RenterHeader: React.FC<Props> = ({ topInset, initials, onProfilePress }) => (
   <View style={[styles.root, { paddingTop: topInset + spacing.md }]}>
     <View style={styles.topRow}>
-      <BrandLockup
-        label="URBAN NEST"
-        logoSize={ms(20)}
-        gap={spacing.sm}
-        textStyle={typographyPresets.brandTitle}
-        style={styles.brand}
-      />
-      <Pressable
-        onPress={onProfilePress}
-        style={styles.avatar}
-        accessibilityRole="button"
-        accessibilityLabel="Profile"
-      >
-        <Text style={styles.avatarText}>{initials}</Text>
-      </Pressable>
+      <HeaderBrand style={styles.brand} />
+      <ProfileAvatar initials={initials} onPress={onProfilePress} />
     </View>
 
     <View style={styles.copy}>
-      <Text style={styles.eyebrow}>My Rentals</Text>
+      {/* <Text style={styles.eyebrow}>My Rentals</Text> */}
       <Text style={styles.title}>My Residences</Text>
       <Text style={[typographyPresets.heroSubtitle, styles.subtitle]}>
         The properties you're currently renting{'\n'}and previously lived in.
@@ -46,11 +33,10 @@ export const RenterHeader: React.FC<Props> = ({ topInset, initials, onProfilePre
   </View>
 );
 
-const AVATAR = ms(42);
-
 const styles = StyleSheet.create({
   root: {
-    paddingHorizontal: spacing.screenHorizontal + 4,
+    // Same side padding as the guest header
+    paddingHorizontal: spacing.screenHorizontal,
   },
   topRow: {
     flexDirection: 'row',
@@ -58,20 +44,6 @@ const styles = StyleSheet.create({
   },
   brand: {
     flex: 1,
-  },
-  avatar: {
-    width: AVATAR,
-    height: AVATAR,
-    borderRadius: AVATAR / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.6)',
-  },
-  avatarText: {
-    ...typographyPresets.button,
-    color: colors.navy,
   },
   copy: {
     marginTop: spacing.xxxl,
