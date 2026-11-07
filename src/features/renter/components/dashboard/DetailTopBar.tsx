@@ -7,8 +7,8 @@
 import React from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { ChevronLeftIcon } from '@/components/icons';
-import { colors, spacing, typography } from '@/config/theme';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { colors, spacing, typographyPresets } from '@/config/theme';
+import { moderateScale as ms } from '@/utils/responsive';
 
 interface Props {
   topInset: number;
@@ -99,11 +99,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.32)',
   },
   title: {
+    ...typographyPresets.sectionTitle,
     flex: 1,
     marginHorizontal: spacing.md,
     textAlign: 'center',
-    fontFamily: typography.fontFamily.heading.bold,
-    fontSize: scaleFont(17),
     color: colors.white,
   },
   avatar: {
@@ -117,10 +116,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.6)',
   },
   avatarText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(12.5),
+    ...typographyPresets.button,
     color: colors.navy,
-    letterSpacing: 0.5,
   },
   pressed: {
     transform: [{ scale: 0.94 }],

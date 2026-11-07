@@ -8,8 +8,8 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from '@/components/LinearGradient';
-import { borderRadius, colors, gradients, spacing, typography, typographyPresets } from '@/config/theme';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { borderRadius, colors, gradients, spacing, typographyPresets } from '@/config/theme';
+import { moderateScale as ms } from '@/utils/responsive';
 import type { CheckInSummary } from '../../types';
 import { RenterIcon } from '../dashboard/RenterIcon';
 
@@ -122,7 +122,6 @@ const styles = StyleSheet.create({
   eyebrow: {
     ...typographyPresets.eyebrow,
     color: colors.heroAccent,
-    letterSpacing: 2,
   },
   verified: {
     flexDirection: 'row',
@@ -145,21 +144,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   verifiedText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(11.5),
+    ...typographyPresets.badge,
     color: colors.white,
   },
   title: {
-    fontFamily: typography.fontFamily.heading.bold,
-    fontSize: scaleFont(30),
-    lineHeight: scaleFont(38),
-    color: colors.white,
+    ...typographyPresets.heroTitle,
     marginTop: spacing.md,
   },
   body: {
-    fontFamily: typography.fontFamily.body.regular,
-    fontSize: scaleFont(13.5),
-    lineHeight: scaleFont(20.5),
+    ...typographyPresets.body,
     color: colors.textInverseMuted,
     marginTop: spacing.sm,
   },
@@ -185,15 +178,12 @@ const styles = StyleSheet.create({
   },
   factLabel: {
     ...typographyPresets.eyebrow,
-    fontSize: scaleFont(10),
     color: 'rgba(255,255,255,0.6)',
   },
   factValue: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(14),
+    ...typographyPresets.bodyBold,
     color: colors.white,
     marginTop: ms(4),
-    letterSpacing: 0.4,
   },
   keyButton: {
     flexDirection: 'row',
@@ -217,14 +207,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   keyTitle: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(14.5),
+    ...typographyPresets.cardTitle,
     color: colors.navy,
   },
   keyHint: {
-    fontFamily: typography.fontFamily.body.regular,
-    fontSize: scaleFont(11.5),
-    color: colors.textSecondary,
+    ...typographyPresets.cardSubtitle,
     marginTop: 1,
   },
   pressed: {

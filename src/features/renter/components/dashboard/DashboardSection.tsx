@@ -5,9 +5,9 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, spacing, typography, typographyPresets } from '@/config/theme';
+import { colors, spacing, typographyPresets } from '@/config/theme';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { moderateScale as ms } from '@/utils/responsive';
 
 interface Props {
   title: string;
@@ -54,16 +54,11 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   title: {
-    fontFamily: typography.fontFamily.heading.bold,
-    fontSize: scaleFont(22),
-    lineHeight: scaleFont(29),
+    ...typographyPresets.sectionHeading,
     color: colors.navy,
   },
   subtitle: {
-    fontFamily: typography.fontFamily.body.regular,
-    fontSize: scaleFont(13),
-    lineHeight: scaleFont(19),
-    color: colors.textSecondary,
+    ...typographyPresets.cardSubtitle,
     marginTop: spacing.xs,
   },
   link: {
@@ -74,7 +69,6 @@ const styles = StyleSheet.create({
   },
   linkText: {
     ...typographyPresets.sectionLink,
-    fontFamily: typography.fontFamily.body.semiBold,
   },
   body: {
     marginTop: spacing.lg,

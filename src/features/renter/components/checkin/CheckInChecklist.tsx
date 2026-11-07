@@ -10,9 +10,9 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from '@/components/LinearGradient';
-import { borderRadius, colors, gradients, spacing, typography } from '@/config/theme';
+import { borderRadius, colors, gradients, spacing, typographyPresets } from '@/config/theme';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { moderateScale as ms } from '@/utils/responsive';
 import type { CheckInTask } from '../../types';
 import { RenterIcon } from '../dashboard/RenterIcon';
 
@@ -173,18 +173,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   progressLabel: {
-    fontFamily: typography.fontFamily.body.medium,
-    fontSize: scaleFont(13),
+    ...typographyPresets.bodyMedium,
     color: colors.textSecondary,
   },
   progressCount: {
-    fontFamily: typography.fontFamily.body.bold,
-    fontSize: scaleFont(16),
+    ...typographyPresets.price,
     color: colors.navy,
   },
   progressPct: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(12.5),
+    ...typographyPresets.sectionLink,
     color: colors.navy,
   },
   track: {
@@ -243,15 +240,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   tileLabel: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(14),
-    color: colors.navy,
+    ...typographyPresets.listingTitle,
     marginTop: spacing.lg,
   },
   tileHint: {
-    fontFamily: typography.fontFamily.body.regular,
-    fontSize: scaleFont(11.5),
-    color: colors.textSecondary,
+    ...typographyPresets.cardSubtitle,
     marginTop: spacing.xs,
   },
   textOn: {
@@ -270,10 +263,8 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.pill,
   },
   submitText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(15),
+    ...typographyPresets.button,
     color: colors.white,
-    letterSpacing: 0.3,
   },
   submitDone: {
     backgroundColor: colors.chipBlue,
@@ -287,14 +278,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.navy,
   },
   submitDoneText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(15),
+    ...typographyPresets.button,
     color: colors.navy,
   },
   footnote: {
-    fontFamily: typography.fontFamily.body.regular,
-    fontSize: scaleFont(11.5),
-    color: colors.textSecondary,
+    ...typographyPresets.caption,
     textAlign: 'center',
     marginTop: spacing.md,
   },

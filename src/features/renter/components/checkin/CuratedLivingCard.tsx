@@ -6,9 +6,9 @@
 
 import React from 'react';
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
-import { borderRadius, colors, spacing, typography, typographyPresets } from '@/config/theme';
+import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { moderateScale as ms } from '@/utils/responsive';
 
 interface Props {
   eyebrow: string;
@@ -69,12 +69,9 @@ const styles = StyleSheet.create({
   kicker: {
     ...typographyPresets.eyebrow,
     color: colors.heroAccent,
-    letterSpacing: 2,
   },
   title: {
-    fontFamily: typography.fontFamily.heading.bold,
-    fontSize: scaleFont(24),
-    lineHeight: scaleFont(31),
+    ...typographyPresets.sectionHeading,
     color: colors.white,
     marginTop: ms(6),
   },
@@ -82,9 +79,7 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
   },
   text: {
-    fontFamily: typography.fontFamily.body.regular,
-    fontSize: scaleFont(14),
-    lineHeight: scaleFont(22),
+    ...typographyPresets.body,
     color: colors.textSecondary,
   },
   signature: {
@@ -101,9 +96,7 @@ const styles = StyleSheet.create({
   },
   signatureText: {
     ...typographyPresets.eyebrow,
-    fontSize: scaleFont(10),
     color: colors.navy,
-    letterSpacing: 1.6,
   },
 });
 

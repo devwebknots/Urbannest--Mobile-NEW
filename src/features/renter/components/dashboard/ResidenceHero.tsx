@@ -7,9 +7,9 @@
 import React from 'react';
 import { Animated, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
 import { MapPinIcon } from '@/components/icons';
-import { borderRadius, colors, spacing, typography, typographyPresets } from '@/config/theme';
+import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { moderateScale as ms } from '@/utils/responsive';
 
 interface Props {
   image: ImageSourcePropType;
@@ -126,12 +126,9 @@ const styles = StyleSheet.create({
   eyebrow: {
     ...typographyPresets.eyebrow,
     color: 'rgba(250,210,77,0.92)',
-    letterSpacing: 2.4,
   },
   name: {
     ...typographyPresets.heroTitle,
-    fontSize: scaleFont(34),
-    lineHeight: scaleFont(41),
     marginTop: spacing.sm,
   },
   addressRow: {
@@ -144,11 +141,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   address: {
+    ...typographyPresets.heroSubtitle,
     flex: 1,
-    fontFamily: typography.fontFamily.body.medium,
-    fontSize: scaleFont(14),
-    lineHeight: scaleFont(20),
-    color: 'rgba(255,255,255,0.9)',
   },
   pills: {
     flexDirection: 'row',
@@ -176,8 +170,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4ADE80',
   },
   pillText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(12),
+    ...typographyPresets.badge,
     color: colors.white,
   },
 });

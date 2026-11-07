@@ -8,9 +8,9 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { MapPinIcon } from '@/components/icons';
-import { borderRadius, colors, spacing, typography, typographyPresets } from '@/config/theme';
+import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { moderateScale as ms } from '@/utils/responsive';
 import type { NeighborhoodCategory, NeighborhoodPlace } from '../../types';
 import { RenterIcon } from '../dashboard/RenterIcon';
 
@@ -129,8 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.navy,
   },
   tabText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(12.5),
+    ...typographyPresets.bodyMedium,
     color: colors.navy,
   },
   tabTextOn: {
@@ -150,8 +149,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   index: {
-    fontFamily: typography.fontFamily.heading.bold,
-    fontSize: scaleFont(18),
+    ...typographyPresets.displayTitle,
     color: colors.textSubtle,
     width: ms(26),
   },
@@ -159,14 +157,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   placeName: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(14),
-    color: colors.navy,
+    ...typographyPresets.listingTitle,
   },
   placeMeta: {
     ...typographyPresets.eyebrow,
-    fontSize: scaleFont(10),
-    letterSpacing: 1,
     marginTop: spacing.xs,
   },
   distance: {
@@ -189,11 +183,9 @@ const styles = StyleSheet.create({
   },
   mapLinkText: {
     ...typographyPresets.sectionLink,
-    fontFamily: typography.fontFamily.body.semiBold,
   },
   distanceText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(11.5),
+    ...typographyPresets.badge,
     color: colors.navy,
   },
 });
