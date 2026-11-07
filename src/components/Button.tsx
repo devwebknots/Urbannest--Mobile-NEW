@@ -1,97 +1,213 @@
 /**
  * Global Dumb Component: Button
- * Pure presentation component for user actions.
+ * Pure presentation component for user actions. Uses TouchableOpacity so
+ * every button fades when pressed.
+ *
+ * App button styles (use these for new screens):
+ *  - brand: navy gradient, white text (main action, e.g. "Check-In Now")
+ *  - soft:  light blue fill, navy text (secondary action, e.g. "Manage")
+ *  - link:  no fill, navy text, usually with an arrow (e.g. "Renew")
+ * All share radius 10, the `button` text preset and optional icons.
+ * Sizes: md = 44 high, lg = 48 high.
+ *
+ * Older variants (primary / secondary / outline / danger) are kept for the
+ * login screen.
  */
 
 import React from 'react';
 import {
   ActivityIndicator,
+  Insets,
   StyleProp,
   StyleSheet,
   Text,
   TextStyle,
   TouchableOpacity,
+  View,
   ViewStyle,
 } from 'react-native';
-import { colors, borderRadius, spacing, typography } from '@/config/theme';
+import { LinearGradient } from '@/components/LinearGradient';
+import {
+  colors,
+  borderRadius,
+  gradients,
+  spacing,
+  typography,
+  typographyPresets,
+} from '@/config/theme';
+import { moderateScale as ms } from '@/utils/responsive';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'danger'
+  | 'brand'
+  | 'soft'
+  | 'link';
+
+export type ButtonSize = 'md' | 'lg';
 
 export interface ButtonProps {
   readonly title: string;
-  readonly onPress: () => void;
+  readonly onPress?: () => void;
   readonly variant?: ButtonVariant;
+  /** Height for brand / soft: md = 44, lg = 48 (default lg) */
+  readonly size?: ButtonSize;
+  /** Icon before the text */
+  readonly leftIcon?: React.ReactNode;
+  /** Icon after the text (e.g. an arrow) */
+  readonly rightIcon?: React.ReactNode;
   readonly isLoading?: boolean;
   readonly disabled?: boolean;
   readonly style?: StyleProp<ViewStyle>;
   readonly textStyle?: StyleProp<TextStyle>;
+  readonly accessibilityLabel?: string;
+  readonly hitSlop?: Insets | number;
   readonly testID?: string;
 }
+
+const APP_VARIANTS: readonly ButtonVariant[] = ['brand', 'soft', 'link'];
 
 export const Button: React.FC<ButtonProps> = ({
   title,
   onPress,
   variant = 'primary',
+  size = 'lg',
+  leftIcon,
+  rightIcon,
   isLoading = false,
   disabled = false,
   style,
   textStyle,
+  accessibilityLabel,
+  hitSlop,
   testID,
 }) => {
   const isInteractionDisabled = disabled || isLoading;
+  const isApp = APP_VARIANTS.includes(variant);
 
   const getContainerStyle = (): StyleProp<ViewStyle> => {
     switch (variant) {
+      case 'brand':
+        return [styles.appContainer, styles[size]];
+      case 'soft':
+        return [styles.appContainer, styles[size], styles.softContainer];
+      case 'link':
+        return styles.linkContainer;
       case 'secondary':
-        return styles.secondaryContainer;
+        return [styles.baseContainer, styles.secondaryContainer];
       case 'outline':
-        return styles.outlineContainer;
+        return [styles.baseContainer, styles.outlineContainer];
       case 'danger':
-        return styles.dangerContainer;
+        return [styles.baseContainer, styles.dangerContainer];
       case 'primary':
       default:
-        return styles.primaryContainer;
+        return [styles.baseContainer, styles.primaryContainer];
     }
   };
 
   const getTextStyle = (): StyleProp<TextStyle> => {
     switch (variant) {
+      case 'brand':
+        return [styles.appText, styles.lightText];
+      case 'soft':
+      case 'link':
+        return styles.appText;
       case 'outline':
-        return styles.outlineText;
+        return [styles.baseText, styles.outlineText];
       case 'primary':
       case 'secondary':
       case 'danger':
       default:
-        return styles.solidText;
+        return [styles.baseText, styles.solidText];
     }
   };
+
+  const spinnerColor =
+    variant === 'outline'
+      ? colors.primary
+      : variant === 'soft' || variant === 'link'
+        ? colors.navy
+        : colors.white;
 
   return (
     <TouchableOpacity
       testID={testID}
       style={[
-        styles.baseContainer,
         getContainerStyle(),
-        isInteractionDisabled && styles.disabledContainer,
+        isInteractionDisabled && (isApp ? styles.appDisabled : styles.disabledContainer),
         style,
       ]}
       onPress={onPress}
       disabled={isInteractionDisabled}
-      activeOpacity={0.8}
+      activeOpacity={0.7}
+      hitSlop={hitSlop}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? title}
+      accessibilityState={{ disabled: isInteractionDisabled, busy: isLoading }}
     >
-      {isLoading ? (
-        <ActivityIndicator
-          size="small"
-          color={variant === 'outline' ? colors.primary : colors.white}
+      {variant === 'brand' ? (
+        <LinearGradient
+          colors={gradients.button}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={StyleSheet.absoluteFill}
         />
+      ) : null}
+      {isLoading ? (
+        <ActivityIndicator size="small" color={spinnerColor} />
       ) : (
-        <Text style={[styles.baseText, getTextStyle(), textStyle]}>{title}</Text>
+        <View style={styles.content}>
+          {leftIcon}
+          <Text style={[getTextStyle(), textStyle]}>{title}</Text>
+          {rightIcon}
+        </View>
       )}
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
+  // App buttons (brand / soft)
+  appContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xl,
+    borderRadius: borderRadius.button,
+    overflow: 'hidden',
+  },
+  md: {
+    height: ms(44),
+  },
+  lg: {
+    height: ms(48),
+  },
+  softContainer: {
+    backgroundColor: colors.chipBlue,
+  },
+  linkContainer: {
+    alignSelf: 'flex-start',
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+  },
+  appText: {
+    ...typographyPresets.button,
+    color: colors.navy,
+  },
+  lightText: {
+    color: colors.white,
+  },
+  appDisabled: {
+    opacity: 0.45,
+  },
+
+  // Older variants (login)
   baseContainer: {
     height: 48,
     borderRadius: borderRadius.md,

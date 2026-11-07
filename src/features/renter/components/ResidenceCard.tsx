@@ -6,13 +6,12 @@
 
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from '@/components/LinearGradient';
+import { Button } from '@/components/Button';
 import { CalendarIcon, ClockIcon, MapPinIcon } from '@/components/icons';
 import {
   borderRadius,
   colors,
   commonStyles,
-  gradients,
   spacing,
   typographyPresets,
 } from '@/config/theme';
@@ -70,44 +69,26 @@ const ActionButton: React.FC<{ status: LeaseStatus; onPress: () => void }> = ({
   onPress,
 }) => {
   const label = ACTION_LABEL[status];
-  if (status === 'moveInReady') {
-    return (
-      <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
-        <LinearGradient
-          colors={gradients.button}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.action}
-        >
-          <Text style={[styles.actionText, styles.actionTextLight]}>{label}</Text>
-        </LinearGradient>
-      </Pressable>
-    );
-  }
   if (status === 'expired') {
     return (
-      <Pressable
+      <Button
+        title={label}
+        variant="link"
         onPress={onPress}
         hitSlop={10}
-        accessibilityRole="button"
-        accessibilityLabel={label}
-        style={styles.link}
-      >
-        <Text style={styles.actionText}>{label}</Text>
-        {/* Same arrow as the guest "Explore Homes" button */}
-        <ArrowRightIcon size={ms(16)} color={colors.navy} />
-      </Pressable>
+        rightIcon={<ArrowRightIcon size={ms(16)} color={colors.navy} />}
+      />
     );
   }
+  // Same width for "Check-In Now" and "Manage"
   return (
-    <Pressable
+    <Button
+      title={label}
+      variant={status === 'moveInReady' ? 'brand' : 'soft'}
+      size="md"
       onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      style={[styles.action, styles.actionSoft]}
-    >
-      <Text style={styles.actionText}>{label}</Text>
-    </Pressable>
+      style={styles.action}
+    />
   );
 };
 
@@ -331,31 +312,9 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.md - 2,
     backgroundColor: colors.border,
   },
-  // Same as the guest "Tap to talk" button: 44 high, radius 10, centred
-  // text, no arrow, no shadow. Same width for "Check-In Now" and "Manage".
+  // Same width for "Check-In Now" and "Manage" (look comes from Button)
   action: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     minWidth: ms(130),
-    height: ms(44),
-    paddingHorizontal: spacing.xl,
-    borderRadius: borderRadius.button,
-  },
-  actionSoft: {
-    backgroundColor: colors.chipBlue,
-  },
-  link: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  actionText: {
-    ...typographyPresets.button,
-    color: colors.navy,
-  },
-  actionTextLight: {
-    color: colors.white,
   },
 });
 

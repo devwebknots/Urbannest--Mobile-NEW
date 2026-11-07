@@ -9,6 +9,7 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Button } from '@/components/Button';
 import { LinearGradient } from '@/components/LinearGradient';
 import { borderRadius, colors, gradients, shadows, spacing, typographyPresets } from '@/config/theme';
 import { CARD_BG } from '@/features/guest/components/CardBackground';
@@ -116,24 +117,14 @@ export const CheckInChecklist: React.FC<Props> = ({
           <Text style={styles.submitDoneText}>Check-In Submitted</Text>
         </View>
       ) : (
-        <Pressable
+        <Button
+          title="Submit Check-In"
+          variant="brand"
           onPress={onSubmit}
           disabled={!canSubmit}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: !canSubmit }}
-          accessibilityLabel="Submit check-in"
-          style={({ pressed }) => [!canSubmit && styles.disabled, pressed && styles.pressed]}
-        >
-          <LinearGradient
-            colors={gradients.button}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.submit}
-          >
-            <Text style={styles.submitText}>Submit Check-In</Text>
-            <ArrowRightIcon size={ms(16)} color={colors.white} />
-          </LinearGradient>
-        </Pressable>
+          rightIcon={<ArrowRightIcon size={ms(16)} color={colors.white} />}
+          style={styles.submitButton}
+        />
       )}
       <Text style={styles.footnote}>
         {submitted
@@ -258,9 +249,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     borderRadius: borderRadius.button,
   },
-  submitText: {
-    ...typographyPresets.button,
-    color: colors.white,
+  submitButton: {
+    marginTop: spacing.xl,
   },
   submitDone: {
     backgroundColor: colors.chipBlue,
@@ -281,9 +271,6 @@ const styles = StyleSheet.create({
     ...typographyPresets.caption,
     textAlign: 'center',
     marginTop: spacing.md,
-  },
-  disabled: {
-    opacity: 0.45,
   },
   pressed: {
     transform: [{ scale: 0.97 }],

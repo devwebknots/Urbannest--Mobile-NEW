@@ -5,26 +5,20 @@
 
 import React, { useRef, useState } from 'react';
 import {
-  Pressable,
   ScrollView,
   ScrollViewInstance,
   StatusBar,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  borderRadius,
-  colors,
-  spacing,
-  typographyPresets,
-} from '@/config/theme';
+import { Button } from '@/components/Button';
+import { colors, spacing } from '@/config/theme';
 import { moderateScale as ms } from '@/utils/responsive';
 import { CategoryRow } from '../components/CategoryRow';
 import { CitiesSection } from '../components/CitiesSection';
 import { FeaturedCarousel } from '../components/FeaturedCarousel';
-import { ArrowCircleIcon } from '../components/GuestIcons';
+import { ArrowRightIcon } from '../components/GuestIcons';
 import { GuidesSection } from '../components/GuidesSection';
 import { GuestMenuKey, GuestSideMenu } from '../components/GuestSideMenu';
 import { HeroSection } from '../components/HeroSection';
@@ -178,14 +172,13 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
               />
             ))}
           </View>
-          <Pressable style={styles.seeMore} accessibilityRole="button">
-            <Text style={styles.seeMoreText}>See More Properties</Text>
-            <ArrowCircleIcon
-              size={ms(30)}
-              background={colors.navy}
-              color={colors.white}
-            />
-          </Pressable>
+          <Button
+            title="See More Properties"
+            variant="soft"
+            size="md"
+            rightIcon={<ArrowRightIcon size={ms(14)} color={colors.navy} />}
+            style={styles.seeMore}
+          />
         </View>
 
         <View
@@ -261,19 +254,7 @@ const styles = StyleSheet.create({
   },
   seeMore: {
     alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
     marginTop: spacing.xl,
-    paddingLeft: spacing.xl,
-    paddingRight: ms(6),
-    height: ms(42),
-    borderRadius: borderRadius.button,
-    backgroundColor: colors.chipBlue,
-  },
-  seeMoreText: {
-    ...typographyPresets.button,
-    color: colors.navy,
   },
 });
 

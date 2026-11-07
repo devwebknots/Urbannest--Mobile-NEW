@@ -8,6 +8,7 @@
 
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Button } from '@/components/Button';
 import { MapPinIcon } from '@/components/icons';
 import { borderRadius, colors, spacing, typography, typographyPresets } from '@/config/theme';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
@@ -91,15 +92,15 @@ export const NeighborhoodCard: React.FC<Props> = ({
         ))}
       </View>
 
-      <Pressable
+      <Button
+        title="View on Map"
+        variant="soft"
+        size="md"
         onPress={onOpenMap}
-        accessibilityRole="button"
         accessibilityLabel="View neighborhood map"
-        style={({ pressed }) => [styles.mapButton, pressed && styles.pressed]}
-      >
-        <Text style={styles.mapText}>View on Map</Text>
-        <ArrowRightIcon size={ms(14)} color={colors.navy} />
-      </Pressable>
+        rightIcon={<ArrowRightIcon size={ms(14)} color={colors.navy} />}
+        style={styles.mapButton}
+      />
     </View>
   );
 };
@@ -192,18 +193,7 @@ const styles = StyleSheet.create({
   },
   mapButton: {
     alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
     marginTop: spacing.xl,
-    paddingHorizontal: spacing.xl,
-    height: ms(42),
-    borderRadius: borderRadius.button,
-    backgroundColor: colors.chipBlue,
-  },
-  mapText: {
-    ...typographyPresets.button,
-    color: colors.navy,
   },
 });
 

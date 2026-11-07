@@ -10,7 +10,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from '@/components/LinearGradient';
+import { Button } from '@/components/Button';
 import {
   ChevronDownIcon,
   HomeIcon,
@@ -21,7 +21,6 @@ import {
 import {
   borderRadius,
   colors,
-  gradients,
   shadows,
   spacing,
   typography,
@@ -202,17 +201,14 @@ export const SearchCard: React.FC<Props> = ({
           <Text style={styles.bubbleText}>
             Try <Text style={styles.bubbleQuote}>“2 bed in Austin under $2,000”</Text>
           </Text>
-          <Pressable onPress={onTalkToOrbitl} accessibilityRole="button" style={styles.talkPress}>
-            <LinearGradient
-              colors={gradients.button}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.talkButton}
-            >
-              <MicIcon size={ms(16)} color={colors.white} />
-              <Text style={styles.talkText}>Tap to talk</Text>
-            </LinearGradient>
-          </Pressable>
+          <Button
+            title="Tap to talk"
+            variant="brand"
+            size="md"
+            onPress={onTalkToOrbitl}
+            leftIcon={<MicIcon size={ms(16)} color={colors.white} />}
+            style={styles.talkPress}
+          />
         </View>
       </Collapsible>
 
@@ -263,17 +259,13 @@ export const SearchCard: React.FC<Props> = ({
             />
           </View>
 
-          <Pressable onPress={onSearch} accessibilityRole="button" style={styles.searchPress}>
-            <LinearGradient
-              colors={gradients.button}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.searchButton}
-            >
-              <SearchIcon size={ms(16)} color={colors.white} />
-              <Text style={styles.searchText}>{copy.searchLabel}</Text>
-            </LinearGradient>
-          </Pressable>
+          <Button
+            title={copy.searchLabel}
+            variant="brand"
+            onPress={onSearch}
+            leftIcon={<SearchIcon size={ms(16)} color={colors.white} />}
+            style={styles.searchPress}
+          />
         </View>
       </Collapsible>
     </View>
@@ -401,18 +393,6 @@ const styles = StyleSheet.create({
   talkPress: {
     marginTop: spacing.md,
   },
-  talkButton: {
-    height: ms(44),
-    borderRadius: borderRadius.button,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-  },
-  talkText: {
-    ...typographyPresets.button,
-    color: colors.white,
-  },
   filters: {
     marginTop: spacing.md,
   },
@@ -460,18 +440,6 @@ const styles = StyleSheet.create({
   },
   searchPress: {
     marginTop: spacing.xs,
-  },
-  searchButton: {
-    height: ms(48),
-    borderRadius: borderRadius.button,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-  },
-  searchText: {
-    ...typographyPresets.button,
-    color: colors.white,
   },
 });
 

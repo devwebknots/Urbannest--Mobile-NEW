@@ -4,9 +4,9 @@
  */
 
 import React from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from '@/components/LinearGradient';
-import { borderRadius, colors, gradients, spacing, typography } from '@/config/theme';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { Button } from '@/components/Button';
+import { borderRadius, colors, spacing, typography } from '@/config/theme';
 import { ArrowRightIcon, StarGlyph } from '@/features/guest/components/GuestIcons';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 import type { CommunityEvent } from '../../types';
@@ -72,22 +72,14 @@ export const EventCard: React.FC<Props> = ({ event, width, onPress }) => {
           </Text>
         </View>
 
-        <Pressable
+        <Button
+          title="View Details"
+          variant="brand"
           onPress={onPress}
-          accessibilityRole="button"
           accessibilityLabel={`View details for ${event.title}`}
-          style={({ pressed }) => [styles.buttonWrap, pressed && styles.pressed]}
-        >
-          <LinearGradient
-            colors={gradients.button}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>View Details</Text>
-            <ArrowRightIcon size={ms(15)} color={colors.white} />
-          </LinearGradient>
-        </Pressable>
+          rightIcon={<ArrowRightIcon size={ms(15)} color={colors.white} />}
+          style={styles.buttonWrap}
+        />
       </View>
     </View>
   );
@@ -211,23 +203,6 @@ const styles = StyleSheet.create({
   },
   buttonWrap: {
     marginTop: spacing.xl,
-  },
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    height: ms(48),
-    borderRadius: borderRadius.button,
-  },
-  pressed: {
-    opacity: 0.92,
-    transform: [{ scale: 0.985 }],
-  },
-  buttonText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: scaleFont(14),
-    color: colors.white,
   },
 });
 
