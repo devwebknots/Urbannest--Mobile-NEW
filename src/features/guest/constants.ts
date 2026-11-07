@@ -12,6 +12,11 @@ import type {
   RentalListing,
 } from './types';
 
+/** Free Mixkit clip (Mixkit License), 720p */
+const mixkit = (id: number) => ({
+  uri: `https://assets.mixkit.co/videos/${id}/${id}-720.mp4`,
+});
+
 const unsplash = (id: string, w = 800) => ({
   uri: `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`,
 });
@@ -45,6 +50,7 @@ export const FEATURED_PROPERTIES: FeaturedProperty[] = [
     baths: 3,
     sqft: 2140,
     image: unsplash('1600585154340-be6161a56a0c'),
+    video: mixkit(47286),
   },
   {
     id: 'f2',
@@ -56,6 +62,7 @@ export const FEATURED_PROPERTIES: FeaturedProperty[] = [
     baths: 2,
     sqft: 1056,
     image: unsplash('1564013799919-ab600027ffc6'),
+    video: mixkit(24945),
   },
   {
     id: 'f3',
@@ -67,6 +74,7 @@ export const FEATURED_PROPERTIES: FeaturedProperty[] = [
     baths: 2,
     sqft: 1480,
     image: unsplash('1568605114967-8130f3a36994'),
+    video: mixkit(48394),
   },
 ];
 

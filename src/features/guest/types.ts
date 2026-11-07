@@ -23,7 +23,10 @@ export interface FeaturedProperty {
   beds: number;
   baths: number;
   sqft: number;
+  /** Poster shown until the video plays (and when it can't) */
   image: ImageSourcePropType;
+  /** Looping, muted video tour that fills the card */
+  video?: { uri: string };
 }
 
 export interface RentalListing {
