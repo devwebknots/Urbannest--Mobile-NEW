@@ -1,17 +1,22 @@
 /**
- * SearchCard: Rent / Buy / Agents tabs, four filter fields and the
- * Search Properties button. Overlaps the bottom of the hero.
+ * SearchCard: "Find your next home" title with two buttons on the right:
+ *  - Orbitl AI (glowing orb): opens a bubble explaining voice search,
+ *    whose "Tap to talk" starts the full-screen listening view.
+ *  - Search: opens a Rent / Buy switch, the filter fields and the search
+ *    button; while open the icon switches to the filter (sliders) icon.
+ *    Rent / Buy changes the field labels and the button text.
+ * Only one panel is open at a time. Overlaps the bottom of the hero.
  */
 
-import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { LayoutAnimation, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from '@/components/LinearGradient';
 import {
   ChevronDownIcon,
   HomeIcon,
   MapPinIcon,
   SearchIcon,
-  UsersIcon,
+  // UsersIcon, // Agents tab hidden for now
 } from '@/components/icons';
 import {
   borderRadius,
@@ -25,6 +30,7 @@ import {
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
 import type { ListingMode } from '../types';
 import { BedIcon, BuildingIcon, DollarIcon, SlidersIcon } from './GuestIcons';
+import { MicIcon, OrbitlOrb, Sparkle, useOrbitlMotion } from './OrbitlOrb';
 
 interface Filters {
   location: string;
@@ -38,19 +44,37 @@ interface Props {
   onModeChange: (mode: ListingMode) => void;
   filters: Filters;
   onSearch: () => void;
+  /** "Tap to talk" in the Orbitl bubble */
+  onTalkToOrbitl: () => void;
 }
+
+type Panel = 'none' | 'filters' | 'orbitl';
 
 const TABS: { key: ListingMode; label: string }[] = [
   { key: 'rent', label: 'Rent' },
   { key: 'buy', label: 'Buy' },
-  { key: 'agents', label: 'Agents' },
+  // Agents tab hidden for now
+  // { key: 'agents', label: 'Agents' },
 ];
+
+/** Field labels and button text for each mode */
+const MODE_COPY = {
+  rent: { budgetLabel: 'Rent / Month', typeLabel: 'Rental Type', searchLabel: 'Search Rentals' },
+  buy: { budgetLabel: 'Price', typeLabel: 'Property Type', searchLabel: 'Search Homes for Sale' },
+};
+
+const ACTION_SIZE = ms(40);
+/** The Orbitl button is bigger so the glowing sphere is easy to spot */
+const ORBITL_SIZE = ms(54);
+const ACTION_GAP = spacing.sm;
+const TAIL = ms(12);
 
 const TabIcon: React.FC<{ tab: ListingMode; color: string }> = ({ tab, color }) => {
   const size = ms(14);
   if (tab === 'rent') return <HomeIcon size={size} color={color} />;
-  if (tab === 'buy') return <BuildingIcon size={size} color={color} />;
-  return <UsersIcon size={size} color={color} />;
+  return <BuildingIcon size={size} color={color} />;
+  // Agents tab hidden for now
+  // return <UsersIcon size={size} color={color} />;
 };
 
 const Field: React.FC<{ label: string; value: string; icon: React.ReactNode }> = ({
@@ -72,70 +96,157 @@ const Field: React.FC<{ label: string; value: string; icon: React.ReactNode }> =
   </Pressable>
 );
 
-export const SearchCard: React.FC<Props> = ({ mode, onModeChange, filters, onSearch }) => {
+export const SearchCard: React.FC<Props> = ({
+  mode,
+  onModeChange,
+  filters,
+  onSearch,
+  onTalkToOrbitl,
+}) => {
+  const [panel, setPanel] = useState<Panel>('none');
+  const animate = useOrbitlMotion();
   const iconSize = ms(16);
   const iconColor = colors.textSecondary;
+
+  const toggle = (next: Panel) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setPanel(current => (current === next ? 'none' : next));
+  };
+
+  const copy = mode === 'buy' ? MODE_COPY.buy : MODE_COPY.rent;
+  const filtersOpen = panel === 'filters';
+  const orbitlOpen = panel === 'orbitl';
+
   return (
     <View style={styles.card}>
-      <View style={styles.tabs}>
-        {TABS.map(tab => {
-          const active = tab.key === mode;
-          const color = active ? colors.white : colors.textSecondary;
-          return (
-            <Pressable
-              key={tab.key}
-              onPress={() => onModeChange(tab.key)}
-              style={[styles.tab, active && styles.tabActive]}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: active }}
-            >
-              <TabIcon tab={tab.key} color={color} />
-              <Text style={[styles.tabText, { color }]}>{tab.label}</Text>
-            </Pressable>
-          );
-        })}
-        <View style={styles.flex} />
-        <Pressable style={styles.filterButton} accessibilityLabel="More filters">
-          <SlidersIcon size={ms(15)} color={colors.navy} />
+      <View style={styles.header}>
+        {/* Title explains the card; tapping it opens the search too */}
+        <Pressable
+          onPress={() => toggle('filters')}
+          style={styles.headerText}
+          accessibilityRole="button"
+          accessibilityLabel="Find your next home"
+        >
+          <Text style={styles.headerTitle} numberOfLines={1}>
+            Find your next home
+          </Text>
+          <Text style={styles.headerSubtitle} numberOfLines={1}>
+            Search with filters or ask Orbitl AI
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => toggle('orbitl')}
+          style={[styles.action, styles.orbitlButton, orbitlOpen && styles.actionActive]}
+          accessibilityRole="button"
+          accessibilityLabel="Ask Orbitl AI"
+          accessibilityState={{ expanded: orbitlOpen }}
+        >
+          <OrbitlOrb size={ORBITL_SIZE} animate={animate} />
+        </Pressable>
+
+        <Pressable
+          onPress={() => toggle('filters')}
+          style={[styles.action, styles.searchButtonSmall, filtersOpen && styles.actionActive]}
+          accessibilityRole="button"
+          accessibilityLabel={filtersOpen ? 'Hide filters' : 'Search with filters'}
+          accessibilityState={{ expanded: filtersOpen }}
+        >
+          {filtersOpen ? (
+            <SlidersIcon size={ms(17)} color={colors.navy} />
+          ) : (
+            <SearchIcon size={ms(19)} color={colors.navy} />
+          )}
         </Pressable>
       </View>
 
-      <View style={styles.row}>
-        <Field
-          label="Location"
-          value={filters.location}
-          icon={<MapPinIcon size={iconSize} color={iconColor} />}
-        />
-        <Field
-          label="Rent / Month"
-          value={filters.budget}
-          icon={<DollarIcon size={iconSize} color={iconColor} />}
-        />
-      </View>
-      <View style={styles.row}>
-        <Field
-          label="Rental Type"
-          value={filters.rentalType}
-          icon={<HomeIcon size={iconSize} color={iconColor} />}
-        />
-        <Field
-          label="Bedrooms"
-          value={filters.bedrooms}
-          icon={<BedIcon size={iconSize} color={iconColor} />}
-        />
-      </View>
+      {orbitlOpen && (
+        <View style={styles.bubble}>
+          {/* Tail pointing up at the Orbitl button */}
+          <View style={styles.bubbleTail} />
+          <View style={styles.bubbleHeader}>
+            <Sparkle size={ms(14)} color={colors.gold} />
+            <Text style={styles.bubbleTitle}>Hi, I'm Orbitl, your home assistant</Text>
+          </View>
+          <Text style={styles.bubbleText}>
+            Skip the filters and just talk to me. Say something like{' '}
+            <Text style={styles.bubbleQuote}>“3 bed home in California under $3,000”</Text> and
+            I'll find homes that match.
+          </Text>
+          <Pressable onPress={onTalkToOrbitl} accessibilityRole="button" style={styles.talkPress}>
+            <LinearGradient
+              colors={gradients.button}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.talkButton}
+            >
+              <MicIcon size={ms(16)} color={colors.white} />
+              <Text style={styles.talkText}>Tap to talk</Text>
+            </LinearGradient>
+          </Pressable>
+        </View>
+      )}
 
-      <Pressable onPress={onSearch} accessibilityRole="button" style={styles.searchPress}>
-        <LinearGradient
-          colors={gradients.button}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.searchButton}
-        >
-          <SearchIcon size={ms(16)} color={colors.white} />
-          <Text style={styles.searchText}>Search Properties</Text>
-        </LinearGradient>
-      </Pressable>
+      {filtersOpen && (
+        <View style={styles.filters}>
+          {/* Rent / Buy decides which homes are searched and the fields below */}
+          <View style={styles.segment} accessibilityRole="tablist">
+            {TABS.map(tab => {
+              const active = tab.key === mode;
+              const color = active ? colors.white : colors.textSecondary;
+              return (
+                <Pressable
+                  key={tab.key}
+                  onPress={() => onModeChange(tab.key)}
+                  style={[styles.segmentItem, active && styles.segmentItemActive]}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: active }}
+                >
+                  <TabIcon tab={tab.key} color={color} />
+                  <Text style={[styles.segmentText, { color }]}>{tab.label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <View style={styles.row}>
+            <Field
+              label="Location"
+              value={filters.location}
+              icon={<MapPinIcon size={iconSize} color={iconColor} />}
+            />
+            <Field
+              label={copy.budgetLabel}
+              value={filters.budget}
+              icon={<DollarIcon size={iconSize} color={iconColor} />}
+            />
+          </View>
+          <View style={styles.row}>
+            <Field
+              label={copy.typeLabel}
+              value={filters.rentalType}
+              icon={<HomeIcon size={iconSize} color={iconColor} />}
+            />
+            <Field
+              label="Bedrooms"
+              value={filters.bedrooms}
+              icon={<BedIcon size={iconSize} color={iconColor} />}
+            />
+          </View>
+
+          <Pressable onPress={onSearch} accessibilityRole="button" style={styles.searchPress}>
+            <LinearGradient
+              colors={gradients.button}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.searchButton}
+            >
+              <SearchIcon size={ms(16)} color={colors.white} />
+              <Text style={styles.searchText}>{copy.searchLabel}</Text>
+            </LinearGradient>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 };
@@ -148,37 +259,127 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     ...shadows.lg,
   },
-  tabs: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.md,
   },
-  tab: {
+  headerText: {
+    flex: 1,
+    marginRight: spacing.sm,
+  },
+  headerTitle: {
+    ...typographyPresets.listingTitle,
+  },
+  headerSubtitle: {
+    ...typographyPresets.caption,
+    marginTop: 2,
+    color: colors.textSecondary,
+  },
+  segment: {
+    flexDirection: 'row',
+    padding: ms(4),
+    marginBottom: spacing.md,
+    borderRadius: borderRadius.pill,
+    backgroundColor: colors.surfaceMuted,
+  },
+  segmentItem: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: spacing.xs + 2,
-    paddingHorizontal: spacing.md,
-    paddingVertical: ms(7),
-    marginRight: spacing.xs,
+    height: ms(38),
     borderRadius: borderRadius.pill,
   },
-  tabActive: {
+  segmentItemActive: {
     backgroundColor: colors.navy,
   },
-  tabText: {
+  segmentText: {
     fontFamily: typography.fontFamily.body.medium,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.medium,
   },
-  flex: { flex: 1 },
-  filterButton: {
-    width: ms(32),
-    height: ms(32),
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+  action: {
+    width: ACTION_SIZE,
+    height: ACTION_SIZE,
+    borderRadius: ACTION_SIZE / 2,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  orbitlButton: {
+    width: ORBITL_SIZE,
+    height: ORBITL_SIZE,
+    borderRadius: ORBITL_SIZE / 2,
+    marginRight: ACTION_GAP,
+  },
+  searchButtonSmall: {
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  actionActive: {
+    backgroundColor: colors.chipBlue,
+    borderColor: colors.chipBlue,
+  },
+  bubble: {
+    marginTop: spacing.md + TAIL / 2,
+    padding: spacing.md,
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.25)',
+    backgroundColor: '#F3F7FE',
+  },
+  bubbleTail: {
+    position: 'absolute',
+    top: -TAIL / 2 - 1,
+    // Centered under the Orbitl button (search button + gap to its right)
+    right: ACTION_SIZE + ACTION_GAP + ORBITL_SIZE / 2 - TAIL / 2 - 1,
+    width: TAIL,
+    height: TAIL,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.25)',
+    backgroundColor: '#F3F7FE',
+    transform: [{ rotate: '45deg' }],
+  },
+  bubbleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs + 2,
+  },
+  bubbleTitle: {
+    fontFamily: typography.fontFamily.body.semiBold,
+    fontSize: typography.fontSize.base,
+    color: colors.navy,
+    fontWeight: typography.fontWeight.semibold,
+  },
+  bubbleText: {
+    marginTop: spacing.xs + 2,
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: typography.fontSize.sm,
+    lineHeight: scaleFont(18),
+    color: colors.textSecondary,
+  },
+  bubbleQuote: {
+    fontFamily: typography.fontFamily.body.medium,
+    color: colors.navy,
+  },
+  talkPress: {
+    marginTop: spacing.md,
+  },
+  talkButton: {
+    height: ms(44),
+    borderRadius: borderRadius.pill,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+  },
+  talkText: {
+    ...typographyPresets.button,
+    color: colors.white,
+  },
+  filters: {
+    marginTop: spacing.md,
   },
   row: {
     flexDirection: 'row',

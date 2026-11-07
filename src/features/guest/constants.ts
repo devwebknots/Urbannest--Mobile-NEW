@@ -173,3 +173,20 @@ export const TRUST_POINTS = [
     subtitle: 'Always here to help you',
   },
 ] as const;
+
+/** Example questions that cycle inside the Orbitl AI prompt */
+export const ORBITL_PROMPTS = [
+  '3 bed home in California under $3,000',
+  'Pet-friendly apartment near downtown',
+  'Quiet condo close to good schools',
+  'Townhome with a garage and backyard',
+];
+
+
+/** Default filter values when the search is switched to Buy */
+export const BUY_FILTERS = {
+  location: 'California',
+  budget: '$400k - $600k',
+  rentalType: 'Single Family',
+  bedrooms: '3 Bed',
+};

@@ -3,7 +3,7 @@
  * featured homes, nearby rentals, guides and cities before signing in.
  */
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -22,17 +22,20 @@ import { FeaturedCarousel } from '../components/FeaturedCarousel';
 import { ArrowCircleIcon } from '../components/GuestIcons';
 import { GuidesSection } from '../components/GuidesSection';
 import { HeroSection } from '../components/HeroSection';
+import { OrbitlListeningOverlay } from '../components/OrbitlListeningOverlay';
 import { RentalCard } from '../components/RentalCard';
 import { SearchCard } from '../components/SearchCard';
 import { CenteredHeader, SectionHeader } from '../components/SectionHeader';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for the hidden trust section
 import { TrustBar } from '../components/TrustBar';
 import {
+  BUY_FILTERS,
   CATEGORIES,
   FEATURED_GUIDE,
   FEATURED_PROPERTIES,
   GUIDES,
   HERO_IMAGES,
+  ORBITL_PROMPTS,
   RENTALS_NEAR_YOU,
   SEARCH_FILTERS,
   TOP_CITIES,
@@ -48,6 +51,8 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
   const vm = useGuestHome(navigation);
   const scrollRef = useRef<ScrollViewInstance>(null);
   const searchY = useRef(0);
+  // Full-screen Orbitl AI listening view
+  const [orbitlListening, setOrbitlListening] = useState(false);
 
   const scrollToSearch = () =>
     scrollRef.current?.scrollTo({ y: Math.max(0, searchY.current - insets.top), animated: true });
@@ -77,8 +82,9 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
           <SearchCard
             mode={vm.mode}
             onModeChange={vm.setMode}
-            filters={SEARCH_FILTERS}
+            filters={vm.mode === 'buy' ? BUY_FILTERS : SEARCH_FILTERS}
             onSearch={() => {}}
+            onTalkToOrbitl={() => setOrbitlListening(true)}
           />
         </View>
 
@@ -148,6 +154,12 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
         </View>
         */}
       </ScrollView>
+
+      <OrbitlListeningOverlay
+        visible={orbitlListening}
+        prompts={ORBITL_PROMPTS}
+        onClose={() => setOrbitlListening(false)}
+      />
     </View>
   );
 };
