@@ -17,8 +17,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronRightIcon } from '@/components/icons';
-import { borderRadius, colors, spacing, typography } from '@/config/theme';
-import { scaleFont } from '@/utils/responsive';
+import { borderRadius, colors, spacing, typography, typographyPresets } from '@/config/theme';
 import { PaginationDots } from '../components/PaginationDots';
 import { PersonaCarousel } from '../components/PersonaCarousel';
 import { Scrim } from '../components/Scrim';
@@ -194,11 +193,9 @@ const styles = StyleSheet.create({
     color: colors.subtitlePeriwinkle,
     textAlign: 'center',
   },
+  // Page headline: same Playfair style as the guest hero
   title: {
-    fontFamily: typography.fontFamily.heading.semiBold,
-    fontSize: scaleFont(30),
-    lineHeight: scaleFont(38),
-    color: colors.white,
+    ...typographyPresets.heroTitle,
     textAlign: 'center',
     marginTop: spacing.md,
   },

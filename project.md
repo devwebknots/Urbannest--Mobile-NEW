@@ -359,7 +359,8 @@ The application strictly uses **2 font families** (Poppins was deprecated and re
 
 | Preset | Font | Weight | Size / Line height | Extra | Used for |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `heroTitle` | Playfair Display | 800 ExtraBold in Figma → **Bold (700) until `PlayfairDisplay-ExtraBold.ttf` is added** | 30 / 35.4 | letterSpacing -0.75, white | "Finding New Home is *Simple*" |
+| `heroTitle` | Playfair Display | 800 ExtraBold in Figma → **Bold (700) until `PlayfairDisplay-ExtraBold.ttf` is added** | 30 / 35.4 | letterSpacing -0.75, white | **The one page-headline style for the whole app**: "Finding New Home is *Simple*" (guest hero), "Choose your persona", renter hero / header / check-in status titles |
+| `heroAccent` | Playfair Display | 600 SemiBold | 30 / 35.4 | letterSpacing -0.75, `heroAccent` gold | Accent word inside a `heroTitle` line ("*Simple*"); slant with `transform: [{ skewX: "-10deg" }]` |
 | `displayTitle` | Playfair Display | 600 SemiBold | 18 / 24.75 | letterSpacing 0, center | Centered section titles ("Most Exclusive Homes Just For You") |
 | `sectionDescription` | Inter | 400 Regular | 10 / 17.88 | letterSpacing 0, center, `textSecondary` | Paragraph under a centered section title |
 | `sectionHeading` | Playfair Display | 500 Medium | 19 / 26 | — | Left-aligned section titles ("Rentals Near You", "Resources & Guides") |
@@ -373,7 +374,12 @@ The application strictly uses **2 font families** (Poppins was deprecated and re
 
 All presets above (plus `cardTitle`, `cardSubtitle`, `body*`, `label`, `badge`, `button`, `tabLabel` in `theme.ts`) are the **only** text styles screens may use. Apply them directly, e.g. `style={[typographyPresets.listingTitle, styles.name]}`, where the local style holds layout only.
 
-Hero accent word "Simple": `PlayfairDisplay-SemiBold` + `fontStyle: 'italic'` (synthesized; no italic font file), color `heroAccent`, with the `heroAccentUnderline` bar.
+Hero accent word "Simple": `heroAccent` preset (Playfair SemiBold, gold) slanted with `transform: [{ skewX: '-10deg' }]`, with the `heroAccentUnderline` bar.
+
+**Playfair rules (apply app-wide):**
+- Page headlines always use `heroTitle` (+ `heroAccent` for a highlighted word); section titles use `sectionHeading` / `displayTitle`; logo text uses `brandTitle`. Don't hand-roll Playfair styles in screens.
+- Never add `fontWeight` to a Playfair style: the weight is in the font file (`PlayfairDisplay-Bold` etc.). Extra `fontWeight` can make Android fake-bold or fall back to the system font. The Playfair presets in `theme.ts` carry no `fontWeight`.
+- Never use `fontStyle: 'italic'` with Playfair: there is no italic file, so Android may render the system font. Use `skewX` for a slanted look.
 
 ### 4. Spacing Conventions
 - **`spacing.screenHorizontal`**: `20dp` standard side padding on all screens.
@@ -419,8 +425,11 @@ Supports two operational modes:
 ### 0a. Guest Home (`src/features/guest/screens/GuestHomeScreen.tsx`)
 - **Role**: First screen after the splash; visitors browse before signing in.
 - **Sections** (top → bottom, `spacing.sectionGap` 40dp apart, page bg `pageTint`):
-  1. `HeroSection`: design hero image (`hero_bg.png`, baked text painted out) shown uncropped at `width / (1560/1620)`; bottom `Scrim` fade to `pageTint`. Header: logo + "Urban Nest" (Playfair Bold 21), search icon, frosted "Log In / Sign Up" pill. `heroTitle` headline, Inter 12 subtitle, white "Explore Homes →" button, page dots.
-  2. `SearchCard` (overlaps hero by 28dp): Rent / Buy / Agents tabs (active = `navy` pill), sliders button, 2×2 filter fields, "Search Properties" with `gradients.button`.
+  1. `HeroSection`: design hero image (`hero_bg.png`, baked text painted out) shown uncropped at `width / (1560/1620)`; bottom `Scrim` fade to `pageTint`. Header: logo + "Urban Nest" (Playfair Bold 21) and a frosted round **burger menu** button (same spot the Log In pill used to be). The burger opens a white dropdown (Modal, tap outside to close) with **"Log In / Sign Up"** → PersonaSelect. The header search icon and the hero subtitle are commented out. `heroTitle` + `heroAccent` headline ("Finding New Home is *Simple*"), white "Explore Homes →" button (scrolls to the search card), page dots.
+  2. `SearchCard` (overlaps hero by 28dp): frosted light-blue card (`CARD_BG`: base `#EEF4FF`, `chipBlue` wash, `#518EF9` waves bottom-right, white glossy border). Header "Find your next home" / "Search with filters or ask Orbitl AI" + two buttons:
+     - **Orbitl AI** (`OrbitlOrb`, 54): emblem sphere (`orbitl_sphere.png`) with cyan/violet glow, violet ripples and 3 orbiting rings with glowing dots (`OrbitlOrb.tsx`). Opens a bubble explaining voice search; "Tap to talk" opens `OrbitlListeningOverlay` (full-screen navy, big orb, "I'm listening…", voice bars, example phrases, stop button; UI only, speech-to-text TODO).
+     - **Search** (white round button): opens the filters; icon spins into the sliders icon while open. Panel = Rent | Buy segmented switch (Agents commented out), 2×2 fields and a gradient search button. Rent → "Rent / Month", "Rental Type", **Search Rentals**; Buy → "Price", "Property Type", **Search Homes for Sale** (`BUY_FILTERS`).
+     - One panel open at a time; both expand / collapse smoothly via `Collapsible.tsx` (height + fade + slide).
   3. `CategoryRow`: 5 `tileBlue` icon tiles.
   4. Featured: `CenteredHeader` (`eyebrow` / `displayTitle` / `sectionDescription`) + `FeaturedCarousel` (snap, side cards scale 0.86 + fade 0.55, "Exclusive" gold badge, favorite heart).
   5. Rentals Near You: `SectionHeader` + 3 `RentalCard`s (image 448:384, "★ Premium" navy badge unless `badgeInImage`) + "See More Properties" `chipBlue` pill.

@@ -255,13 +255,15 @@ export const typography = {
  * Predefined Typography Presets
  * Reusable styles for Headings, Body, Labels, and Buttons
  */
+// Playfair Display presets never set fontWeight: the weight is in the font
+// file (PlayfairDisplay-Bold etc.). Adding fontWeight on top can make
+// Android fake-bold or fall back to the system font.
 export const typographyPresets: Record<string, TextStyle> = {
   greetingTitle: {
     fontFamily: typography.fontFamily.heading.regular,
     fontSize: scaleFont(23),
     lineHeight: scaleFont(30),
     color: colors.white,
-    fontWeight: typography.fontWeight.regular,
   },
   greetingSubtitle: {
     fontFamily: typography.fontFamily.body.regular,
@@ -275,7 +277,6 @@ export const typographyPresets: Record<string, TextStyle> = {
     lineHeight: scaleFont(24),
     letterSpacing: -0.3,
     color: colors.textPrimary,
-    fontWeight: typography.fontWeight.medium,
   },
   sectionLink: {
     fontFamily: typography.fontFamily.body.medium,
@@ -360,7 +361,16 @@ export const typographyPresets: Record<string, TextStyle> = {
     lineHeight: scaleFont(35.4),
     letterSpacing: -0.75,
     color: colors.white,
-    fontWeight: typography.fontWeight.bold,
+  },
+  // Accent word inside heroTitle, e.g. "Simple". Same size, Playfair SemiBold,
+  // gold. For an italic look use transform skewX (no italic font file;
+  // fontStyle: "italic" can fall back to the system font on Android).
+  heroAccent: {
+    fontFamily: typography.fontFamily.heading.semiBold,
+    fontSize: scaleFont(30),
+    lineHeight: scaleFont(35.4),
+    letterSpacing: -0.75,
+    color: colors.heroAccent,
   },
   // Centered section title, e.g. "Most Exclusive Homes Just For You"
   displayTitle: {
@@ -369,7 +379,6 @@ export const typographyPresets: Record<string, TextStyle> = {
     lineHeight: scaleFont(24.75),
     letterSpacing: 0,
     color: colors.textPrimary,
-    fontWeight: typography.fontWeight.semibold,
     textAlign: 'center',
   },
   // Centered paragraph under a section title
@@ -387,7 +396,6 @@ export const typographyPresets: Record<string, TextStyle> = {
     fontSize: scaleFont(19),
     lineHeight: scaleFont(26),
     color: colors.textPrimary,
-    fontWeight: typography.fontWeight.medium,
   },
   eyebrow: {
     fontFamily: typography.fontFamily.body.medium,
@@ -423,7 +431,6 @@ export const typographyPresets: Record<string, TextStyle> = {
     fontFamily: typography.fontFamily.heading.bold,
     fontSize: scaleFont(21),
     color: colors.white,
-    fontWeight: typography.fontWeight.bold,
   },
   // Paragraph under heroTitle on a dark header
   heroSubtitle: {

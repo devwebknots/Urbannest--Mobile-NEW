@@ -69,7 +69,6 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
           images={HERO_IMAGES}
           topInset={insets.top}
           onLoginPress={vm.goToSignIn}
-          onSearchPress={scrollToSearch}
           onExplorePress={scrollToSearch}
         />
 
