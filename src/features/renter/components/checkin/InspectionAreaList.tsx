@@ -17,9 +17,9 @@ import { CARD_BG } from '@/features/guest/components/CardBackground';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
 import { moderateScale as ms } from '@/utils/responsive';
 import type { InspectionArea } from '../../types';
-import { RenterIcon } from '../dashboard/RenterIcon';
 import { TILE_BORDER } from './CheckInChecklist';
 import { ChecklistProgress } from './ChecklistProgress';
+import { CompletedBadge, DONE_BLUE } from './CompletedBadge';
 
 interface Props {
   areas: readonly InspectionArea[];
@@ -34,8 +34,6 @@ interface Props {
 const PHOTO = ms(68);
 const NODE = ms(28);
 const CARD_PAD = spacing.md;
-/** Completed number + line: secondary blue (#518EF9) at 70%, softer */
-const DONE_BLUE = `${colors.headerGradientEnd}B3`;
 /** Centres the number on the card (card height = photo + padding) */
 const NODE_TOP = CARD_PAD + (PHOTO - NODE) / 2;
 
@@ -76,10 +74,7 @@ const Step: React.FC<{
         </Text>
         {done ? (
           <View style={styles.badge}>
-            <View style={styles.badgeTick}>
-              <RenterIcon name="check" size={ms(8)} color={colors.white} />
-            </View>
-            <Text style={styles.badgeText}>Completed</Text>
+            <CompletedBadge />
           </View>
         ) : null}
       </View>
@@ -216,30 +211,8 @@ const styles = StyleSheet.create({
     ...typographyPresets.cardSubtitle,
     marginTop: spacing.xxs,
   },
-  // "Completed" badge in the secondary blue
   badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: spacing.xs,
     marginTop: spacing.sm,
-    paddingLeft: spacing.xxs + 1,
-    paddingRight: spacing.sm,
-    paddingVertical: spacing.xxs,
-    borderRadius: borderRadius.pill,
-    backgroundColor: colors.chipBlue,
-  },
-  badgeTick: {
-    width: ms(14),
-    height: ms(14),
-    borderRadius: ms(7),
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.headerGradientEnd,
-  },
-  badgeText: {
-    ...typographyPresets.badge,
-    color: colors.navy,
   },
   submit: {
     // The last card already adds spacing.md below it
