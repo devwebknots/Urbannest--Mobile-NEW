@@ -38,7 +38,8 @@ const Tile: React.FC<{
   <Pressable
     onPress={onPress}
     disabled={locked}
-    accessibilityRole="checkbox"
+    // Items with their own screen open it instead of ticking on tap
+    accessibilityRole={task.screen ? 'button' : 'checkbox'}
     accessibilityState={{ checked, disabled: locked }}
     accessibilityLabel={task.label}
     style={({ pressed }) => [styles.tile, checked && styles.tileOn, pressed && styles.pressed]}
@@ -47,9 +48,12 @@ const Tile: React.FC<{
       <View style={[styles.iconBox, checked && styles.iconBoxOn]}>
         <RenterIcon name={task.icon} size={ms(20)} color={colors.navy} />
       </View>
-      <View style={[styles.tick, checked && styles.tickOn]}>
-        {checked ? <RenterIcon name="check" size={ms(10)} color={colors.white} /> : null}
-      </View>
+      {/* Tick only appears once the item is completed (no empty dot before) */}
+      {checked ? (
+        <View style={[styles.tick, styles.tickOn]}>
+          <RenterIcon name="check" size={ms(10)} color={colors.white} />
+        </View>
+      ) : null}
     </View>
     <Text style={styles.tileLabel} numberOfLines={1}>
       {task.label}

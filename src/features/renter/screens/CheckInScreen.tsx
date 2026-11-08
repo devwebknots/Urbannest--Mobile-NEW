@@ -25,7 +25,7 @@ import { CheckInNavigation, useCheckIn } from '../hooks/useCheckIn';
 
 interface Props {
   navigation?: CheckInNavigation;
-  route?: { params?: { residenceId?: string } };
+  route?: { params?: { residenceId?: string; inspectionSubmitted?: boolean } };
 }
 
 const SHEET_OVERLAP = ms(30);
@@ -33,7 +33,7 @@ const SHEET_OVERLAP = ms(30);
 export const CheckInScreen: React.FC<Props> = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const vm = useCheckIn(route?.params?.residenceId, navigation);
+  const vm = useCheckIn(route?.params?.residenceId, navigation, route?.params?.inspectionSubmitted);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const cardWidth = width - spacing.screenHorizontal * 2;

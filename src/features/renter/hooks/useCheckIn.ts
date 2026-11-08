@@ -5,9 +5,9 @@
  * actions show "coming soon" for now.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
-import { goBack } from '@/navigation/navigationRef';
+import { goBack, navigate } from '@/navigation/navigationRef';
 import {
   CHECK_IN_SUMMARY,
   CHECK_IN_TASKS,
@@ -21,16 +21,32 @@ import type { CheckInTask, NeighborhoodPlace } from '../types';
 
 export interface CheckInNavigation {
   goBack: () => void;
+  navigate?: (route: 'Inspection', params: { residenceId: string }) => void;
 }
 
 const soon = (title: string, message = 'Coming soon.') => Alert.alert(title, message);
 
-export function useCheckIn(residenceId?: string, navigation?: CheckInNavigation) {
+/**
+ * @param inspectionSubmitted set by the Inspection screen after a submit.
+ *   Later this status will come from the backend instead.
+ */
+export function useCheckIn(
+  residenceId?: string,
+  navigation?: CheckInNavigation,
+  inspectionSubmitted?: boolean,
+) {
   const residence = useMemo(
     () => RESIDENCES.find(r => r.id === residenceId) ?? RESIDENCES[0],
     [residenceId],
   );
   const [confirmed, setConfirmed] = useState<ReadonlySet<string>>(() => new Set());
+
+  // Tick the inspection only once its own screen has been submitted
+  useEffect(() => {
+    if (inspectionSubmitted) {
+      setConfirmed(prev => new Set(prev).add('inspection'));
+    }
+  }, [inspectionSubmitted]);
   const [submitted, setSubmitted] = useState(false);
   const [placeTab, setPlaceTab] = useState(NEIGHBORHOOD[0].id);
 
@@ -43,6 +59,16 @@ export function useCheckIn(residenceId?: string, navigation?: CheckInNavigation)
       if (submitted) {
         return;
       }
+      // Items with their own screen open it; that screen ticks them on submit
+      if (task.screen) {
+        const params = { residenceId: residence.id };
+        if (navigation?.navigate) {
+          navigation.navigate(task.screen, params);
+        } else {
+          navigate(task.screen, params);
+        }
+        return;
+      }
       setConfirmed(prev => {
         const next = new Set(prev);
         if (next.has(task.id)) {
@@ -53,7 +79,7 @@ export function useCheckIn(residenceId?: string, navigation?: CheckInNavigation)
         return next;
       });
     },
-    [submitted],
+    [submitted, navigation, residence.id],
   );
 
   const submit = useCallback(() => {

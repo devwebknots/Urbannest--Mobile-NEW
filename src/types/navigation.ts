@@ -20,7 +20,9 @@ export type RootStackParamList = {
   PersonaSelect: undefined;
   RenterHome: undefined;
   ResidenceDashboard: { residenceId: string };
-  CheckIn: { residenceId: string };
+  /** inspectionSubmitted is set by the Inspection screen when it hands back */
+  CheckIn: { residenceId: string; inspectionSubmitted?: boolean };
+  Inspection: { residenceId: string };
   Auth: undefined;
   Main: undefined;
   Home: undefined;

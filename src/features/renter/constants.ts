@@ -146,7 +146,7 @@ export const CHECK_IN_SUMMARY: CheckInSummary = {
 };
 
 export const CHECK_IN_TASKS: readonly CheckInTask[] = [
-  { id: 'inspection', label: 'Inspection', hint: 'Walkthrough report', icon: 'inspect', accent: 'blue' },
+  { id: 'inspection', label: 'Inspection', hint: 'Walkthrough report', icon: 'inspect', accent: 'blue', screen: 'Inspection' },
   { id: 'utilities', label: 'Utilities', hint: 'Power & water live', icon: 'bolt', accent: 'amber' },
   { id: 'internet', label: 'Internet', hint: 'Fibre activated', icon: 'wifi', accent: 'violet' },
   { id: 'security', label: 'Home Security', hint: 'Alarm & access', icon: 'shield', accent: 'green' },

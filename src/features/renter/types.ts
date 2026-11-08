@@ -88,6 +88,11 @@ export interface CheckInTask {
   readonly hint: string;
   readonly icon: CheckInIcon;
   readonly accent: ConciergeAccent;
+  /**
+   * Set when the item is completed on its own screen. Tapping the tile opens
+   * that screen; the tile only ticks once that screen is submitted.
+   */
+  readonly screen?: 'Inspection';
 }
 
 export interface CheckInSummary {

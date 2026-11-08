@@ -70,13 +70,18 @@ test('cards open check-in when move-in ready, else the dashboard', async () => {
   });
 });
 
-test('check-in submits only after every checklist item is confirmed', async () => {
+test('check-in submits only after every item is confirmed; inspection ticks only after its screen is submitted', async () => {
   const goBack = jest.fn();
+  const navigate = jest.fn();
+  const render = (inspectionSubmitted?: boolean) => (
+    <CheckInScreen
+      navigation={{ goBack, navigate }}
+      route={{ params: { residenceId: 'obsidian', inspectionSubmitted } }}
+    />
+  );
   let tree!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
-    tree = ReactTestRenderer.create(
-      <CheckInScreen navigation={{ goBack }} route={{ params: { residenceId: 'obsidian' } }} />,
-    );
+    tree = ReactTestRenderer.create(render());
   });
 
   const json = JSON.stringify(tree.toJSON());
@@ -94,15 +99,28 @@ test('check-in submits only after every checklist item is confirmed', async () =
     expect(json).toContain(text);
   }
 
-  const submit = () => tree.root.findByProps({ accessibilityLabel: 'Submit check-in' });
-  expect(submit().props.disabled).toBe(true);
-
-  for (const label of ['Inspection', 'Utilities', 'Internet', 'Home Security']) {
-    const tile = tree.root.findByProps({ accessibilityLabel: label });
+  const submit = () => tree.root.findAllByProps({ accessibilityLabel: 'Submit Check-In' })[0];
+  const tap = async (label: string) => {
+    const tile = tree.root.findAllByProps({ accessibilityLabel: label })[0];
     await ReactTestRenderer.act(() => {
       tile.props.onPress();
     });
+  };
+  expect(submit().props.disabled).toBe(true);
+
+  // Inspection opens its own screen instead of ticking
+  await tap('Inspection');
+  expect(navigate).toHaveBeenCalledWith('Inspection', { residenceId: 'obsidian' });
+
+  for (const label of ['Utilities', 'Internet', 'Home Security']) {
+    await tap(label);
   }
+  expect(submit().props.disabled).toBe(true);
+
+  // Coming back from a submitted inspection ticks it
+  await ReactTestRenderer.act(() => {
+    tree.update(render(true));
+  });
   expect(submit().props.disabled).toBe(false);
 
   await ReactTestRenderer.act(() => {
