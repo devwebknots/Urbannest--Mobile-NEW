@@ -10,13 +10,13 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/Button';
-import { LinearGradient } from '@/components/LinearGradient';
-import { borderRadius, colors, gradients, shadows, spacing, typographyPresets } from '@/config/theme';
+import { borderRadius, colors, shadows, spacing, typographyPresets } from '@/config/theme';
 import { CARD_BG } from '@/features/guest/components/CardBackground';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
 import { moderateScale as ms } from '@/utils/responsive';
 import type { CheckInTask } from '../../types';
 import { RenterIcon } from '../dashboard/RenterIcon';
+import { ChecklistProgress } from './ChecklistProgress';
 
 interface Props {
   tasks: readonly CheckInTask[];
@@ -82,20 +82,7 @@ export const CheckInChecklist: React.FC<Props> = ({
 
   return (
     <View style={styles.card}>
-      <View style={styles.progressRow}>
-        <Text style={styles.progressLabel}>
-          <Text style={styles.progressCount}>{done}</Text> of {total} confirmed
-        </Text>
-        <Text style={styles.progressPct}>{Math.round((done / total) * 100)}%</Text>
-      </View>
-      <View style={styles.track}>
-        <LinearGradient
-          colors={gradients.button}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={[styles.fill, { width: `${(done / total) * 100}%` }]}
-        />
-      </View>
+      <ChecklistProgress done={done} total={total} />
 
       <View style={styles.grid}>
         {rows.map((row, r) => (
@@ -141,42 +128,14 @@ export const CheckInChecklist: React.FC<Props> = ({
   );
 };
 
-/** Light blue tile edge, visible on the pale page */
-const TILE_BORDER = '#C9DAF6';
+/** Light blue tile edge, visible on the pale page (also used by the inspection list) */
+export const TILE_BORDER = '#C9DAF6';
 /** Plain light tile fill (lighter than the page tint) */
-const TILE_BG = '#F7FAFF';
+export const TILE_BG = '#F7FAFF';
 
 const styles = StyleSheet.create({
   card: {
     paddingHorizontal: spacing.screenHorizontal,
-  },
-  progressRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-  },
-  progressLabel: {
-    ...typographyPresets.body,
-    color: colors.textSecondary,
-  },
-  progressCount: {
-    ...typographyPresets.bodyBold,
-    color: colors.navy,
-  },
-  progressPct: {
-    ...typographyPresets.sectionLink,
-    color: colors.navy,
-  },
-  track: {
-    height: ms(4),
-    marginTop: spacing.sm,
-    borderRadius: ms(2),
-    backgroundColor: colors.chipBlue,
-    overflow: 'hidden',
-  },
-  fill: {
-    height: '100%',
-    borderRadius: ms(2),
   },
   grid: {
     marginTop: spacing.lg,

@@ -362,6 +362,7 @@ Headings (Playfair Display — weight comes from the font file, never add `fontW
 | Preset | Font file | Size / Line height | Extra | Used for |
 | :--- | :--- | :--- | :--- | :--- |
 | `heroTitle` | `PlayfairDisplay-Bold` (800 ExtraBold in Figma, Bold until the ExtraBold .ttf is added) | 30 / 35.4 | letterSpacing -0.75, white | The one page-headline style: guest hero "Finding New Home is *Simple*", "Choose your persona", "My Residences", residence name in `ResidenceHero` |
+| `heroTitleCompact` | `PlayfairDisplay-Bold` (same as `heroTitle`) | 26 / 30.7 | letterSpacing -0.65, white | Smaller page headline for task pages: "Move-In Inspection" in `ResidenceHero` (via its `nameStyle` prop) |
 | `heroAccent` | `PlayfairDisplay-SemiBold` | 30 / 35.4 | letterSpacing -0.75, gold `heroAccent` | Highlighted word inside a `heroTitle` line ("*Simple*"); slant with `skewX(-10deg)` |
 | `greetingTitle` | `PlayfairDisplay-Regular` | 23 / 30 | white | Greeting headline on the old Home dashboard |
 | `sectionHeading` | `PlayfairDisplay-Medium` | 19 / 26 | `textPrimary` | **Left-aligned section titles** ("Rentals Near You", "Move-In Checklist", "Around Your Home"); also titles on dark cards ("Move-In Ready" status card, white) |

@@ -1,6 +1,11 @@
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
-import { CheckInScreen, RenterHomeScreen, ResidenceDashboardScreen } from '../src/features/renter';
+import {
+  CheckInScreen,
+  InspectionScreen,
+  RenterHomeScreen,
+  ResidenceDashboardScreen,
+} from '../src/features/renter';
 
 test('residence dashboard shows every section for the chosen residence', async () => {
   const goBack = jest.fn();
@@ -127,6 +132,47 @@ test('check-in submits only after every item is confirmed; inspection ticks only
     submit().props.onPress();
   });
   expect(tree.root.findAllByProps({ accessibilityLabel: 'Check-in submitted' }).length).toBeGreaterThan(0);
+
+  await ReactTestRenderer.act(() => {
+    tree.unmount();
+  });
+});
+
+test('inspection finalizes only after every area is confirmed, then returns to check-in', async () => {
+  const goBack = jest.fn();
+  const navigate = jest.fn();
+  let tree!: ReactTestRenderer.ReactTestRenderer;
+  await ReactTestRenderer.act(() => {
+    tree = ReactTestRenderer.create(
+      <InspectionScreen navigation={{ goBack, navigate }} route={{ params: { residenceId: 'obsidian' } }} />,
+    );
+  });
+
+  const json = JSON.stringify(tree.toJSON());
+  for (const text of ['Move-In Inspection', 'Property Readiness', 'Living Room', 'Outside Areas']) {
+    expect(json).toContain(text);
+  }
+
+  const finalize = () => tree.root.findAllByProps({ accessibilityLabel: 'Finalize Inspection' })[0];
+  expect(finalize().props.disabled).toBe(true);
+
+  const areas = ['Living Room', 'Dining', 'Kitchen', 'Bedrooms', 'Washrooms', 'Common Areas', 'Outside Areas'];
+  for (const label of areas) {
+    const row = tree.root.findAllByProps({ accessibilityLabel: label })[0];
+    await ReactTestRenderer.act(() => {
+      row.props.onPress();
+    });
+  }
+  expect(finalize().props.disabled).toBe(false);
+
+  await ReactTestRenderer.act(() => {
+    finalize().props.onPress();
+  });
+  expect(navigate).toHaveBeenCalledWith({
+    name: 'CheckIn',
+    params: { residenceId: 'obsidian', inspectionSubmitted: true },
+    merge: true,
+  });
 
   await ReactTestRenderer.act(() => {
     tree.unmount();

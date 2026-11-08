@@ -9,6 +9,7 @@ import type {
   CommunityEvent,
   ConciergeService,
   FinancialSummary,
+  InspectionArea,
   LeaseStatus,
   NeighborhoodCategory,
   Residence,
@@ -150,6 +151,18 @@ export const CHECK_IN_TASKS: readonly CheckInTask[] = [
   { id: 'utilities', label: 'Utilities', hint: 'Power & water live', icon: 'bolt', accent: 'amber' },
   { id: 'internet', label: 'Internet', hint: 'Fibre activated', icon: 'wifi', accent: 'violet' },
   { id: 'security', label: 'Home Security', hint: 'Alarm & access', icon: 'shield', accent: 'green' },
+];
+
+/* ---------- Move-in inspection (mock) ---------- */
+
+export const INSPECTION_AREAS: readonly InspectionArea[] = [
+  { id: 'living', label: 'Living Room', hint: 'Walls, floors & windows', image: renterAssets.areaLiving },
+  { id: 'dining', label: 'Dining', hint: 'Lighting & fixtures', image: renterAssets.areaDining },
+  { id: 'kitchen', label: 'Kitchen', hint: 'Appliances & plumbing', image: renterAssets.areaKitchen },
+  { id: 'bedrooms', label: 'Bedrooms', hint: 'Closets & fittings', image: renterAssets.areaBedroom },
+  { id: 'washrooms', label: 'Washrooms', hint: 'Water flow & drainage', image: renterAssets.areaWashroom },
+  { id: 'common', label: 'Common Areas', hint: 'Corridors & lobby', image: renterAssets.areaCommon },
+  { id: 'outside', label: 'Outside Areas', hint: 'Terrace & landscaping', image: renterAssets.areaOutside },
 ];
 
 export const NEIGHBORHOOD_RADIUS = '5 km';

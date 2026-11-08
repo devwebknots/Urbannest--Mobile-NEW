@@ -95,6 +95,15 @@ export interface CheckInTask {
   readonly screen?: 'Inspection';
 }
 
+/** One room / area on the move-in inspection page */
+export interface InspectionArea {
+  readonly id: string;
+  readonly label: string;
+  /** What to check, e.g. "Walls, floors & windows" */
+  readonly hint: string;
+  readonly image: ImageSourcePropType;
+}
+
 export interface CheckInSummary {
   readonly leaseId: string;
   readonly moveInDate: string;

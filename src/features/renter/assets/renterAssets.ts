@@ -23,6 +23,17 @@ export const renterAssets = {
   placeHospitalLobby: require('@/assets/images/renter/place_hospital_lobby.jpg'),
   placeParkSwing: require('@/assets/images/renter/place_park_swing.jpg'),
   placeParkCoaster: require('@/assets/images/renter/place_park_coaster.jpg'),
+  // Move-in inspection hero: people in a living room (Unsplash nkUCyTz2lKU,
+  // João Emanuel, 3D render; cropped to the hero's shape)
+  inspectionHero: require('@/assets/images/renter/inspection_hero.jpg'),
+  // Inspection area photos, cut from the inspection design
+  areaLiving: require('@/assets/images/renter/area_living.jpg'),
+  areaDining: require('@/assets/images/renter/area_dining.jpg'),
+  areaKitchen: require('@/assets/images/renter/area_kitchen.jpg'),
+  areaBedroom: require('@/assets/images/renter/area_bedroom.jpg'),
+  areaWashroom: require('@/assets/images/renter/area_washroom.jpg'),
+  areaCommon: require('@/assets/images/renter/area_common.jpg'),
+  areaOutside: require('@/assets/images/renter/area_outside.jpg'),
 };
 
 /** Line icons drawn for the dashboard (white PNGs, tinted in the app). */
