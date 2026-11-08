@@ -55,6 +55,17 @@ export const renterAssets = {
   providerCityWater: require('@/assets/images/renter/provider_city_water.jpg'),
   providerHeartlandGas: require('@/assets/images/renter/provider_heartland_gas.jpg'),
   providerLakesideSanitary: require('@/assets/images/renter/provider_lakeside_sanitary.jpg'),
+  // More provider thumbnails (Unsplash): solar 1497435334941-8c899ee9e8e9 ·
+  // underwater 1559825481-12a05cc00344 · bathroom 1584622650111-993a426fbf0a ·
+  // plans 1581092160562-40aa08e78837 · kitchen 1556909114-f6e7ad7d3136 ·
+  // rain 1501691223387-dd0500403074 · site crew 1504307651254-35680f356dfd
+  providerSunfieldSolar: require('@/assets/images/renter/provider_sunfield_solar.jpg'),
+  providerRiverbendWater: require('@/assets/images/renter/provider_riverbend_water.jpg'),
+  providerAquaPure: require('@/assets/images/renter/provider_aquapure.jpg'),
+  providerMidwestEnergy: require('@/assets/images/renter/provider_midwest_energy.jpg'),
+  providerGasSafety: require('@/assets/images/renter/provider_gas_safety.jpg'),
+  providerMetroDrain: require('@/assets/images/renter/provider_metro_drain.jpg'),
+  providerCountyWastewater: require('@/assets/images/renter/provider_county_wastewater.jpg'),
 };
 
 /** Line icons drawn for the dashboard (white PNGs, tinted in the app). */
