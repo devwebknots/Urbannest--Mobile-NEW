@@ -1,16 +1,17 @@
 /**
  * InspectionAreaList: the move-in inspection checklist. Progress bar, then
  * the areas as a numbered timeline, then "Finalize Inspection".
- * Timeline: a rail on the left links step 1 -> N; a step's number turns
- * into a navy tick once checked and the line below it fills in. Each area
- * card shows its photo, name, what to check and a status pill
- * ("To check" / "Checked"). Tap a card to toggle it. Finalize is enabled
- * once every area is done.
+ * Tapping an area card opens that area's page (no selected state on tap).
+ * Once the area page is finalized the area is "completed": its number turns
+ * secondary blue (#518EF9), the line below it turns blue and the card shows a blue
+ * "Completed" badge. Completed areas can still be opened again.
+ * Finalize is enabled once every area is completed.
  */
 
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/Button';
+import { ChevronRightIcon } from '@/components/icons';
 import { borderRadius, colors, shadows, spacing, typographyPresets } from '@/config/theme';
 import { CARD_BG } from '@/features/guest/components/CardBackground';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
@@ -22,50 +23,48 @@ import { ChecklistProgress } from './ChecklistProgress';
 
 interface Props {
   areas: readonly InspectionArea[];
-  confirmed: ReadonlySet<string>;
+  completed: ReadonlySet<string>;
   done: number;
   total: number;
   canSubmit: boolean;
-  onToggle: (area: InspectionArea) => void;
+  onOpen: (area: InspectionArea) => void;
   onSubmit: () => void;
 }
 
 const PHOTO = ms(68);
 const NODE = ms(28);
 const CARD_PAD = spacing.md;
+/** Completed number + line: secondary blue (#518EF9) at 70%, softer */
+const DONE_BLUE = `${colors.headerGradientEnd}B3`;
 /** Centres the number on the card (card height = photo + padding) */
 const NODE_TOP = CARD_PAD + (PHOTO - NODE) / 2;
 
 const Step: React.FC<{
   area: InspectionArea;
   index: number;
-  checked: boolean;
-  /** Step above is checked: colours the line coming into this number */
-  prevChecked: boolean;
+  done: boolean;
+  /** Step above is completed: colours the line coming into this number */
+  prevDone: boolean;
   last: boolean;
   onPress: () => void;
-}> = ({ area, index, checked, prevChecked, last, onPress }) => (
+}> = ({ area, index, done, prevDone, last, onPress }) => (
   <View style={styles.step}>
     <View style={styles.rail}>
       {/* Line from the step above into this number */}
-      <View style={[styles.railTop, index > 0 && styles.line, prevChecked && styles.lineOn]} />
-      <View style={[styles.node, checked && styles.nodeOn]}>
-        {checked ? (
-          <RenterIcon name="check" size={ms(11)} color={colors.white} />
-        ) : (
-          <Text style={styles.nodeText}>{index + 1}</Text>
-        )}
+      <View style={[styles.railTop, index > 0 && styles.line, prevDone && styles.lineDone]} />
+      <View style={[styles.node, done && styles.nodeDone]}>
+        <Text style={[styles.nodeText, done && styles.nodeTextDone]}>{index + 1}</Text>
       </View>
       {/* Line down to the next step */}
-      {last ? null : <View style={[styles.lineDown, styles.line, checked && styles.lineOn]} />}
+      {last ? null : <View style={[styles.lineDown, styles.line, done && styles.lineDone]} />}
     </View>
 
     <Pressable
       onPress={onPress}
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked }}
+      accessibilityRole="button"
       accessibilityLabel={area.label}
-      style={({ pressed }) => [styles.card, checked && styles.cardOn, pressed && styles.pressed]}
+      accessibilityHint={done ? 'Completed. Opens to inspect again.' : 'Opens this area.'}
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <Image source={area.image} style={styles.photo} resizeMode="cover" />
       <View style={styles.copy}>
@@ -75,24 +74,27 @@ const Step: React.FC<{
         <Text style={styles.hint} numberOfLines={1}>
           {area.hint}
         </Text>
-        <View style={[styles.pill, checked && styles.pillOn]}>
-          {checked ? <RenterIcon name="check" size={ms(9)} color={colors.white} /> : null}
-          <Text style={[styles.pillText, checked && styles.pillTextOn]}>
-            {checked ? 'Checked' : 'To check'}
-          </Text>
-        </View>
+        {done ? (
+          <View style={styles.badge}>
+            <View style={styles.badgeTick}>
+              <RenterIcon name="check" size={ms(8)} color={colors.white} />
+            </View>
+            <Text style={styles.badgeText}>Completed</Text>
+          </View>
+        ) : null}
       </View>
+      <ChevronRightIcon size={ms(14)} color={colors.textMuted} />
     </Pressable>
   </View>
 );
 
 export const InspectionAreaList: React.FC<Props> = ({
   areas,
-  confirmed,
+  completed,
   done,
   total,
   canSubmit,
-  onToggle,
+  onOpen,
   onSubmit,
 }) => {
   const remaining = total - done;
@@ -106,10 +108,10 @@ export const InspectionAreaList: React.FC<Props> = ({
             key={area.id}
             area={area}
             index={i}
-            checked={confirmed.has(area.id)}
-            prevChecked={i > 0 && confirmed.has(areas[i - 1].id)}
+            done={completed.has(area.id)}
+            prevDone={i > 0 && completed.has(areas[i - 1].id)}
             last={i === areas.length - 1}
-            onPress={() => onToggle(area)}
+            onPress={() => onOpen(area)}
           />
         ))}
       </View>
@@ -124,8 +126,8 @@ export const InspectionAreaList: React.FC<Props> = ({
       />
       <Text style={styles.footnote}>
         {remaining > 0
-          ? `Tap each area once checked. ${remaining} ${remaining === 1 ? 'area' : 'areas'} remaining.`
-          : 'All areas checked. Finalize to complete your inspection.'}
+          ? `Open each area to inspect it. ${remaining} ${remaining === 1 ? 'area' : 'areas'} remaining.`
+          : 'All areas completed. Finalize to complete your inspection.'}
       </Text>
     </View>
   );
@@ -155,8 +157,8 @@ const styles = StyleSheet.create({
     width: 2,
     backgroundColor: TILE_BORDER,
   },
-  lineOn: {
-    backgroundColor: colors.navy,
+  lineDone: {
+    backgroundColor: DONE_BLUE,
   },
   node: {
     width: NODE,
@@ -168,14 +170,19 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: TILE_BORDER,
   },
-  nodeOn: {
-    backgroundColor: colors.navy,
-    borderColor: colors.navy,
+  // Softer secondary blue (#518EF9 at 70%), white number
+  nodeDone: {
+    backgroundColor: DONE_BLUE,
+    borderColor: 'transparent',
   },
   nodeText: {
     ...typographyPresets.badge,
     color: colors.navy,
   },
+  nodeTextDone: {
+    color: colors.white,
+  },
+  // Same white card whether completed or not (no selected border)
   card: {
     flex: 1,
     flexDirection: 'row',
@@ -192,9 +199,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 8,
   },
-  cardOn: {
-    borderColor: colors.navy,
-  },
   photo: {
     width: PHOTO,
     height: PHOTO,
@@ -202,7 +206,7 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
-    marginLeft: spacing.md,
+    marginHorizontal: spacing.md,
   },
   label: {
     ...typographyPresets.cardTitle,
@@ -212,26 +216,30 @@ const styles = StyleSheet.create({
     ...typographyPresets.cardSubtitle,
     marginTop: spacing.xxs,
   },
-  pill: {
+  // "Completed" badge in the secondary blue
+  badge: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
     gap: spacing.xs,
     marginTop: spacing.sm,
-    paddingHorizontal: spacing.sm,
+    paddingLeft: spacing.xxs + 1,
+    paddingRight: spacing.sm,
     paddingVertical: spacing.xxs,
     borderRadius: borderRadius.pill,
     backgroundColor: colors.chipBlue,
   },
-  pillOn: {
-    backgroundColor: colors.navy,
+  badgeTick: {
+    width: ms(14),
+    height: ms(14),
+    borderRadius: ms(7),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.headerGradientEnd,
   },
-  pillText: {
+  badgeText: {
     ...typographyPresets.badge,
     color: colors.navy,
-  },
-  pillTextOn: {
-    color: colors.white,
   },
   submit: {
     // The last card already adds spacing.md below it
@@ -243,7 +251,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   pressed: {
-    transform: [{ scale: 0.98 }],
+    opacity: 0.85,
   },
 });
 

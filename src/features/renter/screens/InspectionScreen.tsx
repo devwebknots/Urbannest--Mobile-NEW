@@ -22,7 +22,8 @@ import { InspectionNavigation, useInspection } from '../hooks/useInspection';
 
 interface Props {
   navigation?: InspectionNavigation;
-  route?: { params?: { residenceId?: string } };
+  /** completedAreaId is set by an area page when it is finalized */
+  route?: { params?: { residenceId?: string; completedAreaId?: string } };
 }
 
 const SHEET_OVERLAP = ms(30);
@@ -30,7 +31,11 @@ const SHEET_OVERLAP = ms(30);
 export const InspectionScreen: React.FC<Props> = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const vm = useInspection(route?.params?.residenceId, navigation);
+  const vm = useInspection(
+    route?.params?.residenceId,
+    navigation,
+    route?.params?.completedAreaId,
+  );
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const heroHeight = Math.round(width * 0.92);
@@ -84,11 +89,11 @@ export const InspectionScreen: React.FC<Props> = ({ navigation, route }) => {
             <View style={styles.sectionBody}>
               <InspectionAreaList
                 areas={vm.areas}
-                confirmed={vm.confirmed}
+                completed={vm.completed}
                 done={vm.done}
                 total={vm.total}
                 canSubmit={vm.canSubmit}
-                onToggle={vm.toggleArea}
+                onOpen={vm.openArea}
                 onSubmit={vm.finalize}
               />
             </View>

@@ -10,6 +10,7 @@ import { HomeScreen } from '@/features/home';
 import { PersonaSelectScreen } from '@/features/persona';
 import {
   CheckInScreen,
+  InspectionAreaScreen,
   InspectionScreen,
   RenterHomeScreen,
   ResidenceDashboardScreen,
@@ -64,6 +65,11 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="Inspection"
         component={InspectionScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="InspectionArea"
+        component={InspectionAreaScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen name="Home" component={HomeScreen} />

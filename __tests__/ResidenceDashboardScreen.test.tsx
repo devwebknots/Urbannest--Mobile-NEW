@@ -2,6 +2,7 @@ import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import {
   CheckInScreen,
+  InspectionAreaScreen,
   InspectionScreen,
   RenterHomeScreen,
   ResidenceDashboardScreen,
@@ -138,14 +139,18 @@ test('check-in submits only after every item is confirmed; inspection ticks only
   });
 });
 
-test('inspection finalizes only after every area is confirmed, then returns to check-in', async () => {
+test('inspection areas open their own page and complete only when that page is finalized', async () => {
   const goBack = jest.fn();
   const navigate = jest.fn();
+  const render = (completedAreaId?: string) => (
+    <InspectionScreen
+      navigation={{ goBack, navigate }}
+      route={{ params: { residenceId: 'obsidian', completedAreaId } }}
+    />
+  );
   let tree!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
-    tree = ReactTestRenderer.create(
-      <InspectionScreen navigation={{ goBack, navigate }} route={{ params: { residenceId: 'obsidian' } }} />,
-    );
+    tree = ReactTestRenderer.create(render());
   });
 
   const json = JSON.stringify(tree.toJSON());
@@ -154,15 +159,27 @@ test('inspection finalizes only after every area is confirmed, then returns to c
   }
 
   const finalize = () => tree.root.findAllByProps({ accessibilityLabel: 'Finalize Inspection' })[0];
+  const completedBadges = () => JSON.stringify(tree.toJSON()).split('"Completed"').length - 1;
   expect(finalize().props.disabled).toBe(true);
 
-  const areas = ['Living Room', 'Dining', 'Kitchen', 'Bedrooms', 'Washrooms', 'Common Areas', 'Outside Areas'];
-  for (const label of areas) {
-    const row = tree.root.findAllByProps({ accessibilityLabel: label })[0];
+  // Tapping an area opens its page and does not complete it
+  const living = tree.root.findAllByProps({ accessibilityLabel: 'Living Room' })[0];
+  await ReactTestRenderer.act(() => {
+    living.props.onPress();
+  });
+  expect(navigate).toHaveBeenCalledWith({
+    name: 'InspectionArea',
+    params: { residenceId: 'obsidian', areaId: 'living' },
+  });
+  expect(completedBadges()).toBe(0);
+
+  // Each area page hands back completedAreaId when finalized
+  for (const id of ['living', 'dining', 'kitchen', 'bedrooms', 'washrooms', 'common', 'outside']) {
     await ReactTestRenderer.act(() => {
-      row.props.onPress();
+      tree.update(render(id));
     });
   }
+  expect(completedBadges()).toBe(7);
   expect(finalize().props.disabled).toBe(false);
 
   await ReactTestRenderer.act(() => {
@@ -171,6 +188,34 @@ test('inspection finalizes only after every area is confirmed, then returns to c
   expect(navigate).toHaveBeenCalledWith({
     name: 'CheckIn',
     params: { residenceId: 'obsidian', inspectionSubmitted: true },
+    merge: true,
+  });
+
+  await ReactTestRenderer.act(() => {
+    tree.unmount();
+  });
+});
+
+test('inspection area page finalizes back to inspection with the area completed', async () => {
+  const goBack = jest.fn();
+  const navigate = jest.fn();
+  let tree!: ReactTestRenderer.ReactTestRenderer;
+  await ReactTestRenderer.act(() => {
+    tree = ReactTestRenderer.create(
+      <InspectionAreaScreen
+        navigation={{ goBack, navigate }}
+        route={{ params: { residenceId: 'obsidian', areaId: 'kitchen' } }}
+      />,
+    );
+  });
+
+  const finalize = tree.root.findAllByProps({ accessibilityLabel: 'Finalize Kitchen' })[0];
+  await ReactTestRenderer.act(() => {
+    finalize.props.onPress();
+  });
+  expect(navigate).toHaveBeenCalledWith({
+    name: 'Inspection',
+    params: { residenceId: 'obsidian', completedAreaId: 'kitchen' },
     merge: true,
   });
 
