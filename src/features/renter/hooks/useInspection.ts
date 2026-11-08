@@ -1,17 +1,19 @@
 /**
  * useInspection: ViewModel for the move-in inspection page.
- * Tapping an area opens its own page (InspectionArea). When that page is
- * finalized it comes back with `completedAreaId`, which marks the area
- * completed here; completed areas can be opened and finalized again.
+ * Tapping an area opens its own page (InspectionArea). An area is
+ * completed once its page is saved (read from inspectionAreaStore, so it
+ * stays right even after jumping between rooms); completed areas can be
+ * opened and saved again.
  * "Finalize Inspection" is enabled once every area is completed; it
  * returns to Check-In with `inspectionSubmitted`, which ticks the
  * Inspection tile there. Later this status will come from the backend.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Alert } from 'react-native';
 import { goBack, navigate } from '@/navigation/navigationRef';
 import { INSPECTION_AREAS, RENTER_PROFILE, RESIDENCES } from '../constants';
+import { inspectionAreaStore, useInspectionAreaStore } from '../store/inspectionAreaStore';
 import type { InspectionArea } from '../types';
 
 export interface InspectionNavigation {
@@ -20,23 +22,21 @@ export interface InspectionNavigation {
   navigate?: (options: { name: string; params: object; merge?: boolean }) => void;
 }
 
-export function useInspection(
-  residenceId?: string,
-  navigation?: InspectionNavigation,
-  completedAreaId?: string,
-) {
+export function useInspection(residenceId?: string, navigation?: InspectionNavigation) {
   const residence = useMemo(
     () => RESIDENCES.find(r => r.id === residenceId) ?? RESIDENCES[0],
     [residenceId],
   );
-  const [completed, setCompleted] = useState<ReadonlySet<string>>(() => new Set());
-
-  // An area page was finalized: mark that area completed
-  useEffect(() => {
-    if (completedAreaId) {
-      setCompleted(prev => new Set(prev).add(completedAreaId));
-    }
-  }, [completedAreaId]);
+  // Areas with a saved result (re-computed whenever one is saved)
+  const storeVersion = useInspectionAreaStore();
+  const completed = useMemo<ReadonlySet<string>>(
+    () =>
+      new Set(
+        INSPECTION_AREAS.filter(a => inspectionAreaStore.isDone(residence.id, a.id)).map(a => a.id),
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [residence.id, storeVersion],
+  );
 
   const total = INSPECTION_AREAS.length;
   const done = completed.size;

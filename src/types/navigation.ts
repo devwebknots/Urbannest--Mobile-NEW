@@ -22,8 +22,7 @@ export type RootStackParamList = {
   ResidenceDashboard: { residenceId: string };
   /** inspectionSubmitted is set by the Inspection screen when it hands back */
   CheckIn: { residenceId: string; inspectionSubmitted?: boolean };
-  /** completedAreaId is set by an InspectionArea page when it hands back */
-  Inspection: { residenceId: string; completedAreaId?: string };
+  Inspection: { residenceId: string };
   InspectionArea: { residenceId: string; areaId: string };
   Auth: undefined;
   Main: undefined;

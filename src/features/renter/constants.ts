@@ -10,6 +10,7 @@ import type {
   ConciergeService,
   FinancialSummary,
   InspectionArea,
+  IssueCategory,
   LeaseStatus,
   NeighborhoodCategory,
   Residence,
@@ -164,6 +165,23 @@ export const INSPECTION_AREAS: readonly InspectionArea[] = [
   { id: 'common', label: 'Common Areas', hint: 'Corridors & lobby', image: renterAssets.areaCommon },
   { id: 'outside', label: 'Outside Areas', hint: 'Terrace & landscaping', image: renterAssets.areaOutside },
 ];
+
+/** Issue categories for the area page dropdown (later from the backend) */
+export const ISSUE_CATEGORIES: readonly IssueCategory[] = [
+  { id: 'walls', label: 'Walls & Paint' },
+  { id: 'flooring', label: 'Flooring & Surfaces' },
+  { id: 'doors', label: 'Doors & Windows' },
+  { id: 'electrical', label: 'Electrical & Lighting' },
+  { id: 'plumbing', label: 'Plumbing & Leaks' },
+  { id: 'appliances', label: 'Appliances' },
+  { id: 'fixtures', label: 'Furniture & Fixtures' },
+  { id: 'cleanliness', label: 'Cleanliness' },
+  { id: 'pests', label: 'Pests' },
+  { id: 'other', label: 'Other' },
+];
+
+/** Most photos / videos one issue can have */
+export const MAX_ISSUE_MEDIA = 5;
 
 export const NEIGHBORHOOD_RADIUS = '5 km';
 

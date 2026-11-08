@@ -26,7 +26,11 @@ export const renterAssets = {
   // Move-in inspection hero: people in a living room (Unsplash nkUCyTz2lKU,
   // João Emanuel, 3D render; cropped to the hero's shape)
   inspectionHero: require('@/assets/images/renter/inspection_hero.jpg'),
-  // Inspection area photos, cut from the inspection design
+  // Inspection area photos (Unsplash, cropped to the hero's shape):
+  // living mw_mj-noYHM Zac Gudakov · dining GmIt2MvjgfQ Kailun Zhang ·
+  // kitchen GliaHAJ3_5A Jason Briscoe · bedroom AT1AqItpuOI Puscas Adryan ·
+  // washroom 9OKuf13OidA Peter Muniz · common 1PXsFfTbEcI Aalo Lens ·
+  // outside xQWLtlQb7L0 garrett parker
   areaLiving: require('@/assets/images/renter/area_living.jpg'),
   areaDining: require('@/assets/images/renter/area_dining.jpg'),
   areaKitchen: require('@/assets/images/renter/area_kitchen.jpg'),

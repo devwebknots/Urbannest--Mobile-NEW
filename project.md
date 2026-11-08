@@ -476,6 +476,26 @@ Shared look: radius `borderRadius.button` (10), text `typographyPresets.button` 
   rightIcon={<ArrowRightIcon size={ms(14)} color={colors.navy} />} style={{ alignSelf: 'center' }} />
 ```
 
+### 7. Pop-ups — always use `AppDialog` (`src/components/AppDialog.tsx`)
+**Every warning, confirmation or short choice uses the shared `AppDialog`, not the system `Alert`.** Centered white card (radius `xxl`) over a navy-dimmed page: round icon, title (`displayTitle`), message (`body`, `textSecondary`), then full-width stacked actions.
+
+| Option | Values |
+| :--- | :--- |
+| `tone` | `warning` (amber circle + triangle icon, for destructive / data-loss) · `info` (no icon unless `icon` is given; `chipBlue` circle when it is) |
+| `icon` | custom icon node, e.g. `VideoCameraIcon` / `UploadIcon` (navy, `ms(22)`) |
+| action `variant` | `brand` (main, default) · `soft` (other choice) · `danger` (soft red fill, red text: "Remove", "Discard") · `link` (quiet grey text: "Cancel", "Keep Editing") |
+
+Every action closes the dialog first; its `onPress` runs after the close animation (safe for opening the camera / photo picker). Backdrop tap and Android back close it like "Cancel".
+
+```tsx
+const dialog = useAppDialog();
+dialog.show({ tone: 'warning', title: 'Mark as all good?', message: 'This removes the issues you added.',
+  actions: [{ label: 'Yes, Mark All Good', variant: 'danger', onPress: apply },
+            { label: 'Keep My Issues', variant: 'link' }] });
+// in the screen
+<AppDialog {...dialog.props} />
+```
+
 Not yet on `Button` (special layouts — move them over if a variant fits): "Access Digital Key" (white pill with navy key circle, `CheckInStatusCard`), Pay Now / HOA buttons (`FinancialCard`), "Continue as …" (persona), side-menu Log In, icon-only round buttons (back, burger, Orbitl, search toggle — these stay circular).
 
 ---

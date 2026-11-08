@@ -104,6 +104,29 @@ export interface InspectionArea {
   readonly image: ImageSourcePropType;
 }
 
+/** Issue category in the area page's dropdown, e.g. "Walls & Paint" */
+export interface IssueCategory {
+  readonly id: string;
+  readonly label: string;
+}
+
+/** Photo or video attached to an issue (local file from camera / gallery) */
+export interface IssueMedia {
+  readonly uri: string;
+  readonly type: 'photo' | 'video';
+}
+
+/** One issue reported for an area during the move-in inspection */
+export interface InspectionIssue {
+  readonly id: string;
+  readonly categoryId: string;
+  readonly description: string;
+  readonly media: readonly IssueMedia[];
+}
+
+/** Area result: "allGood" (no issues) or "issues" (at least one issue) */
+export type AreaStatus = 'unset' | 'allGood' | 'issues';
+
 export interface CheckInSummary {
   readonly leaseId: string;
   readonly moveInDate: string;

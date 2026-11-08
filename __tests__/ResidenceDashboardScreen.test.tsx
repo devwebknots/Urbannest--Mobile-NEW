@@ -7,6 +7,11 @@ import {
   RenterHomeScreen,
   ResidenceDashboardScreen,
 } from '../src/features/renter';
+import { inspectionAreaStore } from '../src/features/renter/store/inspectionAreaStore';
+
+beforeEach(() => {
+  inspectionAreaStore.reset();
+});
 
 test('residence dashboard shows every section for the chosen residence', async () => {
   const goBack = jest.fn();
@@ -142,15 +147,11 @@ test('check-in submits only after every item is confirmed; inspection ticks only
 test('inspection areas open their own page and complete only when that page is finalized', async () => {
   const goBack = jest.fn();
   const navigate = jest.fn();
-  const render = (completedAreaId?: string) => (
-    <InspectionScreen
-      navigation={{ goBack, navigate }}
-      route={{ params: { residenceId: 'obsidian', completedAreaId } }}
-    />
-  );
   let tree!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
-    tree = ReactTestRenderer.create(render());
+    tree = ReactTestRenderer.create(
+      <InspectionScreen navigation={{ goBack, navigate }} route={{ params: { residenceId: 'obsidian' } }} />,
+    );
   });
 
   const json = JSON.stringify(tree.toJSON());
@@ -173,10 +174,10 @@ test('inspection areas open their own page and complete only when that page is f
   });
   expect(completedBadges()).toBe(0);
 
-  // Each area page hands back completedAreaId when finalized
+  // Each area page saves its result; the list reads it
   for (const id of ['living', 'dining', 'kitchen', 'bedrooms', 'washrooms', 'common', 'outside']) {
     await ReactTestRenderer.act(() => {
-      tree.update(render(id));
+      inspectionAreaStore.save('obsidian', id, { status: 'allGood', issues: [] });
     });
   }
   expect(completedBadges()).toBe(7);
@@ -196,26 +197,79 @@ test('inspection areas open their own page and complete only when that page is f
   });
 });
 
-test('inspection area page finalizes back to inspection with the area completed', async () => {
+test('inspection area page saves as all good, or with at least one issue', async () => {
   const goBack = jest.fn();
   const navigate = jest.fn();
+  const render = (areaId: string) => (
+    <InspectionAreaScreen
+      navigation={{ goBack, navigate }}
+      route={{ params: { residenceId: 'obsidian', areaId } }}
+    />
+  );
   let tree!: ReactTestRenderer.ReactTestRenderer;
-  await ReactTestRenderer.act(() => {
-    tree = ReactTestRenderer.create(
-      <InspectionAreaScreen
-        navigation={{ goBack, navigate }}
-        route={{ params: { residenceId: 'obsidian', areaId: 'kitchen' } }}
-      />,
-    );
-  });
+  const byLabel = (label: string) => tree.root.findAllByProps({ accessibilityLabel: label })[0];
+  const press = async (label: string) => {
+    await ReactTestRenderer.act(() => {
+      byLabel(label).props.onPress();
+    });
+  };
 
-  const finalize = tree.root.findAllByProps({ accessibilityLabel: 'Finalize Kitchen' })[0];
+  // All good: Save enabled straight away
   await ReactTestRenderer.act(() => {
-    finalize.props.onPress();
+    tree = ReactTestRenderer.create(render('kitchen'));
   });
+  expect(JSON.stringify(tree.toJSON())).toContain('How is the Kitchen?');
+  expect(byLabel('Save Kitchen').props.disabled).toBe(true);
+  await press('All good');
+  expect(byLabel('Save Kitchen').props.disabled).toBe(false);
+  await press('Save Kitchen');
+  expect(inspectionAreaStore.isDone('obsidian', 'kitchen')).toBe(true);
   expect(navigate).toHaveBeenCalledWith({
     name: 'Inspection',
-    params: { residenceId: 'obsidian', completedAreaId: 'kitchen' },
+    params: { residenceId: 'obsidian' },
+    merge: true,
+  });
+  await ReactTestRenderer.act(() => {
+    tree.unmount();
+  });
+
+  // Report issues: needs a category + description, then Save is enabled
+  await ReactTestRenderer.act(() => {
+    tree = ReactTestRenderer.create(render('living'));
+  });
+  await press('Report issues');
+  expect(byLabel('Add Issue').props.disabled).toBe(true);
+  await press('Choose a category');
+  await press('Walls & Paint');
+  await ReactTestRenderer.act(() => {
+    byLabel('Description').props.onChangeText('Crack above the window');
+  });
+  expect(byLabel('Add Issue').props.disabled).toBe(false);
+  expect(byLabel('Save Living Room').props.disabled).toBe(true);
+  await press('Add Issue');
+
+  const json = JSON.stringify(tree.toJSON());
+  expect(json).toContain('Issues (');
+  expect(json).toContain('Crack above the window');
+  expect(json).toContain('Add another issue');
+  expect(byLabel('Save Living Room').props.disabled).toBe(false);
+
+  // Switching to All good asks first (app dialog), and keeps the issue until confirmed
+  await press('All good');
+  expect(JSON.stringify(tree.toJSON())).toContain('Mark as all good?');
+  await press('Keep My Issues');
+  expect(JSON.stringify(tree.toJSON())).toContain('Crack above the window');
+
+  // Room stepper: jumping away with unsaved changes asks first
+  await press('Kitchen, done');
+  expect(JSON.stringify(tree.toJSON())).toContain('Leave without saving?');
+  await press('Stay');
+  expect(navigate).not.toHaveBeenCalledWith(expect.objectContaining({ name: 'InspectionArea' }));
+
+  await press('Save Living Room');
+  expect(navigate).toHaveBeenLastCalledWith({
+    name: 'Inspection',
+    params: { residenceId: 'obsidian' },
     merge: true,
   });
 
