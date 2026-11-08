@@ -11,7 +11,6 @@ import { PersonaSelectScreen } from '@/features/persona';
 import {
   CheckInScreen,
   InspectionAreaScreen,
-  InspectionScreen,
   RenterHomeScreen,
   ResidenceDashboardScreen,
 } from '@/features/renter';
@@ -62,11 +61,13 @@ export const RootNavigator: React.FC = () => (
         component={CheckInScreen}
         options={{ animation: 'slide_from_right' }}
       />
+      {/* Unwired: the room page (InspectionArea) now covers the numbered
+          Inspection list. InspectionScreen is kept in features/renter.
       <Stack.Screen
         name="Inspection"
         component={InspectionScreen}
         options={{ animation: 'slide_from_right' }}
-      />
+      /> */}
       <Stack.Screen
         name="InspectionArea"
         component={InspectionAreaScreen}

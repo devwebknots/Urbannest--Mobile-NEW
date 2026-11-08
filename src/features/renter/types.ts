@@ -92,7 +92,7 @@ export interface CheckInTask {
    * Set when the item is completed on its own screen. Tapping the tile opens
    * that screen; the tile only ticks once that screen is submitted.
    */
-  readonly screen?: 'Inspection';
+  readonly screen?: 'InspectionArea';
 }
 
 /** One room / area on the move-in inspection page */

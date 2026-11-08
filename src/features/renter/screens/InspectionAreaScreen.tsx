@@ -1,17 +1,21 @@
 /**
- * InspectionAreaScreen: one area of the move-in inspection. A single common
- * page for every area (Living Room, Kitchen, ...); the area comes in by id.
+ * InspectionAreaScreen: the move-in inspection, one area at a time. A single
+ * common page for every area (Living Room, Kitchen, ...); the area comes in
+ * by id (none = first area not done yet). Opened from the Check-In
+ * "Inspection" tile; it replaces the old numbered Inspection list.
  * Light page (no full-bleed hero):
  *  - top bar: back, "Inspection", avatar
  *  - rounded photo card of the area with an "Area n of N" pill
  *  - area name (heroTitleCompact, navy) + what to check
- *  - room stepper: every area as a round thumbnail (done / current / to do);
- *    tap to jump to another area
+ *  - "Rooms · n of N done" + room stepper: every area as a round thumbnail
+ *    (done / current / to do); tap to jump to another area
  *  - "How is the <area>?": All good / Report issues tabs
  *  - Issues (n): reported issues, divided rows
  *  - New issue: category dropdown, description, optional photos / videos
  *    (or "Add another issue" once one is added)
- *  - "Save <area>" + hint, at the end of the page (like Check-In)
+ *  - "Save <area>" + hint, at the end of the page (like Check-In); saving
+ *    moves on to the next area that isn't done
+ *  - once every area is done: "Finalize Inspection" (back to Check-In)
  * Warnings and choices use the shared AppDialog.
  */
 
@@ -61,7 +65,9 @@ const AreaPage: React.FC<Props> = ({ navigation, route }) => {
   const photoH = Math.round(photoW * 0.62);
 
   const footnote =
-    vm.status === 'unset'
+    vm.isDone && !vm.canSave && vm.status !== 'unset'
+      ? `${vm.area.label} is saved. Change anything to save again.`
+      : vm.status === 'unset'
       ? 'Choose All good or Report issues to continue.'
       : vm.status === 'issues' && vm.issues.length === 0
         ? 'Add at least one issue to save.'
@@ -122,6 +128,12 @@ const AreaPage: React.FC<Props> = ({ navigation, route }) => {
 
         {/* Every room: done / current / to do */}
         <View style={styles.stepper}>
+          <View style={styles.stepperHead}>
+            <Text style={styles.stepperTitle}>Rooms</Text>
+            <Text style={styles.stepperCount}>
+              <Text style={styles.stepperDone}>{vm.doneCount}</Text> of {vm.total} done
+            </Text>
+          </View>
           <RoomStepper rooms={vm.rooms} onSelect={vm.jumpTo} />
         </View>
 
@@ -211,13 +223,31 @@ const AreaPage: React.FC<Props> = ({ navigation, route }) => {
         <View style={styles.saveBlock}>
           <Button
             title={`Save ${vm.area.label}`}
-            variant="brand"
+            // Finalize is the main action once every area is done
+            variant={vm.allDone ? 'soft' : 'brand'}
             onPress={vm.save}
             disabled={!vm.canSave}
             rightIcon={<ArrowRightIcon size={ms(16)} color={colors.white} />}
           />
           <Text style={styles.footnote}>{footnote}</Text>
         </View>
+
+        {vm.allDone ? (
+          <View style={styles.section}>
+            <SectionHeader
+              title="All areas checked"
+              subtitle={`All ${vm.total} areas are done. Finalize to send your inspection.`}
+            />
+            <View style={[styles.sectionBody, styles.finalize]}>
+              <Button
+                title="Finalize Inspection"
+                variant="brand"
+                onPress={vm.finalize}
+                rightIcon={<ArrowRightIcon size={ms(16)} color={colors.white} />}
+              />
+            </View>
+          </View>
+        ) : null}
       </ScrollView>
 
       <CategorySheet
@@ -304,6 +334,28 @@ const styles = StyleSheet.create({
   },
   stepper: {
     marginTop: spacing.xl,
+  },
+  stepperHead: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.screenHorizontal,
+  },
+  stepperTitle: {
+    ...typographyPresets.bodyBold,
+    color: colors.navy,
+  },
+  stepperCount: {
+    ...typographyPresets.body,
+    color: colors.textSecondary,
+  },
+  stepperDone: {
+    ...typographyPresets.bodyBold,
+    color: colors.navy,
+  },
+  finalize: {
+    paddingHorizontal: spacing.screenHorizontal,
   },
   // Same section rhythm as the other pages
   section: {

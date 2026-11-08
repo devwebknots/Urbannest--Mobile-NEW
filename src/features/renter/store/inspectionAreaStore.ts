@@ -33,6 +33,12 @@ export const inspectionAreaStore = {
     records.set(key(residenceId, areaId), record);
     changed();
   },
+  /** Marks an area as not done again */
+  remove: (residenceId: string, areaId: string): void => {
+    if (records.delete(key(residenceId, areaId))) {
+      changed();
+    }
+  },
   /** Clears everything (tests) */
   reset: (): void => {
     records.clear();

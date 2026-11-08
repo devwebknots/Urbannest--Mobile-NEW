@@ -20,10 +20,12 @@ export type RootStackParamList = {
   PersonaSelect: undefined;
   RenterHome: undefined;
   ResidenceDashboard: { residenceId: string };
-  /** inspectionSubmitted is set by the Inspection screen when it hands back */
+  /** inspectionSubmitted is set by the inspection room page on "Finalize Inspection" */
   CheckIn: { residenceId: string; inspectionSubmitted?: boolean };
+  /** Unwired (not in the navigator); kept with InspectionScreen */
   Inspection: { residenceId: string };
-  InspectionArea: { residenceId: string; areaId: string };
+  /** areaId missing: opens the first area that isn't done yet */
+  InspectionArea: { residenceId: string; areaId?: string };
   Auth: undefined;
   Main: undefined;
   Home: undefined;

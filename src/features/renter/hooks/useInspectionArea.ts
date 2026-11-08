@@ -6,11 +6,15 @@
  * new-issue form (category from a dropdown, description, optional photos /
  * videos). "Add Issue" puts it in the list; "Add another issue" opens the
  * form again. Save is enabled once the area is all good or has at least
- * one issue; it stores the result (inspectionAreaStore) and returns to the
- * Inspection page, which then shows the area as completed.
+ * one issue; it stores the result (inspectionAreaStore) and moves on to the
+ * next area that isn't done. When every area is done it offers
+ * "Finalize Inspection", which returns to Check-In with
+ * `inspectionSubmitted` (ticks the Inspection tile there).
  *
- * The room stepper lists every area (done / current / to do); tapping one
- * jumps to it. Leaving or jumping with unsaved changes asks first.
+ * This page replaces the numbered Inspection list: Check-In opens it
+ * directly (first area not done yet), the room stepper lists every area
+ * (done / current / to do) with "n of N done", and tapping one jumps to it.
+ * Leaving or jumping with unsaved changes asks first.
  */
 
 import { createElement, useCallback, useMemo, useState } from 'react';
@@ -62,9 +66,13 @@ export function useInspectionArea(
     () => RESIDENCES.find(r => r.id === residenceId) ?? RESIDENCES[0],
     [residenceId],
   );
+  // No area given (opened from Check-In): first area that isn't done yet
   const area = useMemo(
-    () => INSPECTION_AREAS.find(a => a.id === areaId) ?? INSPECTION_AREAS[0],
-    [areaId],
+    () =>
+      INSPECTION_AREAS.find(a => a.id === areaId) ??
+      INSPECTION_AREAS.find(a => !inspectionAreaStore.isDone(residence.id, a.id)) ??
+      INSPECTION_AREAS[0],
+    [areaId, residence.id],
   );
   const step = INSPECTION_AREAS.indexOf(area) + 1;
 
@@ -85,14 +93,22 @@ export function useInspectionArea(
   const draftHasContent =
     Boolean(draft.categoryId) || draft.description.trim().length > 0 || draft.media.length > 0;
   const canAddIssue = Boolean(draft.categoryId) && draft.description.trim().length > 0;
-  const canSave = status === 'allGood' || (status === 'issues' && issues.length > 0);
-  // Something the renter would lose by leaving now
-  const hasUnsaved =
-    draftHasContent ||
-    issues !== savedIssues ||
-    (status !== savedStatus && !(status === 'issues' && issues.length === 0));
+  const isDone = saved !== undefined;
+  // Something the renter would lose by leaving now. A new (never saved)
+  // area only counts real input (an issue, or a half-written one), so just
+  // switching tabs there leaves quietly. A saved area also counts a tab
+  // change (e.g. All good -> Report issues), so leaving it asks every time.
+  const issuesChanged =
+    issues.length !== savedIssues.length || issues.some((issue, i) => issue !== savedIssues[i]);
+  const hasUnsaved = draftHasContent || issuesChanged || (isDone && status !== savedStatus);
+  const hasResult = status === 'allGood' || (status === 'issues' && issues.length > 0);
+  // Saved and unchanged: nothing new to save
+  const canSave = hasResult && (!isDone || hasUnsaved);
+  // Saved area that now has no result (e.g. switched from All good to
+  // Report issues without adding one): leaving can mark it not done
+  const incomplete = isDone && !hasResult;
 
-  // Room stepper: every area with its done / current state
+  // Overall progress + room stepper: every area with its done / current state
   const rooms = useMemo(
     () =>
       INSPECTION_AREAS.map(a => ({
@@ -103,6 +119,9 @@ export function useInspectionArea(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [residence.id, area.id, storeVersion],
   );
+  const doneCount = rooms.filter(r => r.done).length;
+  // Finalize only when every area is done and this one still has a result
+  const allDone = doneCount === INSPECTION_AREAS.length && !incomplete;
 
   const resetDraft = () => setDraft(EMPTY_DRAFT);
 
@@ -242,7 +261,29 @@ export function useInspectionArea(
     });
   }, []);
 
-  /* ---------- Save / back ---------- */
+  /* ---------- Save / finalize / back ---------- */
+
+  const openArea = useCallback(
+    (targetId: string) => {
+      const params = { residenceId: residence.id, areaId: targetId };
+      if (navigation?.navigate) {
+        navigation.navigate({ name: 'InspectionArea', params });
+      } else {
+        navigate('InspectionArea', params);
+      }
+    },
+    [navigation, residence.id],
+  );
+
+  // Whole inspection done: back to Check-In, which ticks the Inspection tile
+  const submitInspection = useCallback(() => {
+    const params = { residenceId: residence.id, inspectionSubmitted: true };
+    if (navigation?.navigate) {
+      navigation.navigate({ name: 'CheckIn', params, merge: true });
+    } else {
+      navigate('CheckIn', params);
+    }
+  }, [navigation, residence.id]);
 
   const save = useCallback(() => {
     if (!canSave) {
@@ -250,12 +291,24 @@ export function useInspectionArea(
     }
     const finish = () => {
       inspectionAreaStore.save(residence.id, area.id, { status, issues });
-      const params = { residenceId: residence.id };
-      if (navigation?.navigate) {
-        navigation.navigate({ name: 'Inspection', params, merge: true });
-      } else {
-        navigate('Inspection', params);
+      // Next area that isn't done, after this one (wrapping round)
+      const index = INSPECTION_AREAS.indexOf(area);
+      const order = [...INSPECTION_AREAS.slice(index + 1), ...INSPECTION_AREAS.slice(0, index)];
+      const next = order.find(a => !inspectionAreaStore.isDone(residence.id, a.id));
+      if (next) {
+        openArea(next.id);
+        return;
       }
+      showDialog({
+        tone: 'info',
+        icon: createElement(UploadIcon, { size: ms(22), color: colors.navy }),
+        title: 'All areas checked',
+        message: 'Finalize your inspection to send it to your property manager.',
+        actions: [
+          { label: 'Finalize Inspection', onPress: submitInspection },
+          { label: 'Later', variant: 'link' },
+        ],
+      });
     };
     // Don't silently drop a half-filled issue
     if (formOpen && draftHasContent) {
@@ -276,10 +329,11 @@ export function useInspectionArea(
     formOpen,
     draftHasContent,
     residence.id,
-    area.id,
+    area,
     status,
     issues,
-    navigation,
+    openArea,
+    submitInspection,
     showDialog,
   ]);
 
@@ -288,6 +342,27 @@ export function useInspectionArea(
     (leave: () => void) => {
       if (!hasUnsaved) {
         leave();
+        return;
+      }
+      if (incomplete) {
+        const before = savedStatus === 'allGood' ? 'All Good' : 'As Saved';
+        showDialog({
+          tone: 'warning',
+          title: `${area.label} isn't finished`,
+          message: `It has no result now: not All good and no issues added. Leave and mark it not done, or keep it as it was.`,
+          actions: [
+            {
+              label: 'Leave & Mark Not Done',
+              variant: 'danger',
+              onPress: () => {
+                inspectionAreaStore.remove(residence.id, area.id);
+                leave();
+              },
+            },
+            { label: `Keep It ${before}`, variant: 'soft', onPress: leave },
+            { label: 'Stay', variant: 'link' },
+          ],
+        });
         return;
       }
       showDialog({
@@ -300,7 +375,7 @@ export function useInspectionArea(
         ],
       });
     },
-    [hasUnsaved, showDialog, area.label],
+    [hasUnsaved, incomplete, savedStatus, showDialog, area.label, area.id, residence.id],
   );
 
   const back = useCallback(() => {
@@ -319,17 +394,16 @@ export function useInspectionArea(
       if (targetId === area.id) {
         return;
       }
-      confirmLeave(() => {
-        const params = { residenceId: residence.id, areaId: targetId };
-        if (navigation?.navigate) {
-          navigation.navigate({ name: 'InspectionArea', params });
-        } else {
-          navigate('InspectionArea', params);
-        }
-      });
+      confirmLeave(() => openArea(targetId));
     },
-    [area.id, confirmLeave, navigation, residence.id],
+    [area.id, confirmLeave, openArea],
   );
+
+  const finalize = useCallback(() => {
+    if (allDone) {
+      confirmLeave(submitInspection);
+    }
+  }, [allDone, confirmLeave, submitInspection]);
 
   const categoryLabel = useCallback(
     (id?: string) => ISSUE_CATEGORIES.find(c => c.id === id)?.label,
@@ -367,7 +441,11 @@ export function useInspectionArea(
     save,
     back,
     rooms,
+    doneCount,
+    allDone,
+    isDone,
     jumpTo,
+    finalize,
     openProfile: () =>
       showDialog({ tone: 'info', title: 'Profile', message: 'Coming soon.', actions: [{ label: 'OK' }] }),
     dialog: dialog.props,

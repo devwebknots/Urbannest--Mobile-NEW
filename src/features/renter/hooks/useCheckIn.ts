@@ -21,13 +21,13 @@ import type { CheckInTask, NeighborhoodPlace } from '../types';
 
 export interface CheckInNavigation {
   goBack: () => void;
-  navigate?: (route: 'Inspection', params: { residenceId: string }) => void;
+  navigate?: (route: 'InspectionArea', params: { residenceId: string }) => void;
 }
 
 const soon = (title: string, message = 'Coming soon.') => Alert.alert(title, message);
 
 /**
- * @param inspectionSubmitted set by the Inspection screen after a submit.
+ * @param inspectionSubmitted set by the inspection room page after "Finalize Inspection".
  *   Later this status will come from the backend instead.
  */
 export function useCheckIn(
