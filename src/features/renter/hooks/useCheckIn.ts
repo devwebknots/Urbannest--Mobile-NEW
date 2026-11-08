@@ -21,19 +21,21 @@ import type { CheckInTask, NeighborhoodPlace } from '../types';
 
 export interface CheckInNavigation {
   goBack: () => void;
-  navigate?: (route: 'InspectionArea', params: { residenceId: string }) => void;
+  navigate?: (route: 'InspectionArea' | 'Utilities', params: { residenceId: string }) => void;
 }
 
 const soon = (title: string, message = 'Coming soon.') => Alert.alert(title, message);
 
 /**
  * @param inspectionSubmitted set by the inspection room page after "Finalize Inspection".
- *   Later this status will come from the backend instead.
+ * @param utilitiesConfirmed set by the Utilities page after "Confirm Utilities".
+ *   Later these statuses will come from the backend instead.
  */
 export function useCheckIn(
   residenceId?: string,
   navigation?: CheckInNavigation,
   inspectionSubmitted?: boolean,
+  utilitiesConfirmed?: boolean,
 ) {
   const residence = useMemo(
     () => RESIDENCES.find(r => r.id === residenceId) ?? RESIDENCES[0],
@@ -47,6 +49,11 @@ export function useCheckIn(
       setConfirmed(prev => new Set(prev).add('inspection'));
     }
   }, [inspectionSubmitted]);
+  useEffect(() => {
+    if (utilitiesConfirmed) {
+      setConfirmed(prev => new Set(prev).add('utilities'));
+    }
+  }, [utilitiesConfirmed]);
   const [submitted, setSubmitted] = useState(false);
   const [placeTab, setPlaceTab] = useState(NEIGHBORHOOD[0].id);
 

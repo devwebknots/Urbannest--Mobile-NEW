@@ -186,6 +186,7 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 - **GuestHome → PersonaSelect** (`navigate`): "Log In / Sign Up" pill in the hero.
 - **PersonaSelect → RenterHome** (`replace`): "Continue as Renter".
 - **RenterHome → CheckIn** (`navigate`): tap a Move-In Ready card ("Check-In Now").
+- **CheckIn → Utilities → UtilityProviders**: the "Utilities" tile opens the Utilities list; a utility card opens its providers page (info only). "Confirm Utilities" navigates back to `CheckIn` with `utilitiesConfirmed: true` (`merge`), which ticks the tile.
 - **RenterHome → ResidenceDashboard** (`navigate`): tap a current residence card (active lease) (past leases show "coming soon"). Back button / system back returns.
 - **PersonaSelect → Home** (`replace`): "Continue as PMS". The route for each persona is in `ROUTE_FOR_PERSONA` (`usePersonaSelection`).
 - **Home → Calendar**: "View Calendar" (ScheduleSection), "Schedule" (QuickActionBar), CALENDAR tab (BottomNavBar).
@@ -587,7 +588,17 @@ Supports two operational modes:
   3. `NeighborhoodCard` ("Around Your Home"): `segmentLabel` pill tabs (Schools / Hospitals / Parks; navy when selected) switch a 2-column grid of **photo cards** styled like the guest guide cards (white, hairline border): photo with white distance pill, eyebrow-style type in `primary`, 2-line name. `Button` `soft` "View on Map →". Photos `place_*.jpg` in `src/assets/images/renter/` (Unsplash; coaster = Wikimedia Commons CC0) via `NeighborhoodPlace.image`.
   4. `CuratedLivingCard`: photo with fade + gold kicker + `sectionHeading` title, white body (`body`), gold rule signature; `borderRadius.xl`, hairline border, `shadows.sm`.
 - **Logic**: `useCheckIn(residenceId, navigation)` — confirmed set, `canSubmit`, `submitted`, `toggleTask`, `submit` (Alert); key / places / map / profile show "coming soon". Mock data: `CHECK_IN_SUMMARY`, `CHECK_IN_TASKS`, `NEIGHBORHOOD`, `NEIGHBORHOOD_RADIUS`, `CURATED_LIVING`.
-- **Icons** added to `src/assets/icons/renter/`: inspect, bolt, wifi, shield, key, check, school, hospital, park (white 128px line PNGs drawn with System.Drawing, tinted via `RenterIcon`).
+- **Icons** added to `src/assets/icons/renter/`: inspect, bolt, wifi, shield, key, check, school, hospital, park, flame, waves (white 128px line PNGs drawn with System.Drawing, tinted via `RenterIcon`).
+
+### 0f. Utilities (`UtilitiesScreen.tsx`) and Utility Providers (`UtilityProvidersScreen.tsx`)
+- **Opened by**: the Check-In "Utilities" tile (`CHECK_IN_TASKS` item has `screen: 'Utilities'`). Routes `Utilities { residenceId }` and `UtilityProviders { residenceId, utilityId }`.
+- **Light pages** (no glass hero), shared pieces:
+  - `components/LightTopBar`: round white back button (`TILE_BORDER` edge), centered `sectionTitle` navy title, `ProfileAvatar`. Use it for any light renter page.
+  - `components/utilities/PageIntro`: `eyebrow` (`secondary`), `heroTitle` navy title (the app's page heading preset, as on My Residences), 36 × 3 navy rule, `body` intro in `textSecondary`.
+- **Utilities**: intro "Essential Services"; one `UtilityCard` per utility: full-width photo (`borderRadius.xxl`, ratio 0.66), navy `Scrim` at the bottom, white icon chip + dark "n providers" pill on top, `heroTitleCompact` white name, `heroSubtitle` hint, "View providers" + white `ArrowCircleIcon`. Then "Good to know" numbered tips (on the page) and `Button` `brand` "Confirm Utilities →" + `caption` footnote.
+- **Providers**: rounded utility photo with icon chip, `PageIntro` ("Service directory"), "n providers for your home", one `ProviderCard` each (tile fill / edge like the Check-In tiles): 56 px rounded photo thumbnail (`UtilityProvider.image`, `provider_*.jpg` 300 × 300; later the provider logo), `listingTitle` name, kind, short accent rule, description, uppercase tag pills, then contact rows (customer care and 24/7 emergency → `tel:`, website → browser, hours). Ends with a "Which provider is mine?" panel + service address facts, on the guest search card container (`CardBackground` + `CARD_BG` fill / white edge / blue glow) with dark text.
+- **Logic**: `useUtilities` (open a utility, `confirm`), `useUtilityProviders` (`call`, `openWebsite` via `Linking`; failures show an `AppDialog`). Mock data `UTILITIES` in `constants.ts`: placeholder provider names, 555 numbers and example.com sites until the backend sends real ones.
+- **Photos** `utility_*.jpg` (1000 × 620) in `src/assets/images/renter/`: Unsplash (electricity, water, sewer) and Wikimedia Commons CC BY-SA 4.0 (gas); credits in `renterAssets.ts`.
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.
 - **Components**:

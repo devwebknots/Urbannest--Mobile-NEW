@@ -13,6 +13,8 @@ import {
   InspectionAreaScreen,
   RenterHomeScreen,
   ResidenceDashboardScreen,
+  UtilitiesScreen,
+  UtilityProvidersScreen,
 } from '@/features/renter';
 import { SplashScreen } from '@/features/splash';
 import { LoginScreen } from '@/features/auth/screens/LoginScreen';
@@ -71,6 +73,16 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="InspectionArea"
         component={InspectionAreaScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="Utilities"
+        component={UtilitiesScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="UtilityProviders"
+        component={UtilityProvidersScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen name="Home" component={HomeScreen} />

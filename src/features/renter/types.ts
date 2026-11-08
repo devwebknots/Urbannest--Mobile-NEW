@@ -92,7 +92,43 @@ export interface CheckInTask {
    * Set when the item is completed on its own screen. Tapping the tile opens
    * that screen; the tile only ticks once that screen is submitted.
    */
-  readonly screen?: 'InspectionArea';
+  readonly screen?: 'InspectionArea' | 'Utilities';
+}
+
+/* ---------- Utilities (move-in) ---------- */
+
+export type UtilityIcon = 'bolt' | 'faucet' | 'flame' | 'waves';
+
+/** A company that supplies one utility at the residence (mock; later from the backend) */
+export interface UtilityProvider {
+  readonly id: string;
+  readonly name: string;
+  /** Kind of provider, e.g. "Investor-owned utility" */
+  readonly kind: string;
+  readonly description: string;
+  readonly tags: readonly string[];
+  readonly accent: ConciergeAccent;
+  /** Square thumbnail next to the name (later the provider's logo) */
+  readonly image: ImageSourcePropType;
+  readonly phone: string;
+  /** 24/7 outage / leak line, when the provider has one */
+  readonly emergency?: string;
+  /** Full URL, opened in the browser */
+  readonly website: string;
+  readonly hours: string;
+}
+
+/** One utility on the Utilities page (Electricity, Water, ...) */
+export interface UtilityService {
+  readonly id: string;
+  readonly label: string;
+  /** One line on the utility card */
+  readonly hint: string;
+  /** Intro under the title on the providers page */
+  readonly description: string;
+  readonly icon: UtilityIcon;
+  readonly image: ImageSourcePropType;
+  readonly providers: readonly UtilityProvider[];
 }
 
 /** One room / area on the move-in inspection page */

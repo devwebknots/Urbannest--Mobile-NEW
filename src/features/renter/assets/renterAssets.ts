@@ -38,6 +38,23 @@ export const renterAssets = {
   areaWashroom: require('@/assets/images/renter/area_washroom.jpg'),
   areaCommon: require('@/assets/images/renter/area_common.jpg'),
   areaOutside: require('@/assets/images/renter/area_outside.jpg'),
+  // Utilities photos (cropped to 1000 x 620): electricity Unsplash
+  // 1473341304170-971dccb5ac1e · water Unsplash 1548839140-29a749e1cf4d ·
+  // sewer Unsplash 1513828583688-c52646db42da · gas Wikimedia Commons
+  // "Flame from the burner of a gas stove" by BogTar201213, CC BY-SA 4.0
+  utilityElectricity: require('@/assets/images/renter/utility_electricity.jpg'),
+  utilityWater: require('@/assets/images/renter/utility_water.jpg'),
+  utilityGas: require('@/assets/images/renter/utility_gas.jpg'),
+  utilitySewer: require('@/assets/images/renter/utility_sewer.jpg'),
+  // Provider thumbnails (300 x 300): Unsplash 1621905251918-48416bd8575a
+  // (power) · 1548337138-e87d889cc369 (wind) · 1585704032915-c3400ca199e7
+  // (water) · 1541888946425-d81bb19240f5 (sewer) · gas: Wikimedia Commons
+  // "Gas Stove Burner Blue Flame" by Federico Cardoner, CC BY 2.0
+  providerGatewayPower: require('@/assets/images/renter/provider_gateway_power.jpg'),
+  providerPrairieWind: require('@/assets/images/renter/provider_prairie_wind.jpg'),
+  providerCityWater: require('@/assets/images/renter/provider_city_water.jpg'),
+  providerHeartlandGas: require('@/assets/images/renter/provider_heartland_gas.jpg'),
+  providerLakesideSanitary: require('@/assets/images/renter/provider_lakeside_sanitary.jpg'),
 };
 
 /** Line icons drawn for the dashboard (white PNGs, tinted in the app). */
@@ -58,6 +75,9 @@ export const renterIcons = {
   school: require('@/assets/icons/renter/school.png'),
   hospital: require('@/assets/icons/renter/hospital.png'),
   park: require('@/assets/icons/renter/park.png'),
+  // Utilities: gas flame and sewer waves (drawn to match the set)
+  flame: require('@/assets/icons/renter/flame.png'),
+  waves: require('@/assets/icons/renter/waves.png'),
 };
 
 /** Width / height of residences_header.jpg */

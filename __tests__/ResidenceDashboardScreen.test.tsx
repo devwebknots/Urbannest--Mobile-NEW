@@ -6,6 +6,8 @@ import {
   InspectionScreen,
   RenterHomeScreen,
   ResidenceDashboardScreen,
+  UtilitiesScreen,
+  UtilityProvidersScreen,
 } from '../src/features/renter';
 import { inspectionAreaStore } from '../src/features/renter/store/inspectionAreaStore';
 
@@ -84,10 +86,10 @@ test('cards open check-in when move-in ready, else the dashboard', async () => {
 test('check-in submits only after every item is confirmed; inspection ticks only after its screen is submitted', async () => {
   const goBack = jest.fn();
   const navigate = jest.fn();
-  const render = (inspectionSubmitted?: boolean) => (
+  const render = (inspectionSubmitted?: boolean, utilitiesConfirmed?: boolean) => (
     <CheckInScreen
       navigation={{ goBack, navigate }}
-      route={{ params: { residenceId: 'obsidian', inspectionSubmitted } }}
+      route={{ params: { residenceId: 'obsidian', inspectionSubmitted, utilitiesConfirmed } }}
     />
   );
   let tree!: ReactTestRenderer.ReactTestRenderer;
@@ -123,14 +125,24 @@ test('check-in submits only after every item is confirmed; inspection ticks only
   await tap('Inspection');
   expect(navigate).toHaveBeenCalledWith('InspectionArea', { residenceId: 'obsidian' });
 
-  for (const label of ['Utilities', 'Internet', 'Home Security']) {
+  // Utilities opens its own page too
+  await tap('Utilities');
+  expect(navigate).toHaveBeenCalledWith('Utilities', { residenceId: 'obsidian' });
+
+  for (const label of ['Internet', 'Home Security']) {
     await tap(label);
   }
   expect(submit().props.disabled).toBe(true);
 
-  // Coming back from a submitted inspection ticks it
+  // Coming back from a submitted inspection ticks it; utilities still open
   await ReactTestRenderer.act(() => {
     tree.update(render(true));
+  });
+  expect(submit().props.disabled).toBe(true);
+
+  // Coming back from "Confirm Utilities" ticks the last item
+  await ReactTestRenderer.act(() => {
+    tree.update(render(true, true));
   });
   expect(submit().props.disabled).toBe(false);
 
@@ -139,6 +151,62 @@ test('check-in submits only after every item is confirmed; inspection ticks only
   });
   expect(tree.root.findAllByProps({ accessibilityLabel: 'Check-in submitted' }).length).toBeGreaterThan(0);
 
+  await ReactTestRenderer.act(() => {
+    tree.unmount();
+  });
+});
+
+test('utilities list opens each provider page and confirms back to check-in', async () => {
+  const goBack = jest.fn();
+  const navigate = jest.fn();
+  let tree!: ReactTestRenderer.ReactTestRenderer;
+  await ReactTestRenderer.act(() => {
+    tree = ReactTestRenderer.create(
+      <UtilitiesScreen navigation={{ goBack, navigate }} route={{ params: { residenceId: 'obsidian' } }} />,
+    );
+  });
+
+  const json = JSON.stringify(tree.toJSON());
+  for (const text of ['Essential Services', 'Electricity', 'Water Supply', 'Gas Connection', 'Sewer']) {
+    expect(json).toContain(text);
+  }
+
+  const press = async (label: string) => {
+    const node = tree.root.findAllByProps({ accessibilityLabel: label })[0];
+    await ReactTestRenderer.act(() => {
+      node.props.onPress();
+    });
+  };
+  await press('Electricity');
+  expect(navigate).toHaveBeenCalledWith({
+    name: 'UtilityProviders',
+    params: { residenceId: 'obsidian', utilityId: 'electricity' },
+  });
+
+  await press('Confirm Utilities');
+  expect(navigate).toHaveBeenCalledWith({
+    name: 'CheckIn',
+    params: { residenceId: 'obsidian', utilitiesConfirmed: true },
+    merge: true,
+  });
+
+  await ReactTestRenderer.act(() => {
+    tree.unmount();
+  });
+
+  // Providers page shows the chosen utility's providers and contacts
+  await ReactTestRenderer.act(() => {
+    tree = ReactTestRenderer.create(
+      <UtilityProvidersScreen
+        navigation={{ goBack }}
+        route={{ params: { residenceId: 'obsidian', utilityId: 'gas' } }}
+      />,
+    );
+  });
+  const providers = JSON.stringify(tree.toJSON());
+  for (const text of ['Gas Connection', 'Heartland Natural Gas', 'Customer care', '24/7 emergency', 'Which provider is mine?']) {
+    expect(providers).toContain(text);
+  }
   await ReactTestRenderer.act(() => {
     tree.unmount();
   });

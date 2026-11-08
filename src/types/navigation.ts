@@ -20,8 +20,15 @@ export type RootStackParamList = {
   PersonaSelect: undefined;
   RenterHome: undefined;
   ResidenceDashboard: { residenceId: string };
-  /** inspectionSubmitted is set by the inspection room page on "Finalize Inspection" */
-  CheckIn: { residenceId: string; inspectionSubmitted?: boolean };
+  /**
+   * inspectionSubmitted is set by the inspection room page on "Finalize Inspection";
+   * utilitiesConfirmed by the Utilities page on "Confirm Utilities"
+   */
+  CheckIn: { residenceId: string; inspectionSubmitted?: boolean; utilitiesConfirmed?: boolean };
+  /** Move-in utilities list (Electricity, Water, Gas, Sewer) */
+  Utilities: { residenceId: string };
+  /** Providers for one utility (information only) */
+  UtilityProviders: { residenceId: string; utilityId: string };
   /** Unwired (not in the navigator); kept with InspectionScreen */
   Inspection: { residenceId: string };
   /** areaId missing: opens the first area that isn't done yet */

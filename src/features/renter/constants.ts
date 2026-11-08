@@ -16,6 +16,7 @@ import type {
   Residence,
   ResidenceFilter,
   ServiceRequest,
+  UtilityService,
 } from './types';
 
 export const RENTER_PROFILE = {
@@ -149,7 +150,7 @@ export const CHECK_IN_SUMMARY: CheckInSummary = {
 
 export const CHECK_IN_TASKS: readonly CheckInTask[] = [
   { id: 'inspection', label: 'Inspection', hint: 'Walkthrough report', icon: 'inspect', accent: 'blue', screen: 'InspectionArea' },
-  { id: 'utilities', label: 'Utilities', hint: 'Power & water live', icon: 'bolt', accent: 'amber' },
+  { id: 'utilities', label: 'Utilities', hint: 'Power & water live', icon: 'bolt', accent: 'amber', screen: 'Utilities' },
   { id: 'internet', label: 'Internet', hint: 'Fibre activated', icon: 'wifi', accent: 'violet' },
   { id: 'security', label: 'Home Security', hint: 'Alarm & access', icon: 'shield', accent: 'green' },
 ];
@@ -182,6 +183,120 @@ export const ISSUE_CATEGORIES: readonly IssueCategory[] = [
 
 /** Most photos / videos one issue can have */
 export const MAX_ISSUE_MEDIA = 5;
+
+/* ---------- Move-in utilities (mock) ---------- */
+
+/**
+ * Utilities and their providers for the residence. Provider names, phone
+ * numbers (555) and websites (example.com) are placeholders until the
+ * backend sends the real ones for each home.
+ */
+export const UTILITIES: readonly UtilityService[] = [
+  {
+    id: 'electricity',
+    label: 'Electricity',
+    hint: 'Power for lights, heating & appliances',
+    description: 'Choose the energy partner on your lease to start service before move-in day.',
+    icon: 'bolt',
+    image: renterAssets.utilityElectricity,
+    providers: [
+      {
+        id: 'gateway-power',
+        name: 'Gateway Power & Light',
+        kind: 'Investor-owned utility',
+        description: 'Main grid supplier for the building, with smart billing and usage alerts.',
+        tags: ['Grid supplier', 'Smart billing'],
+        accent: 'blue',
+        image: renterAssets.providerGatewayPower,
+        phone: '(314) 555-0142',
+        emergency: '(314) 555-0199',
+        website: 'https://gatewaypower.example.com',
+        hours: 'Mon – Fri · 7 am – 7 pm',
+      },
+      {
+        id: 'prairie-wind',
+        name: 'Prairie Wind Energy',
+        kind: 'Renewable energy plan',
+        description: 'Optional 100% wind-powered plan, billed through your grid supplier.',
+        tags: ['100% renewable', 'Optional'],
+        accent: 'violet',
+        image: renterAssets.providerPrairieWind,
+        phone: '(636) 555-0118',
+        website: 'https://prairiewind.example.com',
+        hours: 'Mon – Sat · 8 am – 6 pm',
+      },
+    ],
+  },
+  {
+    id: 'water',
+    label: 'Water Supply',
+    hint: 'Drinking water & household supply',
+    description: 'Water is billed by the city. Open an account in your name before you move in.',
+    icon: 'faucet',
+    image: renterAssets.utilityWater,
+    providers: [
+      {
+        id: 'city-water',
+        name: 'City Water Services',
+        kind: 'Municipal utility',
+        description: 'Supplies treated water to the building and reads your unit meter monthly.',
+        tags: ['City utility', 'Monthly billing'],
+        accent: 'blue',
+        image: renterAssets.providerCityWater,
+        phone: '(636) 555-0164',
+        emergency: '(636) 555-0170',
+        website: 'https://citywater.example.com',
+        hours: 'Mon – Fri · 8 am – 5 pm',
+      },
+    ],
+  },
+  {
+    id: 'gas',
+    label: 'Gas Connection',
+    hint: 'Cooking, heating & hot water',
+    description: 'Natural gas runs the stove and water heater. Book a meter reading for move-in day.',
+    icon: 'flame',
+    image: renterAssets.utilityGas,
+    providers: [
+      {
+        id: 'heartland-gas',
+        name: 'Heartland Natural Gas',
+        kind: 'Regulated gas utility',
+        description: 'Gas supply and meter service for the building. Smell gas? Call the 24/7 line.',
+        tags: ['Natural gas', 'Meter service'],
+        accent: 'amber',
+        image: renterAssets.providerHeartlandGas,
+        phone: '(314) 555-0127',
+        emergency: '(314) 555-0111',
+        website: 'https://heartlandgas.example.com',
+        hours: 'Mon – Fri · 7 am – 8 pm',
+      },
+    ],
+  },
+  {
+    id: 'sewer',
+    label: 'Sewer',
+    hint: 'Wastewater & drainage',
+    description: 'Sewer service is linked to your water account and billed with it.',
+    icon: 'waves',
+    image: renterAssets.utilitySewer,
+    providers: [
+      {
+        id: 'lakeside-sanitary',
+        name: 'Lakeside Sanitary District',
+        kind: 'Public sewer district',
+        description: 'Wastewater collection and treatment. Report backups or blocked drains any time.',
+        tags: ['Public district', 'Billed with water'],
+        accent: 'navy',
+        image: renterAssets.providerLakesideSanitary,
+        phone: '(636) 555-0135',
+        emergency: '(636) 555-0188',
+        website: 'https://lakesidesanitary.example.com',
+        hours: 'Mon – Fri · 8 am – 4:30 pm',
+      },
+    ],
+  },
+];
 
 export const NEIGHBORHOOD_RADIUS = '5 km';
 
