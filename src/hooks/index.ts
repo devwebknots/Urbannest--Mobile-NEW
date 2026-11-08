@@ -6,3 +6,6 @@ export * from './useDebounce';
 
 export { default as useKeyboard } from './useKeyboard';
 export * from './useKeyboard';
+
+export { default as useStatusBarInsets } from './useStatusBarInsets';
+export * from './useStatusBarInsets';
