@@ -1,5 +1,5 @@
 /**
- * RenterTabBar: floating frosted bar (Residences, Search, Alerts, Calendar).
+ * RenterTabBar: floating frosted bar (Residences, Search, Alerts, Profile).
  * A glass capsule springs under the selected tab; icons and labels
  * cross-fade navy <-> white as it passes. Same language as ResidenceFilterBar.
  */
@@ -14,7 +14,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { BellIcon, CalendarIcon, HomeIcon, SearchIcon } from '@/components/icons';
+import { BellIcon, HomeIcon, SearchIcon, UserIcon } from '@/components/icons';
 import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
 import { moderateScale as ms } from '@/utils/responsive';
@@ -36,7 +36,7 @@ const TABS: { key: RenterTab; label: string }[] = [
   { key: 'residences', label: 'Homes' },
   { key: 'search', label: 'Search' },
   { key: 'alerts', label: 'Alerts' },
-  { key: 'calendar', label: 'Calendar' },
+  { key: 'profile', label: 'Profile' },
 ];
 
 const TabIcon: React.FC<{ tab: RenterTab; color: string }> = ({ tab, color }) => {
@@ -44,7 +44,7 @@ const TabIcon: React.FC<{ tab: RenterTab; color: string }> = ({ tab, color }) =>
   if (tab === 'residences') return <HomeIcon size={size} color={color} />;
   if (tab === 'search') return <SearchIcon size={size} color={color} />;
   if (tab === 'alerts') return <BellIcon size={size} color={color} />;
-  return <CalendarIcon size={size} color={color} />;
+  return <UserIcon size={size} color={color} />;
 };
 
 const TabContent: React.FC<{

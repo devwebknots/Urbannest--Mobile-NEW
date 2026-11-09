@@ -190,7 +190,7 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 - **RenterHome → CheckIn** (`navigate`): tap a Move-In Ready card ("Check-In Now").
 - **CheckIn → Utilities → UtilityProviders**: the "Utilities" tile opens the Utilities list; a utility card opens its providers page (info only). "Confirm Utilities" navigates back to `CheckIn` with `utilitiesConfirmed: true` (`merge`), which ticks the tile.
 - **RenterHome → ManageResidence** (`navigate`): tap an Active Lease card ("Manage") (past leases show "coming soon"). Back button / system back returns.
-- **RenterHome → Neyora** (`navigate('Neyora')`): the **Calendar** tab in `RenterTabBar` opens the Neyora maintenance module (its Home, then its Calendar). The tab stays on Homes, so coming back shows Homes selected. Back / swipe returns to RenterHome.
+- **ManageResidence → Neyora** (`navigate('Neyora')`): the **Scheduling** shortcut (calendar icon, replaced Invoices) on the frosted `ResidenceHeroCard` opens the Neyora maintenance module (its Home, then its Calendar). Back / swipe returns to ManageResidence.
 - **PersonaSelect → Home** (`replace`): "Continue as PMS". The route for each persona is in `ROUTE_FOR_PERSONA` (`usePersonaSelection`).
 - **Home → Calendar**: "View Calendar" (ScheduleSection), "Schedule" (QuickActionBar), CALENDAR tab (BottomNavBar).
 - **Calendar → Home**: HOME tab in BottomNavBar or system back.
@@ -217,7 +217,7 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 1. Neyora's Home + Calendar screens are **packed into one file**: `vendor/neyora-maintenance-sdk-0.1.0.tgz` (~3.3 MB, 42 files).
 2. `package.json` installs it: `"@neyora/maintenance-sdk": "file:vendor/neyora-maintenance-sdk-0.1.0.tgz"` → real copy in `node_modules/@neyora/maintenance-sdk`.
 3. `RootNavigator.tsx` uses it: `<Stack.Screen name="Neyora" component={NeyoraModule} />`.
-4. The **Calendar** tab in `RenterTabBar` (replaced Profile) opens it.
+4. The **Scheduling** shortcut on the Manage page (frosted `ResidenceHeroCard`, calendar icon) opens it.
 
 ### Neyora side (`C:\neyora\sdk\`)
 | File | What it does |
@@ -289,9 +289,9 @@ Only changed an existing screen (Home, Calendar or their parts)? Skip step 2.
 - `vendor/neyora-maintenance-sdk-0.1.0.tgz`: the packed SDK (committed).
 - `src/types/navigation.ts`: `Neyora: undefined` in `RootStackParamList`.
 - `src/navigation/RootNavigator.tsx`: `import { NeyoraModule } from '@neyora/maintenance-sdk'` + `<Stack.Screen name="Neyora" component={NeyoraModule} options={{ animation: 'slide_from_right' }} />`.
-- `src/features/renter/types.ts`: `RenterTab` `'profile'` → `'calendar'`.
-- `src/features/renter/components/RenterTabBar.tsx`: tab `{ key: 'calendar', label: 'Calendar' }`, icon `CalendarIcon` (was `UserIcon`).
-- `src/features/renter/hooks/useRenterTabs.ts`: `TAB_TITLES.calendar`; at the start of `onTabChange`: `if (next === 'calendar') { navigate('Neyora'); return; }` (bar stays on Homes).
+- `src/features/renter/hooks/useManageResidence.ts`: `openAction` → for `action.id === 'scheduling'` calls `navigation.navigate('Neyora')` (falls back to the global `navigate`); Maintenance and the other shortcuts show "coming soon".
+- `src/features/renter/constants.ts` (`MANAGE_ACTIONS`): Invoices → `{ id: 'scheduling', label: 'Scheduling', icon: 'lineCalendar' }`. Icon `src/assets/icons/manage/calendar.png` (Lucide `calendar`, added to `scripts/icons/draw_line_icons.ps1`), mapped in `renterAssets.ts`; `ManageActionIcon` gained `'lineCalendar'`. `ManageNavigation` gained an optional `navigate`.
+- `RenterTabBar` / `useRenterTabs` / `RenterTab`: **unchanged** (an earlier version swapped Profile for a Calendar tab that opened Neyora; reverted, Profile is back).
 - `metro.config.js` / `babel.config.js`: **unchanged** (an earlier version linked `../neyora` directly with `watchFolders` + a Babel alias override; replaced by the packed file).
 
 **Checks run**: `npx tsc --noEmit` passes; `npx react-native bundle --platform android --dev true --reset-cache` builds; the bundle loads 40 files from `node_modules/@neyora/maintenance-sdk`, **none** from `C:\neyora`, and only one `node_modules/react/index.js`. No fonts were needed (Neyora's screens use Inter and Playfair, which UrbanNest already has).
@@ -299,7 +299,7 @@ Only changed an existing screen (Home, Calendar or their parts)? Skip step 2.
 ### Run & test
 1. Stop any running Metro (Neyora's Metro also uses port 8081).
 2. `npm install`, then `npm start -- --reset-cache`, then `npm run android` (or press `r` to reload if UrbanNest is already installed; no native changes).
-3. Renter Home → bottom bar shows Homes / Search / Alerts / Calendar → tap **Calendar** → Neyora Home slides in → open Neyora's calendar → back twice returns to Renter Home with Homes selected. Works with the Neyora app uninstalled and without `C:\neyora` on the computer.
+3. Renter Home → **Manage** on an active residence → tap **Scheduling** on the frosted residence card → Neyora Home slides in → open Neyora's calendar → back twice returns to the Manage page. Works with the Neyora app uninstalled and without `C:\neyora` on the computer.
 
 ### For the real product (not done yet)
 Publish the same package to a private npm registry / GitHub Packages (buyers run `npm install @neyora/maintenance-sdk`); give each buyer an API key and make the backend multi-tenant (each company sees only its own data); add a `theme` prop for buyer brand colours; buyers on Flutter or native apps need a native wrapper.
@@ -658,7 +658,7 @@ Supports two operational modes:
   1. `RenterHeader`: `HeaderBrand` (same logo + "Urban Nest" as the guest hero; shared in `BrandLogo.tsx`, every page header uses it), `ProfileAvatar` (shared in `src/components/ProfileAvatar.tsx`: 36 white circle, navy initials, used by every header that shows the user), "My Residences" (`heroTitle`, 30), two-line subtitle. The "MY RENTALS" eyebrow is commented out. Logo text and subtitle match the guest hero.
   2. `ResidenceFilterBar`: solid white track, no border (radius `xl`, highlight `lg`; a see-through track let Android's elevation shadow show through as a line) — All Rentals / Active / Past with count bubbles (fixed widths 1.3 : 1 : 1). One glass pill (solid `navy` + smooth white `Scrim` sheen from the top + light hairline rim) springs between segments (`Animated.spring`, JS driver since it animates left/width); labels and badges cross-fade navy ↔ white as it passes.
   3. `ResidenceCard`s (24dp apart): fully rounded photo (same height on every card: width × 0.46, `RESIDENCE_IMAGE_RATIO`) with dark status pill (green / grey dot) and frosted "…" menu; `listingTitle` navy name + navy "Premium" badge (same as the guest rental card); navy pin + `cardSubtitle` address; footer: calendar/clock icon circles with label + bold value (divider between two facts) and action (footer wraps, so dates never truncate; the action drops to its own line, right-aligned, when space is short) — `Button` `brand` "Check-In Now" and `soft` "Manage" (size `md`, `minWidth` 130), `link` + navy `ArrowRightIcon` for expired leases.
-  4. `RenterTabBar`: floating frosted capsule bar — Homes / Search / Alerts (dot) / Calendar (`CalendarIcon`; replaced Profile), icon above label. Same glass capsule as the filter (navy + white `Scrim` sheen + rim) springs between tabs; icons/labels cross-fade navy ↔ white. Calendar opens the Neyora SDK module (Section 4b) and the bar stays on Homes. Search / Alerts slide over, show "coming soon", and glide back to Homes on close.
+  4. `RenterTabBar`: floating frosted capsule bar — Homes / Search / Alerts (dot) / Profile, icon above label. Same glass capsule as the filter (navy + white `Scrim` sheen + rim) springs between tabs; icons/labels cross-fade navy ↔ white. Tabs without a page slide over, show "coming soon", and glide back to Homes on close.
 - **Logic**: `useRenterHome` (filter, tab, counts, card + menu actions — "coming soon" alerts for now). Mock data in `renter/constants.ts`; photos in `src/assets/images/renter/` (cropped from the design) via `renterAssets.ts`. Cards fade up in sequence (off in tests).
 
 ### 0d. Residence Dashboard (`src/features/renter/screens/ResidenceDashboardScreen.tsx`) — unwired, replaced by Manage (0g)
@@ -819,7 +819,7 @@ Supports two operational modes:
 - **PersonaSelect ➔ RenterHome**: "Continue as Renter".
 - **RenterHome ➔ ManageResidence**: tap an Active Lease card ("Manage").
 - **RenterHome ➔ CheckIn**: tap a Move-In Ready card.
-- **RenterHome ➔ Neyora** (installed SDK: Neyora Home ➔ Neyora Calendar): **Calendar** tab in `RenterTabBar`. Back returns to RenterHome.
+- **ManageResidence ➔ Neyora** (installed SDK: Neyora Home ➔ Neyora Calendar): **Scheduling** shortcut on the frosted residence card. Back returns to ManageResidence.
 - **PersonaSelect ➔ Home**: "Continue as PMS".
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.
@@ -885,7 +885,7 @@ Supports two operational modes:
 - `colors.buttonGradientStart` in `theme.ts` is `#032B57` while `gradients.button` uses `#03264C` — keep them consistent.
 - Poppins fonts are still in `src/assets/fonts/` though deprecated.
 - `useAppTheme` exposes `isDarkMode`, but there is no dark palette yet.
-- Neyora SDK (Section 4b) is demo-only: installed from a .tgz in `vendor/` (re-pack on every Neyora change), `apiKey` not checked, no `theme` prop, no private npm publish, no multi-tenant backend. The Profile tab was removed from `RenterTabBar` to make room for Calendar.
+- Neyora SDK (Section 4b) is demo-only: installed from a .tgz in `vendor/` (re-pack on every Neyora change), `apiKey` not checked, no `theme` prop, no private npm publish, no multi-tenant backend.
 - `heroTitle` should be Playfair Display ExtraBold (800): add `PlayfairDisplay-ExtraBold.ttf`, link it, and switch the preset's font.
 - Guest home: hero has 3 slides (design `hero_bg.png` + `hero_dusk_house.jpg` + `hero_pool_villa.jpg`, built by `scripts/brand/hero_grade.ps1`), auto-advancing every 5 s and looping; `rental_glass_villa.png` has the Premium badge baked in; need a text-free hero export; featured carousel still uses remote Unsplash images (city tiles are now bundled: `city_*.jpg` in `src/assets/images/guest/`, Unsplash License); Search / categories / See More / guides / cities buttons have no destination yet.
 

@@ -95,6 +95,7 @@ export const renterIcons = {
   // drawn by scripts/icons/draw_line_icons.ps1
   lineWrench: require('@/assets/icons/manage/wrench.png'),
   lineReceipt: require('@/assets/icons/manage/receipt.png'),
+  lineCalendar: require('@/assets/icons/manage/calendar.png'),
   lineDumbbell: require('@/assets/icons/manage/dumbbell.png'),
   lineKey: require('@/assets/icons/manage/key.png'),
 };

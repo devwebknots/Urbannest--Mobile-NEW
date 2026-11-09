@@ -6,7 +6,7 @@
  *  - residence hero card with the four shortcuts along its bottom
  *  - Quick Actions: 2 x 2 grid of wide pastel tiles
  *  - navy Rent Due card with the days-left ring
- *  - This Week: timeline of upcoming items
+ *  - This Week: timeline of upcoming items (commented out for now)
  *  - Community Buzz: snapping carousel of wide event cards
  *  - Help Desk: service requests in one card + "Raise a Request"
  * No bottom tab bar: a pushed page, the back button is the way out.
@@ -25,7 +25,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppDialog } from '@/components/AppDialog';
 import { Button } from '@/components/Button';
-import { CalendarIcon, PlusIcon, UsersIcon } from '@/components/icons';
+// CalendarIcon: used by the hidden This Week section
+import { /* CalendarIcon, */ PlusIcon, UsersIcon } from '@/components/icons';
 import { colors, spacing } from '@/config/theme';
 import { HeadsetIcon } from '@/features/guest/components/GuestIcons';
 import { moderateScale as ms } from '@/utils/responsive';
@@ -38,7 +39,7 @@ import { GridIcon } from '../components/manage/QuickActionTiles';
 import { QuickAlertCard } from '../components/manage/QuickAlertCard';
 import { RentDueCard } from '../components/manage/RentDueCard';
 import { ResidenceHeroCard } from '../components/manage/ResidenceHeroCard';
-import { WeekTimeline } from '../components/manage/WeekTimeline';
+// import { WeekTimeline } from '../components/manage/WeekTimeline'; // hidden This Week section
 import { ManageNavigation, useManageResidence } from '../hooks/useManageResidence';
 
 interface Props {
@@ -133,6 +134,7 @@ export const ManageResidenceScreen: React.FC<Props> = ({ navigation, route }) =>
           </View>
         </Reveal>
 
+        {/* Hidden for now: This Week timeline
         <View style={styles.section}>
           <ManageSectionHeader
             title="This Week"
@@ -142,7 +144,7 @@ export const ManageResidenceScreen: React.FC<Props> = ({ navigation, route }) =>
           <View style={styles.sectionBody}>
             <WeekTimeline alerts={vm.alerts} onPress={vm.openAlert} />
           </View>
-        </View>
+        </View> */}
 
         <View style={styles.section}>
           <ManageSectionHeader

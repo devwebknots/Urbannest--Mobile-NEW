@@ -30,7 +30,7 @@ export interface Residence {
   readonly image: ImageSourcePropType;
 }
 
-export type RenterTab = 'residences' | 'search' | 'alerts' | 'calendar';
+export type RenterTab = 'residences' | 'search' | 'alerts' | 'profile';
 
 /* ---------- Residence dashboard ---------- */
 
@@ -189,9 +189,9 @@ export interface NeighborhoodCategory {
 
 /* ---------- Manage (my home) ---------- */
 
-export type ManageActionIcon = 'lineWrench' | 'lineReceipt' | 'lineDumbbell' | 'lineKey';
+export type ManageActionIcon = 'lineWrench' | 'lineReceipt' | 'lineCalendar' | 'lineDumbbell' | 'lineKey';
 
-/** One quick tile under the Manage header (Maintenance, Invoices, ...) */
+/** One quick tile under the Manage header (Maintenance, Scheduling, ...) */
 export interface ManageAction {
   readonly id: string;
   readonly label: string;

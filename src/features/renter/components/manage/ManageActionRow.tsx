@@ -1,5 +1,5 @@
 /**
- * ManageActionRow: the four shortcuts (Maintenance, Invoices, Amenities,
+ * ManageActionRow: the four shortcuts (Maintenance, Scheduling, Amenities,
  * Access) along the bottom of the residence card. White line icon in a
  * frosted circle, white label under it, thin dividers between the items.
  */

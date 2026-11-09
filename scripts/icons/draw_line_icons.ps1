@@ -170,6 +170,13 @@ $icons = [ordered]@{
     'path:M16 12H8',
     'path:M13 16H8'
   )
+  # lucide: calendar (rect written as a path: x3 y4 18x18 rx2)
+  'calendar' = @(
+    'path:M8 2v4',
+    'path:M16 2v4',
+    'path:M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
+    'path:M3 10h18'
+  )
   # lucide: dumbbell (classic)
   'dumbbell' = @(
     'path:m6.5 6.5 11 11',

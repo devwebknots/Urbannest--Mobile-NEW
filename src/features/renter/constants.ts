@@ -438,7 +438,7 @@ export const CURATED_LIVING = {
 
 export const MANAGE_ACTIONS: readonly ManageAction[] = [
   { id: 'maintenance', label: 'Maintenance', icon: 'lineWrench', accent: 'amber' },
-  { id: 'invoices', label: 'Invoices', icon: 'lineReceipt', accent: 'blue' },
+  { id: 'scheduling', label: 'Scheduling', icon: 'lineCalendar', accent: 'blue' },
   { id: 'amenities', label: 'Amenities', icon: 'lineDumbbell', accent: 'green' },
   { id: 'access', label: 'Access', icon: 'lineKey', accent: 'violet' },
 ];
