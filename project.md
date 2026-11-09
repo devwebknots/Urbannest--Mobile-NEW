@@ -207,27 +207,101 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 
 ## 4b. Neyora Maintenance SDK (embedded module, client demo)
 
-**Goal**: show that **Neyora** (our maintenance app, `C:\neyora`) can be sold to other apps as a package. UrbanNest plays the "buyer app": it **installs** Neyora and shows Neyora's real native screens inside itself.
+**Goal**: show that **Neyora** (our maintenance app, separate repo `C:\neyora`) can be sold to other apps as a package. UrbanNest plays the "buyer app": it **installs** Neyora like any library and shows Neyora's real native screens inside itself.
 - No WebView, no deep link, and the Neyora app does **not** need to be installed on the phone.
-- No Neyora screens are copied into UrbanNest. Neyora's code stays in `C:\neyora`, and changes there show up in UrbanNest automatically.
+- **The Neyora folder is not needed to build or run UrbanNest.** The packed SDK file lives in this repo (`vendor/`), so a fresh clone works with `npm install` + `npm run android`.
+- No special Metro or Babel setup in UrbanNest: the package is plain relative-import code, like any other library.
 
-**Neyora side**: `C:\neyora\sdk\` is the package (new files only; the Neyora app itself is unchanged).
+### How it works (simple)
+1. Neyora's Home + Calendar screens are **packed into one file**: `vendor/neyora-maintenance-sdk-0.1.0.tgz` (~3.3 MB, 42 files).
+2. `package.json` installs it: `"@neyora/maintenance-sdk": "file:vendor/neyora-maintenance-sdk-0.1.0.tgz"` → real copy in `node_modules/@neyora/maintenance-sdk`.
+3. `RootNavigator.tsx` uses it: `<Stack.Screen name="Neyora" component={NeyoraModule} />`.
+4. The **Calendar** tab in `RenterTabBar` (replaced Profile) opens it.
+
+### Neyora side (`C:\neyora\sdk\`)
 | File | What it does |
 | :--- | :--- |
-| `sdk/package.json` | Package `@neyora/maintenance-sdk`, `main: index.tsx`, `types: index.d.ts`. React, navigation, redux and safe-area are **peerDependencies** (the host app provides them). |
-| `sdk/index.tsx` | Public API. `NeyoraProvider` wraps Neyora's own Redux store (kept separate from the host's store). `NeyoraModule` = provider + a nested native stack: `Home` (initial) → `Calendar`. No `NavigationContainer`, no Splash, no StatusBar/SafeArea provider (the host owns those). Accepts an optional `apiKey` (not checked yet). |
-| `sdk/index.d.ts` | Public types, so the host's `tsc` doesn't type-check Neyora's source. |
+| `sdk/index.tsx` | Public API. `NeyoraProvider` wraps Neyora's own Redux store (kept separate from the host's store). `NeyoraModule` = provider + a nested native stack: `Home` (initial) → `Calendar`. No `NavigationContainer`, no Splash, no StatusBar/SafeArea provider (the host owns those). Optional `apiKey` prop (not checked yet). |
+| `sdk/index.d.ts` | Public types (`NeyoraProvider`, `NeyoraModule`, props), so the host's `tsc` doesn't type-check Neyora's source. |
+| `sdk/package.json` | Package `@neyora/maintenance-sdk` (version here = version of the .tgz), `main: index.tsx`, `types: index.d.ts`. React, react-native, navigation, redux, safe-area are **peerDependencies** (the host app provides them). |
+| `sdk/build.js` | Packs the SDK into the .tgz (see below). Output folder `sdk/build/` is git-ignored. |
 
-**UrbanNest side** (how a buyer installs it):
-1. `package.json`: `"@neyora/maintenance-sdk": "file:../neyora/sdk"`. npm makes a symlink, so the `neyora` folder must sit next to `UrbanNestMobile` (both in `C:\`).
-2. `metro.config.js`: `watchFolders: [../neyora]`. `blockList` also blocks `../neyora/node_modules`, `android` and `ios`, and `nodeModulesPaths` points at UrbanNest's `node_modules`, so React, navigation and redux load **only once**.
-3. `babel.config.js`: an `overrides` entry for files under `neyora` re-configures `module-resolver` so `@/` means `../neyora/src`. Both apps use `@/` for their own `src`; without this, Neyora's `@/store` would load UrbanNest's store.
-4. Navigation: route `Neyora` in `RootStackParamList` and `<Stack.Screen name="Neyora" component={NeyoraModule} />` in `RootNavigator.tsx`.
-5. Entry point: the **Calendar** tab of `RenterTabBar` (replaced Profile). `useRenterTabs` calls `navigate('Neyora')`.
+`sdk/index.tsx` core:
+```tsx
+import { Provider } from 'react-redux';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { store } from '../src/store';
+import { HomeScreen } from '../src/features/home';
+import { CalendarScreen } from '../src/features/calendar';
 
-**Run after changing metro/babel config**: `npm start -- --reset-cache`, then `npm run android`. No fonts were needed: Neyora's screens use Inter and Playfair, which UrbanNest already has.
+export const NeyoraProvider = ({ children }) => <Provider store={store}>{children}</Provider>;
+const Stack = createNativeStackNavigator();
+export const NeyoraModule = ({ apiKey }) => (
+  <NeyoraProvider apiKey={apiKey}>
+    <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, animation: 'fade' }}>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Calendar" component={CalendarScreen} options={{ animation: 'slide_from_right' }} />
+    </Stack.Navigator>
+  </NeyoraProvider>
+);
+```
+Neyora's `HomeScreen` / `CalendarScreen` call `propNavigation.navigate('Calendar' | 'Home')` first, so they work inside the nested stack without changes.
 
-**For the real product (not done yet)**: publish the package to a private npm registry instead of `file:`; give each buyer an API key and make the backend multi-tenant (each company sees only its own data); add a `theme` prop so buyers can match their brand colours; buyers on Flutter or native apps would need a native wrapper.
+### What `sdk/build.js` does
+1. Starts at `sdk/index.tsx` and **follows every import** (`from`, `import`, `require`, incl. `.ios`/`.android` variants), so only files the SDK uses are packed (fonts, splash, unused images are left out).
+2. **Rewrites Neyora's `@/...` imports into relative paths** (`'@/config/theme'` → `'../../../config/theme'`). Both apps use `@/` for their own `src`, so without this the host would resolve Neyora's imports to its own files.
+3. **Checks** that every library the SDK imports is listed in `peerDependencies` (fails the build otherwise).
+4. Runs `npm pack` → `neyora-maintenance-sdk-<version>.tgz`.
+
+### Updating the SDK after changing Neyora
+```
+# in C:\neyora: (bump "version" in sdk/package.json for a new file name)
+node sdk/build.js ../UrbanNestMobile/vendor
+
+# in C:\UrbanNestMobile:
+npm install "@neyora/maintenance-sdk@file:vendor/neyora-maintenance-sdk-<version>.tgz"
+npm start -- --reset-cache
+```
+Delete the old .tgz from `vendor/` when the version changes. If the version stays the same, re-run `npm install` with the same path to refresh `node_modules`.
+
+### Adding a new Neyora screen to UrbanNest
+1. **Build the screen in Neyora** as usual (e.g. `src/features/maintenance/screens/RequestsScreen.tsx`, also in Neyora's own `RootNavigator`).
+2. **Register it in `C:\neyora\sdk\index.tsx`**, in the same stack as Home and Calendar:
+   ```tsx
+   import { RequestsScreen } from '../src/features/maintenance';
+   <Stack.Screen name="Requests" component={RequestsScreen} />
+   ```
+   Screens not listed there don't appear in UrbanNest. Their components, images and helpers are found automatically by `build.js`.
+3. **Repack and reinstall** (steps above, with a new version number).
+
+Only changed an existing screen (Home, Calendar or their parts)? Skip step 2.
+
+### Two rules for Neyora screens
+1. **Move between Neyora screens with the `navigation` prop**: `navigation.navigate('Requests')`. Neyora's global `navigate()` helper does nothing inside UrbanNest: it controls Neyora's own `NavigationContainer`, which only exists in the Neyora app. (Neyora is a room inside UrbanNest's house: the prop is the door inside the room; the global helper is a remote for a house that isn't there.)
+2. **Neyora borrows its libraries from UrbanNest.** The package brings no React, navigation, Redux, etc. of its own. If a Neyora screen starts using a new library (e.g. a date picker):
+   - `node sdk/build.js` stops and asks to add it to `peerDependencies` in `C:\neyora\sdk\package.json`: add it and rebuild;
+   - **install the same library in UrbanNest** (`npm install <library>`);
+   - plain-JS library: restart Metro (`npm start -- --reset-cache`) and reload. **Native library** (camera, maps, pickers, calendars…): rebuild the app with `npm run android` / `npm run ios`; a reload only refreshes JavaScript, not native code.
+
+### UrbanNest files touched
+- `package.json` / `package-lock.json`: the SDK dependency.
+- `vendor/neyora-maintenance-sdk-0.1.0.tgz`: the packed SDK (committed).
+- `src/types/navigation.ts`: `Neyora: undefined` in `RootStackParamList`.
+- `src/navigation/RootNavigator.tsx`: `import { NeyoraModule } from '@neyora/maintenance-sdk'` + `<Stack.Screen name="Neyora" component={NeyoraModule} options={{ animation: 'slide_from_right' }} />`.
+- `src/features/renter/types.ts`: `RenterTab` `'profile'` → `'calendar'`.
+- `src/features/renter/components/RenterTabBar.tsx`: tab `{ key: 'calendar', label: 'Calendar' }`, icon `CalendarIcon` (was `UserIcon`).
+- `src/features/renter/hooks/useRenterTabs.ts`: `TAB_TITLES.calendar`; at the start of `onTabChange`: `if (next === 'calendar') { navigate('Neyora'); return; }` (bar stays on Homes).
+- `metro.config.js` / `babel.config.js`: **unchanged** (an earlier version linked `../neyora` directly with `watchFolders` + a Babel alias override; replaced by the packed file).
+
+**Checks run**: `npx tsc --noEmit` passes; `npx react-native bundle --platform android --dev true --reset-cache` builds; the bundle loads 40 files from `node_modules/@neyora/maintenance-sdk`, **none** from `C:\neyora`, and only one `node_modules/react/index.js`. No fonts were needed (Neyora's screens use Inter and Playfair, which UrbanNest already has).
+
+### Run & test
+1. Stop any running Metro (Neyora's Metro also uses port 8081).
+2. `npm install`, then `npm start -- --reset-cache`, then `npm run android` (or press `r` to reload if UrbanNest is already installed; no native changes).
+3. Renter Home → bottom bar shows Homes / Search / Alerts / Calendar → tap **Calendar** → Neyora Home slides in → open Neyora's calendar → back twice returns to Renter Home with Homes selected. Works with the Neyora app uninstalled and without `C:\neyora` on the computer.
+
+### For the real product (not done yet)
+Publish the same package to a private npm registry / GitHub Packages (buyers run `npm install @neyora/maintenance-sdk`); give each buyer an API key and make the backend multi-tenant (each company sees only its own data); add a `theme` prop for buyer brand colours; buyers on Flutter or native apps need a native wrapper.
 
 ---
 
@@ -259,8 +333,6 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 ---
 
 ## 7. Configuration Files (copy these into a new project)
-
-> UrbanNest's own `metro.config.js` and `babel.config.js` also have the Neyora SDK additions (Section 4b). The snippets below are the base config to copy into a new project, without them.
 
 **babel.config.js**
 ```js
@@ -798,7 +870,7 @@ Supports two operational modes:
 - `colors.buttonGradientStart` in `theme.ts` is `#032B57` while `gradients.button` uses `#03264C` — keep them consistent.
 - Poppins fonts are still in `src/assets/fonts/` though deprecated.
 - `useAppTheme` exposes `isDarkMode`, but there is no dark palette yet.
-- Neyora SDK (Section 4b) is demo-only: linked with `file:../neyora/sdk`, `apiKey` not checked, no `theme` prop, no private npm publish, no multi-tenant backend. The Profile tab was removed from `RenterTabBar` to make room for Calendar.
+- Neyora SDK (Section 4b) is demo-only: installed from a .tgz in `vendor/` (re-pack on every Neyora change), `apiKey` not checked, no `theme` prop, no private npm publish, no multi-tenant backend. The Profile tab was removed from `RenterTabBar` to make room for Calendar.
 - `heroTitle` should be Playfair Display ExtraBold (800): add `PlayfairDisplay-ExtraBold.ttf`, link it, and switch the preset's font.
 - Guest home: hero has 3 slides (design `hero_bg.png` + `hero_dusk_house.jpg` + `hero_pool_villa.jpg`, built by `scripts/brand/hero_grade.ps1`), auto-advancing every 5 s and looping; `rental_glass_villa.png` has the Premium badge baked in; need a text-free hero export; featured carousel still uses remote Unsplash images (city tiles are now bundled: `city_*.jpg` in `src/assets/images/guest/`, Unsplash License); Search / categories / See More / guides / cities buttons have no destination yet.
 

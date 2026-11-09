@@ -12,22 +12,4 @@ module.exports = {
       },
     ],
   ],
-  overrides: [
-    {
-      // Neyora SDK files: their '@/' means Neyora's own src
-      test: /[\\/]neyora[\\/]/,
-      plugins: [
-        [
-          'module-resolver',
-          {
-            root: ['../neyora/src'],
-            extensions: ['.ios.js', '.android.js', '.js', '.ts', '.tsx', '.json'],
-            alias: {
-              '@': '../neyora/src',
-            },
-          },
-        ],
-      ],
-    },
-  ],
 };
