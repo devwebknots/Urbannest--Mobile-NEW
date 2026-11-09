@@ -149,6 +149,7 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | `RenterHome` | `RenterHomeScreen` (`@/features/renter`) | `animation: 'slide_from_right'` |
 | `ResidenceDashboard` | `ResidenceDashboardScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | `CheckIn` | `CheckInScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
+| `Neyora` | `NeyoraModule` (`@neyora/maintenance-sdk`, an installed package; see Section 4b) | `animation: 'slide_from_right'` |
 | `Home` | `HomeScreen` (`@/features/home`) | stack default |
 | `Calendar` | `CalendarScreen` (`@/features/calendar`) | `animation: 'slide_from_right'` |
 | `Login` | `LoginScreen` (`@/features/auth/screens/LoginScreen`) | stack default |
@@ -158,7 +159,7 @@ Global `screenOptions`: `{ headerShown: false, animation: 'fade' }` — every sc
 ### Param lists (`src/types/navigation.ts`, re-exported by `src/navigation/types.ts`)
 ```ts
 export type RootStackParamList = {
-  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; ResidenceDashboard: { residenceId: string }; CheckIn: { residenceId: string }; Auth: undefined; Main: undefined;
+  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; ResidenceDashboard: { residenceId: string }; CheckIn: { residenceId: string }; Neyora: undefined; Auth: undefined; Main: undefined;
   Home: undefined; Calendar: undefined; Login: undefined;
 };
 export type AuthStackParamList = { Login: undefined; Register: undefined; ForgotPassword: { email?: string } | undefined };
@@ -188,6 +189,7 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 - **RenterHome → CheckIn** (`navigate`): tap a Move-In Ready card ("Check-In Now").
 - **CheckIn → Utilities → UtilityProviders**: the "Utilities" tile opens the Utilities list; a utility card opens its providers page (info only). "Confirm Utilities" navigates back to `CheckIn` with `utilitiesConfirmed: true` (`merge`), which ticks the tile.
 - **RenterHome → ResidenceDashboard** (`navigate`): tap a current residence card (active lease) (past leases show "coming soon"). Back button / system back returns.
+- **RenterHome → Neyora** (`navigate('Neyora')`): the **Calendar** tab in `RenterTabBar` opens the Neyora maintenance module (its Home, then its Calendar). The tab stays on Homes, so coming back shows Homes selected. Back / swipe returns to RenterHome.
 - **PersonaSelect → Home** (`replace`): "Continue as PMS". The route for each persona is in `ROUTE_FOR_PERSONA` (`usePersonaSelection`).
 - **Home → Calendar**: "View Calendar" (ScheduleSection), "Schedule" (QuickActionBar), CALENDAR tab (BottomNavBar).
 - **Calendar → Home**: HOME tab in BottomNavBar or system back.
@@ -200,6 +202,32 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 4. Register `<Stack.Screen name="<Name>" component={<Name>Screen} />` in `RootNavigator.tsx`.
 5. Navigate with `navigate('<Name>')` or the `navigation` prop; wire `BottomNavBar` if it is a tab.
 6. Add a test in `__tests__/<Name>Screen.test.tsx`.
+
+---
+
+## 4b. Neyora Maintenance SDK (embedded module, client demo)
+
+**Goal**: show that **Neyora** (our maintenance app, `C:\neyora`) can be sold to other apps as a package. UrbanNest plays the "buyer app": it **installs** Neyora and shows Neyora's real native screens inside itself.
+- No WebView, no deep link, and the Neyora app does **not** need to be installed on the phone.
+- No Neyora screens are copied into UrbanNest. Neyora's code stays in `C:\neyora`, and changes there show up in UrbanNest automatically.
+
+**Neyora side**: `C:\neyora\sdk\` is the package (new files only; the Neyora app itself is unchanged).
+| File | What it does |
+| :--- | :--- |
+| `sdk/package.json` | Package `@neyora/maintenance-sdk`, `main: index.tsx`, `types: index.d.ts`. React, navigation, redux and safe-area are **peerDependencies** (the host app provides them). |
+| `sdk/index.tsx` | Public API. `NeyoraProvider` wraps Neyora's own Redux store (kept separate from the host's store). `NeyoraModule` = provider + a nested native stack: `Home` (initial) → `Calendar`. No `NavigationContainer`, no Splash, no StatusBar/SafeArea provider (the host owns those). Accepts an optional `apiKey` (not checked yet). |
+| `sdk/index.d.ts` | Public types, so the host's `tsc` doesn't type-check Neyora's source. |
+
+**UrbanNest side** (how a buyer installs it):
+1. `package.json`: `"@neyora/maintenance-sdk": "file:../neyora/sdk"`. npm makes a symlink, so the `neyora` folder must sit next to `UrbanNestMobile` (both in `C:\`).
+2. `metro.config.js`: `watchFolders: [../neyora]`. `blockList` also blocks `../neyora/node_modules`, `android` and `ios`, and `nodeModulesPaths` points at UrbanNest's `node_modules`, so React, navigation and redux load **only once**.
+3. `babel.config.js`: an `overrides` entry for files under `neyora` re-configures `module-resolver` so `@/` means `../neyora/src`. Both apps use `@/` for their own `src`; without this, Neyora's `@/store` would load UrbanNest's store.
+4. Navigation: route `Neyora` in `RootStackParamList` and `<Stack.Screen name="Neyora" component={NeyoraModule} />` in `RootNavigator.tsx`.
+5. Entry point: the **Calendar** tab of `RenterTabBar` (replaced Profile). `useRenterTabs` calls `navigate('Neyora')`.
+
+**Run after changing metro/babel config**: `npm start -- --reset-cache`, then `npm run android`. No fonts were needed: Neyora's screens use Inter and Playfair, which UrbanNest already has.
+
+**For the real product (not done yet)**: publish the package to a private npm registry instead of `file:`; give each buyer an API key and make the backend multi-tenant (each company sees only its own data); add a `theme` prop so buyers can match their brand colours; buyers on Flutter or native apps would need a native wrapper.
 
 ---
 
@@ -231,6 +259,8 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 ---
 
 ## 7. Configuration Files (copy these into a new project)
+
+> UrbanNest's own `metro.config.js` and `babel.config.js` also have the Neyora SDK additions (Section 4b). The snippets below are the base config to copy into a new project, without them.
 
 **babel.config.js**
 ```js
@@ -555,7 +585,7 @@ Supports two operational modes:
   1. `RenterHeader`: `HeaderBrand` (same logo + "Urban Nest" as the guest hero; shared in `BrandLogo.tsx`, every page header uses it), `ProfileAvatar` (shared in `src/components/ProfileAvatar.tsx`: 36 white circle, navy initials, used by every header that shows the user), "My Residences" (`heroTitle`, 30), two-line subtitle. The "MY RENTALS" eyebrow is commented out. Logo text and subtitle match the guest hero.
   2. `ResidenceFilterBar`: solid white track, no border (radius `xl`, highlight `lg`; a see-through track let Android's elevation shadow show through as a line) — All Rentals / Active / Past with count bubbles (fixed widths 1.3 : 1 : 1). One glass pill (solid `navy` + smooth white `Scrim` sheen from the top + light hairline rim) springs between segments (`Animated.spring`, JS driver since it animates left/width); labels and badges cross-fade navy ↔ white as it passes.
   3. `ResidenceCard`s (24dp apart): fully rounded photo (same height on every card: width × 0.46, `RESIDENCE_IMAGE_RATIO`) with dark status pill (green / grey dot) and frosted "…" menu; `listingTitle` navy name + navy "Premium" badge (same as the guest rental card); navy pin + `cardSubtitle` address; footer: calendar/clock icon circles with label + bold value (divider between two facts) and action (footer wraps, so dates never truncate; the action drops to its own line, right-aligned, when space is short) — `Button` `brand` "Check-In Now" and `soft` "Manage" (size `md`, `minWidth` 130), `link` + navy `ArrowRightIcon` for expired leases.
-  4. `RenterTabBar`: floating frosted capsule bar — Homes / Search / Alerts (dot) / Profile, icon above label. Same glass capsule as the filter (navy + white `Scrim` sheen + rim) springs between tabs; icons/labels cross-fade navy ↔ white. Tabs without a page slide over, show "coming soon", and glide back to Homes on close.
+  4. `RenterTabBar`: floating frosted capsule bar — Homes / Search / Alerts (dot) / Calendar (`CalendarIcon`; replaced Profile), icon above label. Same glass capsule as the filter (navy + white `Scrim` sheen + rim) springs between tabs; icons/labels cross-fade navy ↔ white. Calendar opens the Neyora SDK module (Section 4b) and the bar stays on Homes. Search / Alerts slide over, show "coming soon", and glide back to Homes on close.
 - **Logic**: `useRenterHome` (filter, tab, counts, card + menu actions — "coming soon" alerts for now). Mock data in `renter/constants.ts`; photos in `src/assets/images/renter/` (cropped from the design) via `renterAssets.ts`. Cards fade up in sequence (off in tests).
 
 ### 0d. Residence Dashboard (`src/features/renter/screens/ResidenceDashboardScreen.tsx`)
@@ -702,6 +732,7 @@ Supports two operational modes:
 - **PersonaSelect ➔ RenterHome**: "Continue as Renter".
 - **RenterHome ➔ ResidenceDashboard**: tap a current residence card.
 - **RenterHome ➔ CheckIn**: tap a Move-In Ready card.
+- **RenterHome ➔ Neyora** (installed SDK: Neyora Home ➔ Neyora Calendar): **Calendar** tab in `RenterTabBar`. Back returns to RenterHome.
 - **PersonaSelect ➔ Home**: "Continue as PMS".
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.
@@ -767,6 +798,7 @@ Supports two operational modes:
 - `colors.buttonGradientStart` in `theme.ts` is `#032B57` while `gradients.button` uses `#03264C` — keep them consistent.
 - Poppins fonts are still in `src/assets/fonts/` though deprecated.
 - `useAppTheme` exposes `isDarkMode`, but there is no dark palette yet.
+- Neyora SDK (Section 4b) is demo-only: linked with `file:../neyora/sdk`, `apiKey` not checked, no `theme` prop, no private npm publish, no multi-tenant backend. The Profile tab was removed from `RenterTabBar` to make room for Calendar.
 - `heroTitle` should be Playfair Display ExtraBold (800): add `PlayfairDisplay-ExtraBold.ttf`, link it, and switch the preset's font.
 - Guest home: hero has 3 slides (design `hero_bg.png` + `hero_dusk_house.jpg` + `hero_pool_villa.jpg`, built by `scripts/brand/hero_grade.ps1`), auto-advancing every 5 s and looping; `rental_glass_villa.png` has the Premium badge baked in; need a text-free hero export; featured carousel still uses remote Unsplash images (city tiles are now bundled: `city_*.jpg` in `src/assets/images/guest/`, Unsplash License); Search / categories / See More / guides / cities buttons have no destination yet.
 

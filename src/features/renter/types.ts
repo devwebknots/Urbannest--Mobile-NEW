@@ -30,7 +30,7 @@ export interface Residence {
   readonly image: ImageSourcePropType;
 }
 
-export type RenterTab = 'residences' | 'search' | 'alerts' | 'profile';
+export type RenterTab = 'residences' | 'search' | 'alerts' | 'calendar';
 
 /* ---------- Residence dashboard ---------- */
 

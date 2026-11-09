@@ -33,6 +33,8 @@ export type RootStackParamList = {
   Inspection: { residenceId: string };
   /** areaId missing: opens the first area that isn't done yet */
   InspectionArea: { residenceId: string; areaId?: string };
+  /** Neyora maintenance SDK (Home, then Calendar), opened from the Calendar tab */
+  Neyora: undefined;
   Auth: undefined;
   Main: undefined;
   Home: undefined;

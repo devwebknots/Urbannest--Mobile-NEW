@@ -5,6 +5,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NeyoraModule } from '@neyora/maintenance-sdk';
 import { GuestHomeScreen } from '@/features/guest';
 import { HomeScreen } from '@/features/home';
 import { PersonaSelectScreen } from '@/features/persona';
@@ -83,6 +84,12 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="UtilityProviders"
         component={UtilityProvidersScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      {/* Neyora maintenance SDK, installed as a package */}
+      <Stack.Screen
+        name="Neyora"
+        component={NeyoraModule}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen name="Home" component={HomeScreen} />

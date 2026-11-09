@@ -11,6 +11,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@neyora/maintenance-sdk": "file:../neyora/sdk",
     "@react-native/new-app-screen": "0.88.1",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
