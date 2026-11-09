@@ -16,10 +16,14 @@ interface Props {
   size?: number;
 }
 
-export const CountdownRing: React.FC<Props> = ({ daysLeft, cycleDays, size = ms(92) }) => {
+const DEFAULT_SIZE = ms(92);
+
+export const CountdownRing: React.FC<Props> = ({ daysLeft, cycleDays, size = DEFAULT_SIZE }) => {
   const passed = Math.max(0, cycleDays - daysLeft);
-  const tickW = ms(3);
-  const tickH = ms(9);
+  // Ticks and text scale with the ring, so a small ring keeps the look
+  const scale = size / DEFAULT_SIZE;
+  const tickW = ms(3) * Math.max(scale, 0.75);
+  const tickH = ms(9) * scale;
   // Ticks sit on a circle just inside the edge
   const r = size / 2 - tickH / 2;
   const c = size / 2;
@@ -54,12 +58,20 @@ export const CountdownRing: React.FC<Props> = ({ daysLeft, cycleDays, size = ms(
         );
       })}
       <View style={styles.center}>
-        <Text style={styles.days}>{daysLeft}</Text>
-        <Text style={styles.label}>{daysLeft === 1 ? 'day left' : 'days left'}</Text>
+        <Text style={[styles.days, scale < 1 && scaled(styles.days, scale)]}>{daysLeft}</Text>
+        <Text style={[styles.label, scale < 1 && scaled(styles.label, Math.min(1, scale * 1.15))]}>
+          {daysLeft === 1 ? 'day left' : 'days left'}
+        </Text>
       </View>
     </View>
   );
 };
+
+/** Font size and line height of a text style, multiplied by `k` */
+const scaled = (style: { fontSize?: number; lineHeight?: number }, k: number) => ({
+  fontSize: (style.fontSize ?? 14) * k,
+  lineHeight: style.lineHeight ? style.lineHeight * k : undefined,
+});
 
 const styles = StyleSheet.create({
   tick: {

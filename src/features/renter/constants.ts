@@ -453,7 +453,7 @@ export const RENT_DUE = {
 
 /** Pastel tiles under "Quick Actions" on the Manage page */
 export const MANAGE_QUICK_ACTIONS: readonly ManageQuickAction[] = [
-  { id: 'rent', title: 'Rent Due', detail: 'in 3 days', icon: 'calendar', accent: 'amber' },
+  { id: 'rent', title: 'Rent Due', detail: 'in 3 days', icon: 'calendar', accent: 'amber', highlight: true },
   { id: 'maintenance', title: 'Maintenance', detail: 'Tomorrow', icon: 'wrench', accent: 'blue' },
   { id: 'hoa', title: 'HOA Fee', detail: 'Pending', icon: 'bell', accent: 'violet' },
   { id: 'more', title: 'More', detail: 'Actions', icon: 'grid', accent: 'green' },

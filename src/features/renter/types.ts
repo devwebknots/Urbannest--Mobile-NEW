@@ -208,6 +208,8 @@ export interface ManageQuickAction {
   readonly detail: string;
   readonly icon: ManageQuickActionIcon;
   readonly accent: ConciergeAccent;
+  /** Show the detail line in the accent colour, e.g. "in 3 days" */
+  readonly highlight?: boolean;
 }
 
 /** Upcoming item on the Manage timeline (HOA fee, pest control, ...) */

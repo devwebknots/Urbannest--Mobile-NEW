@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { BellIcon, ChevronLeftIcon } from '@/components/icons';
+import { /* BellIcon, */ ChevronLeftIcon } from '@/components/icons';
 import { ProfileAvatar } from '@/components/ProfileAvatar';
 import { colors, spacing, typographyPresets } from '@/config/theme';
 import { moderateScale as ms } from '@/utils/responsive';
@@ -29,9 +29,8 @@ export const ManageHeader: React.FC<Props> = ({
   greeting,
   firstName,
   initials,
-  unreadAlerts,
+  // unreadAlerts and onNotifications: used by the hidden bell
   onBack,
-  onNotifications,
   onProfilePress,
 }) => (
   <View style={[styles.root, { paddingTop: topInset + spacing.sm }]}>
@@ -47,6 +46,7 @@ export const ManageHeader: React.FC<Props> = ({
       </Pressable>
       <View style={styles.flex} />
 
+      {/* Notification bell hidden for now
       <Pressable
         onPress={onNotifications}
         hitSlop={8}
@@ -60,7 +60,7 @@ export const ManageHeader: React.FC<Props> = ({
             <Text style={styles.badgeText}>{unreadAlerts > 9 ? '9+' : unreadAlerts}</Text>
           </View>
         ) : null}
-      </Pressable>
+      </Pressable> */}
       <ProfileAvatar initials={initials} onPress={onProfilePress} style={styles.avatar} />
     </View>
 

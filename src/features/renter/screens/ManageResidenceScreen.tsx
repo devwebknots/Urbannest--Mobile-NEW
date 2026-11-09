@@ -4,7 +4,7 @@
  *  - header on the page tint: back, logo, bell, avatar, time-of-day
  *    greeting; the residence photo fades in behind the top right
  *  - residence hero card with the four shortcuts along its bottom
- *  - Quick Actions: four pastel tiles
+ *  - Quick Actions: 2 x 2 grid of wide pastel tiles
  *  - navy Rent Due card with the days-left ring
  *  - This Week: timeline of upcoming items
  *  - Community Buzz: snapping carousel of wide event cards
@@ -34,7 +34,8 @@ import { BuzzCarousel } from '../components/manage/BuzzCarousel';
 import { HelpDeskList } from '../components/manage/HelpDeskList';
 import { ManageHeader } from '../components/manage/ManageHeader';
 import { ManageSectionHeader, SECTION_ICON } from '../components/manage/ManageSectionHeader';
-import { QuickActionTiles } from '../components/manage/QuickActionTiles';
+import { GridIcon } from '../components/manage/QuickActionTiles';
+import { QuickAlertCard } from '../components/manage/QuickAlertCard';
 import { RentDueCard } from '../components/manage/RentDueCard';
 import { ResidenceHeroCard } from '../components/manage/ResidenceHeroCard';
 import { WeekTimeline } from '../components/manage/WeekTimeline';
@@ -102,23 +103,32 @@ export const ManageResidenceScreen: React.FC<Props> = ({ navigation, route }) =>
         </View>
 
         <Reveal delay={120}>
+          {/* "Quick Actions" section heading, then the Rent Due card on the
+              left and the Quick Alert card on the right, same height */}
           <View style={styles.section}>
             <ManageSectionHeader
               title="Quick Actions"
-              subtitle="Your rent, requests and updates at a glance."
+              subtitle="Your rent, requests and updates."
+              icon={<GridIcon size={SECTION_ICON} color={colors.primary} />}
               action={{ label: 'View All', onPress: vm.seeAllQuickActions }}
             />
-            <View style={styles.sectionBody}>
-              <QuickActionTiles items={vm.quickActions} onPress={vm.openQuickAction} />
-            </View>
-            <View style={styles.rent}>
-              <RentDueCard
-                rentAmount={vm.rentAmount}
-                dueDate={vm.rentDue.dueDate}
-                daysLeft={vm.rentDue.daysLeft}
-                cycleDays={vm.rentDue.cycleDays}
-                onPayNow={vm.payNow}
-              />
+            <View style={[styles.sectionBody, styles.split]}>
+              <View style={styles.splitRent}>
+                <RentDueCard
+                  compact
+                  rentAmount={vm.rentAmount}
+                  dueDate={vm.rentDue.dueDate}
+                  daysLeft={vm.rentDue.daysLeft}
+                  cycleDays={vm.rentDue.cycleDays}
+                  onPayNow={vm.payNow}
+                />
+              </View>
+              <View style={styles.splitQuick}>
+                <QuickAlertCard
+                  alerts={vm.alerts}
+                  onPress={vm.openAlert}
+                />
+              </View>
             </View>
           </View>
         </Reveal>
@@ -215,8 +225,19 @@ const styles = StyleSheet.create({
   sectionBody: {
     marginTop: spacing.lg,
   },
-  rent: {
-    marginTop: spacing.xl,
+  // Rent Due card + Quick Alert card side by side, same height; the alert
+  // card gets a little more width for its text rows
+  split: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: spacing.sm + 2,
+    paddingHorizontal: spacing.screenHorizontal,
+  },
+  splitRent: {
+    flex: 0.85,
+  },
+  splitQuick: {
+    flex: 1.15,
   },
   request: {
     marginTop: spacing.xl,
