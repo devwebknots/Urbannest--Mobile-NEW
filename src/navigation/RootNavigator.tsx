@@ -12,8 +12,8 @@ import { PersonaSelectScreen } from '@/features/persona';
 import {
   CheckInScreen,
   InspectionAreaScreen,
+  ManageResidenceScreen,
   RenterHomeScreen,
-  ResidenceDashboardScreen,
   UtilitiesScreen,
   UtilityProvidersScreen,
 } from '@/features/renter';
@@ -54,9 +54,16 @@ export const RootNavigator: React.FC = () => (
         component={RenterHomeScreen}
         options={{ animation: 'slide_from_right' }}
       />
+      {/* Unwired: "Manage" now opens ManageResidence.
+          ResidenceDashboardScreen is kept in features/renter.
       <Stack.Screen
         name="ResidenceDashboard"
         component={ResidenceDashboardScreen}
+        options={{ animation: 'slide_from_right' }}
+      /> */}
+      <Stack.Screen
+        name="ManageResidence"
+        component={ManageResidenceScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen

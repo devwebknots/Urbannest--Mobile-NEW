@@ -4,6 +4,7 @@ import {
   CheckInScreen,
   InspectionAreaScreen,
   InspectionScreen,
+  ManageResidenceScreen,
   RenterHomeScreen,
   ResidenceDashboardScreen,
   UtilitiesScreen,
@@ -60,7 +61,54 @@ test('residence dashboard shows every section for the chosen residence', async (
   });
 });
 
-test('cards open check-in when move-in ready, else the dashboard', async () => {
+test('manage page shows every section for the chosen residence', async () => {
+  const goBack = jest.fn();
+  let tree!: ReactTestRenderer.ReactTestRenderer;
+  await ReactTestRenderer.act(() => {
+    tree = ReactTestRenderer.create(
+      <ManageResidenceScreen navigation={{ goBack }} route={{ params: { residenceId: 'sterling' } }} />,
+    );
+  });
+
+  const json = JSON.stringify(tree.toJSON());
+  for (const text of [
+    'John Doe',
+    'The Sterling Collection',
+    'Maintenance',
+    'Access',
+    'Quick Actions',
+    'Rent Due',
+    'This Week',
+    '$5,400.00',
+    'Pest Control',
+    'Community Buzz',
+    'Plant Day',
+    'Help Desk',
+    'Short circuit in power unit',
+    'Raise a Request',
+  ]) {
+    expect(json).toContain(text);
+  }
+
+  // Features without a page yet open the app dialog
+  const tile = tree.root.findAllByProps({ accessibilityLabel: 'Invoices' })[0];
+  await ReactTestRenderer.act(() => {
+    tile.props.onPress();
+  });
+  expect(JSON.stringify(tree.toJSON())).toContain('Coming soon.');
+
+  const back = tree.root.findAllByProps({ accessibilityLabel: 'Back to my residences' })[0];
+  await ReactTestRenderer.act(() => {
+    back.props.onPress();
+  });
+  expect(goBack).toHaveBeenCalled();
+
+  await ReactTestRenderer.act(() => {
+    tree.unmount();
+  });
+});
+
+test('cards open check-in when move-in ready, else the Manage page', async () => {
   const navigate = jest.fn();
   let tree!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
@@ -69,7 +117,7 @@ test('cards open check-in when move-in ready, else the dashboard', async () => {
 
   for (const [name, route, id] of [
     ['The Obsidian Heights', 'CheckIn', 'obsidian'],
-    ['The Sterling Collection', 'ResidenceDashboard', 'sterling'],
+    ['The Sterling Collection', 'ManageResidence', 'sterling'],
   ]) {
     const card = tree.root.findByProps({ accessibilityLabel: name });
     await ReactTestRenderer.act(() => {

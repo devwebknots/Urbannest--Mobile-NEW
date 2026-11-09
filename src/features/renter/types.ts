@@ -186,3 +186,67 @@ export interface NeighborhoodCategory {
   readonly accent: ConciergeAccent;
   readonly places: readonly NeighborhoodPlace[];
 }
+
+/* ---------- Manage (my home) ---------- */
+
+export type ManageActionIcon = 'lineWrench' | 'lineReceipt' | 'lineDumbbell' | 'lineKey';
+
+/** One quick tile under the Manage header (Maintenance, Invoices, ...) */
+export interface ManageAction {
+  readonly id: string;
+  readonly label: string;
+  readonly icon: ManageActionIcon;
+  readonly accent: ConciergeAccent;
+}
+
+export type ManageQuickActionIcon = 'calendar' | 'wrench' | 'bell' | 'grid';
+
+/** Pastel tile in the Manage "Quick Actions" row, e.g. "Rent Due / in 3 days" */
+export interface ManageQuickAction {
+  readonly id: string;
+  readonly title: string;
+  readonly detail: string;
+  readonly icon: ManageQuickActionIcon;
+  readonly accent: ConciergeAccent;
+}
+
+/** Upcoming item on the Manage timeline (HOA fee, pest control, ...) */
+export interface QuickAlert {
+  readonly id: string;
+  readonly title: string;
+  /** Small line under the title, e.g. "Pending payment" */
+  readonly hint: string;
+  /** Date badge, e.g. "NOV" + "14" */
+  readonly month: string;
+  readonly day: string;
+  /** Shown on the right for payments */
+  readonly amount?: string;
+  /** Small status pill on the right, e.g. "Upcoming" */
+  readonly tag?: string;
+  /** Badge month colour */
+  readonly accent: ConciergeAccent;
+}
+
+/** Community Buzz carousel event */
+export interface BuzzEvent {
+  readonly id: string;
+  readonly title: string;
+  readonly host: string;
+  readonly date: string;
+  readonly time: string;
+  readonly audience: 'Public' | 'Residents';
+  readonly registrationOpen: boolean;
+  readonly image: ImageSourcePropType;
+}
+
+export type HelpDeskStatus = 'Pending' | 'In Progress' | 'Resolved';
+
+/** Help Desk ticket (a service request with a photo) */
+export interface HelpDeskTicket {
+  readonly id: string;
+  readonly category: string;
+  readonly title: string;
+  readonly date: string;
+  readonly status: HelpDeskStatus;
+  readonly image: ImageSourcePropType;
+}

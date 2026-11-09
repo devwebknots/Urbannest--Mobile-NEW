@@ -19,7 +19,10 @@ export type RootStackParamList = {
   GuestHome: undefined;
   PersonaSelect: undefined;
   RenterHome: undefined;
+  /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */
   ResidenceDashboard: { residenceId: string };
+  /** "My Home" page of an active lease, opened by "Manage" on My Residences */
+  ManageResidence: { residenceId: string };
   /**
    * inspectionSubmitted is set by the inspection room page on "Finalize Inspection";
    * utilitiesConfirmed by the Utilities page on "Confirm Utilities"

@@ -9,6 +9,8 @@
 export const renterAssets = {
   header: require('@/assets/images/renter/residences_header.jpg'),
   obsidian: require('@/assets/images/renter/residence_obsidian.jpg'),
+  // Modern white apartment building with glass balconies (Unsplash
+  // 1551361415-69c87624334f), cropped to 1080 x 1142
   sterling: require('@/assets/images/renter/residence_sterling.jpg'),
   azure: require('@/assets/images/renter/residence_azure.jpg'),
   marble: require('@/assets/images/renter/residence_marble.jpg'),
@@ -89,6 +91,12 @@ export const renterIcons = {
   // Utilities: gas flame and sewer waves (drawn to match the set)
   flame: require('@/assets/icons/renter/flame.png'),
   waves: require('@/assets/icons/renter/waves.png'),
+  // Modern line icons for the Manage shortcuts (Lucide, ISC licence),
+  // drawn by scripts/icons/draw_line_icons.ps1
+  lineWrench: require('@/assets/icons/manage/wrench.png'),
+  lineReceipt: require('@/assets/icons/manage/receipt.png'),
+  lineDumbbell: require('@/assets/icons/manage/dumbbell.png'),
+  lineKey: require('@/assets/icons/manage/key.png'),
 };
 
 /** Width / height of residences_header.jpg */

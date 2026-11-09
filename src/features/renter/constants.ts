@@ -4,15 +4,20 @@
 
 import { renterAssets } from './assets/renterAssets';
 import type {
+  BuzzEvent,
   CheckInSummary,
   CheckInTask,
   CommunityEvent,
   ConciergeService,
   FinancialSummary,
+  HelpDeskTicket,
   InspectionArea,
   IssueCategory,
   LeaseStatus,
+  ManageAction,
+  ManageQuickAction,
   NeighborhoodCategory,
+  QuickAlert,
   Residence,
   ResidenceFilter,
   ServiceRequest,
@@ -20,8 +25,9 @@ import type {
 } from './types';
 
 export const RENTER_PROFILE = {
-  firstName: 'Alex',
-  initials: 'AM',
+  firstName: 'John',
+  fullName: 'John Doe',
+  initials: 'JD',
   unreadAlerts: 2,
 };
 
@@ -427,3 +433,105 @@ export const CURATED_LIVING = {
   body: 'offers more than just a residence. It is an intersection of architectural precision and community proximity, designed for the discerning tenant.',
   image: renterAssets.livingCurated,
 };
+
+/* ---------- Manage (my home, mock) ---------- */
+
+export const MANAGE_ACTIONS: readonly ManageAction[] = [
+  { id: 'maintenance', label: 'Maintenance', icon: 'lineWrench', accent: 'amber' },
+  { id: 'invoices', label: 'Invoices', icon: 'lineReceipt', accent: 'blue' },
+  { id: 'amenities', label: 'Amenities', icon: 'lineDumbbell', accent: 'green' },
+  { id: 'access', label: 'Access', icon: 'lineKey', accent: 'violet' },
+];
+
+/** Rent card on the Manage page (the amount comes from the residence) */
+export const RENT_DUE = {
+  dueDate: 'Nov 12, 2026',
+  daysLeft: 3,
+  /** Days in the billing cycle (drives the countdown ring) */
+  cycleDays: 30,
+};
+
+/** Pastel tiles under "Quick Actions" on the Manage page */
+export const MANAGE_QUICK_ACTIONS: readonly ManageQuickAction[] = [
+  { id: 'rent', title: 'Rent Due', detail: 'in 3 days', icon: 'calendar', accent: 'amber' },
+  { id: 'maintenance', title: 'Maintenance', detail: 'Tomorrow', icon: 'wrench', accent: 'blue' },
+  { id: 'hoa', title: 'HOA Fee', detail: 'Pending', icon: 'bell', accent: 'violet' },
+  { id: 'more', title: 'More', detail: 'Actions', icon: 'grid', accent: 'green' },
+];
+
+/** "This Week" timeline on the Manage page, soonest first */
+export const QUICK_ALERTS: readonly QuickAlert[] = [
+  { id: 'pest', title: 'Pest Control', hint: 'Building-wide visit', month: 'NOV', day: '14', tag: 'Upcoming', accent: 'amber' },
+  { id: 'hoa', title: 'HOA Fee', hint: 'Pending payment', month: 'NOV', day: '15', amount: '$200.00', accent: 'blue' },
+  { id: 'check', title: 'Maintenance Check', hint: 'Annual unit check', month: 'NOV', day: '18', accent: 'green' },
+];
+
+export const COMMUNITY_BUZZ: readonly BuzzEvent[] = [
+  {
+    id: 'plant-day',
+    title: 'Plant Day',
+    host: 'By Management Team',
+    date: 'Nov 22, 2026',
+    time: '9:00 AM – 11:30 AM',
+    audience: 'Public',
+    registrationOpen: true,
+    image: renterAssets.areaOutside,
+  },
+  {
+    id: 'wine-tasting',
+    title: 'Sky Lounge Wine Tasting',
+    host: 'By Resident Club',
+    date: 'Nov 28, 2026',
+    time: '7:00 PM – 9:30 PM',
+    audience: 'Residents',
+    registrationOpen: true,
+    image: renterAssets.eventSkyLounge,
+  },
+  {
+    id: 'family-day',
+    title: 'Family Fun Day',
+    host: 'By Management Team',
+    date: 'Dec 6, 2026',
+    time: '10:00 AM – 4:00 PM',
+    audience: 'Public',
+    registrationOpen: false,
+    image: renterAssets.placeParkSwing,
+  },
+  {
+    id: 'lobby-social',
+    title: 'Lobby Coffee Morning',
+    host: 'By Concierge Desk',
+    date: 'Dec 13, 2026',
+    time: '8:30 AM – 10:00 AM',
+    audience: 'Residents',
+    registrationOpen: true,
+    image: renterAssets.areaCommon,
+  },
+];
+
+export const HELP_DESK_TICKETS: readonly HelpDeskTicket[] = [
+  {
+    id: 'URB-4921',
+    category: 'Plumbing',
+    title: 'Leak in plumbing unit in kitchen',
+    date: 'Jan 28, 2025',
+    status: 'Pending',
+    image: renterAssets.providerAquaPure,
+  },
+  {
+    id: 'URB-4917',
+    category: 'Electrical',
+    title: 'Short circuit in power unit',
+    date: 'Jan 28, 2025',
+    status: 'In Progress',
+    image: renterAssets.providerGatewayPower,
+  },
+  {
+    id: 'URB-4902',
+    category: 'Masonry',
+    title: 'Repair work in wall',
+    date: 'Jan 26, 2025',
+    status: 'Resolved',
+    image: renterAssets.providerCountyWastewater,
+  },
+];

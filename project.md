@@ -147,7 +147,8 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | `GuestHome` | `GuestHomeScreen` (`@/features/guest`) | `gestureEnabled: false` |
 | `PersonaSelect` | `PersonaSelectScreen` (`@/features/persona`) | `gestureEnabled: false` |
 | `RenterHome` | `RenterHomeScreen` (`@/features/renter`) | `animation: 'slide_from_right'` |
-| `ResidenceDashboard` | `ResidenceDashboardScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
+| `ManageResidence` | `ManageResidenceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
+| ~~`ResidenceDashboard`~~ | Unwired (commented out in the navigator); `ResidenceDashboardScreen` kept in `@/features/renter` | — |
 | `CheckIn` | `CheckInScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | `Neyora` | `NeyoraModule` (`@neyora/maintenance-sdk`, an installed package; see Section 4b) | `animation: 'slide_from_right'` |
 | `Home` | `HomeScreen` (`@/features/home`) | stack default |
@@ -159,7 +160,7 @@ Global `screenOptions`: `{ headerShown: false, animation: 'fade' }` — every sc
 ### Param lists (`src/types/navigation.ts`, re-exported by `src/navigation/types.ts`)
 ```ts
 export type RootStackParamList = {
-  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; ResidenceDashboard: { residenceId: string }; CheckIn: { residenceId: string }; Neyora: undefined; Auth: undefined; Main: undefined;
+  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; ManageResidence: { residenceId: string }; ResidenceDashboard: { residenceId: string } /* unwired */; CheckIn: { residenceId: string }; Neyora: undefined; Auth: undefined; Main: undefined;
   Home: undefined; Calendar: undefined; Login: undefined;
 };
 export type AuthStackParamList = { Login: undefined; Register: undefined; ForgotPassword: { email?: string } | undefined };
@@ -188,7 +189,7 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 - **PersonaSelect → RenterHome** (`replace`): "Continue as Renter".
 - **RenterHome → CheckIn** (`navigate`): tap a Move-In Ready card ("Check-In Now").
 - **CheckIn → Utilities → UtilityProviders**: the "Utilities" tile opens the Utilities list; a utility card opens its providers page (info only). "Confirm Utilities" navigates back to `CheckIn` with `utilitiesConfirmed: true` (`merge`), which ticks the tile.
-- **RenterHome → ResidenceDashboard** (`navigate`): tap a current residence card (active lease) (past leases show "coming soon"). Back button / system back returns.
+- **RenterHome → ManageResidence** (`navigate`): tap an Active Lease card ("Manage") (past leases show "coming soon"). Back button / system back returns.
 - **RenterHome → Neyora** (`navigate('Neyora')`): the **Calendar** tab in `RenterTabBar` opens the Neyora maintenance module (its Home, then its Calendar). The tab stays on Homes, so coming back shows Homes selected. Back / swipe returns to RenterHome.
 - **PersonaSelect → Home** (`replace`): "Continue as PMS". The route for each persona is in `ROUTE_FOR_PERSONA` (`usePersonaSelection`).
 - **Home → Calendar**: "View Calendar" (ScheduleSection), "Schedule" (QuickActionBar), CALENDAR tab (BottomNavBar).
@@ -660,7 +661,7 @@ Supports two operational modes:
   4. `RenterTabBar`: floating frosted capsule bar — Homes / Search / Alerts (dot) / Calendar (`CalendarIcon`; replaced Profile), icon above label. Same glass capsule as the filter (navy + white `Scrim` sheen + rim) springs between tabs; icons/labels cross-fade navy ↔ white. Calendar opens the Neyora SDK module (Section 4b) and the bar stays on Homes. Search / Alerts slide over, show "coming soon", and glide back to Homes on close.
 - **Logic**: `useRenterHome` (filter, tab, counts, card + menu actions — "coming soon" alerts for now). Mock data in `renter/constants.ts`; photos in `src/assets/images/renter/` (cropped from the design) via `renterAssets.ts`. Cards fade up in sequence (off in tests).
 
-### 0d. Residence Dashboard (`src/features/renter/screens/ResidenceDashboardScreen.tsx`)
+### 0d. Residence Dashboard (`src/features/renter/screens/ResidenceDashboardScreen.tsx`) — unwired, replaced by Manage (0g)
 - **Role**: Detail page of the residence picked on My Residences (route param `residenceId`). Sections follow the "Urban Nest Residence Dashboard" design; the top is a distinct immersive property layout (not the navy header used elsewhere).
 - **Pieces** (page bg `pageTint`):
   0. `ResidenceHero`: full-bleed photo of that residence (width × 1.08) with parallax (half-speed drift, stretch on pull-down), top + bottom navy `Scrim`s; gold "WELCOME HOME, ALEX" eyebrow, Playfair 34 name, gold pin + street/city, glass pills "• Your Residence" + lease status. Title block fades/drifts up on scroll.
@@ -701,6 +702,20 @@ Supports two operational modes:
 - **Providers**: rounded utility photo with icon chip, `PageIntro` ("Service directory"), "n providers for your home", one `ProviderCard` each (tile fill / edge like the Check-In tiles): 56 px rounded photo thumbnail (`UtilityProvider.image`, `provider_*.jpg` 300 × 300; later the provider logo), `listingTitle` name, kind, short accent rule, description, uppercase tag pills, then contact rows (customer care and 24/7 emergency → `tel:`, website → browser, hours). Ends with a "Which provider is mine?" panel + service address facts, on the guest search card container (`CardBackground` + `CARD_BG` fill / white edge / blue glow) with dark text.
 - **Logic**: `useUtilities` (open a utility, `confirm`), `useUtilityProviders` (`call`, `openWebsite` via `Linking`; failures show an `AppDialog`). Mock data `UTILITIES` in `constants.ts`: placeholder provider names, 555 numbers and example.com sites until the backend sends real ones.
 - **Photos** `utility_*.jpg` (1000 × 620) in `src/assets/images/renter/`: Unsplash (electricity, water, sewer) and Wikimedia Commons CC BY-SA 4.0 (gas); credits in `renterAssets.ts`.
+
+### 0g. Manage — My Home (`src/features/renter/screens/ManageResidenceScreen.tsx`)
+- **Opened by**: "Manage" on an Active Lease card (route `ManageResidence { residenceId }`). Layout follows the "UrbanNest Premium Home Dashboard" design (Nov 2026), in the app's own colours (navy / `primary` / `ACCENTS`, no purple).
+- **Layout** (components in `components/manage/`), page bg `pageTint`, dark status bar:
+  - Background art: soft `radial-gradient` brand-blue glow top-left; residence photo on the right (62% width, from the page top down to 60% of the residence card, measured with `onLayout`), melted into `pageTint` with CSS `backgroundImage` linear gradients (left, top, bottom) — no hard edges.
+  - `ManageHeader`: white round back button (navy chevron, soft shadow), `BrandLockup` navy "Urban Nest" (18) + `caption` tagline "Your Home, Managed Better", white bell (red count badge, white rim), `ProfileAvatar` on `tileBlue`. "MY HOME" eyebrow (`secondary`), `heroTitle` navy "Good afternoon,\n" + name in `primary` (time-of-day greeting from the hook), `body` intro in `textSecondary`.
+  - `ResidenceHeroCard`: one-row navy glass card (radius 22, photo under a left-to-right navy gradient + top sheen, white 18% rim, `boxShadow`): left "● Active Lease" pill, `sectionTitle` white name (2 lines), pin + unit · city `caption`; right `ManageActionRow` (4 icon-only glass circles, 30) and a glowing `primary` arrow circle (40). Header: navy glass back button (as Check-In), plain navy bell, `tileBlue` avatar, navy eyebrow, `heroTitle` greeting with the name in `primary`, 36 × 3 `primary → headerGradientEnd` gradient rule; logo, tagline and intro line commented out.
+  - `ManageSectionHeader`: optional 24 `primary` line icon + `sectionHeading` + `cardSubtitle`, plain navy semibold "View All / See All →" link.
+  - "Quick Actions" (`QuickActionTiles`): 4 pastel tiles (`MANAGE_QUICK_ACTIONS`, `ACCENTS` bg + white top sheen, 22 accent icon, semibold navy `badge` title + `caption` detail), then `RentDueCard`: navy `gradients.button`, two soft glow circles, eyebrow, `heroTitleCompact` amount, "Payable by", `Button` `light` "Pay Now →", `CountdownRing` on the right.
+  - "This Week" (`WeekTimeline`, calendar icon): one white card; dot rail (next item solid navy, later `tileBlue`), 44 × 46 `TILE_BG` date badges (accent month, Playfair day), navy `cardTitle` + hint, `infoLight` tag pill or amount, chevron, hairline dividers.
+  - "Community Buzz" (`BuzzCarousel`, users icon): landscape cards (80% width, height × 0.62), white "Registration Open" pill + glass audience tag, one-line `heroTitleCompact` title, date / time; navy pill dots.
+  - "Help Desk" (`HelpDeskList`, headset icon): rows in one white card split by hairlines (64 × 56 photo, eyebrow category, one-line navy title, `#ticket · date`, status pill, chevron), then `Button` `soft` "Raise a Request".
+- **Logic**: `useManageResidence(residenceId, navigation)`; mock data `MANAGE_ACTIONS`, `MANAGE_QUICK_ACTIONS`, `RENT_DUE` (`dueDate`, `daysLeft`, `cycleDays`), `QUICK_ALERTS` (`month`, `day`, `amount?`, `tag?`), `COMMUNITY_BUZZ`, `HELP_DESK_TICKETS` in `constants.ts` (rent amount from the residence). Every action shows "coming soon" in an `AppDialog`.
+
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.
 - **Components**:
@@ -802,7 +817,7 @@ Supports two operational modes:
   - Instantly on tap anywhere on the splash screen.
 - **GuestHome ➔ PersonaSelect**: "Log In / Sign Up" pill.
 - **PersonaSelect ➔ RenterHome**: "Continue as Renter".
-- **RenterHome ➔ ResidenceDashboard**: tap a current residence card.
+- **RenterHome ➔ ManageResidence**: tap an Active Lease card ("Manage").
 - **RenterHome ➔ CheckIn**: tap a Move-In Ready card.
 - **RenterHome ➔ Neyora** (installed SDK: Neyora Home ➔ Neyora Calendar): **Calendar** tab in `RenterTabBar`. Back returns to RenterHome.
 - **PersonaSelect ➔ Home**: "Continue as PMS".
