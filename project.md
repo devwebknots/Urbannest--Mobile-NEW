@@ -147,8 +147,10 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | `GuestHome` | `GuestHomeScreen` (`@/features/guest`) | `gestureEnabled: false` |
 | `PersonaSelect` | `PersonaSelectScreen` (`@/features/persona`) | `gestureEnabled: false` |
 | `RenterHome` | `RenterHomeScreen` (`@/features/renter`) | `animation: 'slide_from_right'` |
-| `ResidenceDashboard` | `ResidenceDashboardScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
+| `ManageResidence` | `ManageResidenceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
+| ~~`ResidenceDashboard`~~ | Unwired (commented out in the navigator); `ResidenceDashboardScreen` kept in `@/features/renter` | — |
 | `CheckIn` | `CheckInScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
+| `Neyora` | `NeyoraModule` (`@neyora/maintenance-sdk`, an installed package; see Section 4b) | `animation: 'slide_from_right'` |
 | `Home` | `HomeScreen` (`@/features/home`) | stack default |
 | `Calendar` | `CalendarScreen` (`@/features/calendar`) | `animation: 'slide_from_right'` |
 | `Login` | `LoginScreen` (`@/features/auth/screens/LoginScreen`) | stack default |
@@ -158,7 +160,7 @@ Global `screenOptions`: `{ headerShown: false, animation: 'fade' }` — every sc
 ### Param lists (`src/types/navigation.ts`, re-exported by `src/navigation/types.ts`)
 ```ts
 export type RootStackParamList = {
-  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; ResidenceDashboard: { residenceId: string }; CheckIn: { residenceId: string }; Auth: undefined; Main: undefined;
+  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; ManageResidence: { residenceId: string }; ResidenceDashboard: { residenceId: string } /* unwired */; CheckIn: { residenceId: string }; Neyora: undefined; Auth: undefined; Main: undefined;
   Home: undefined; Calendar: undefined; Login: undefined;
 };
 export type AuthStackParamList = { Login: undefined; Register: undefined; ForgotPassword: { email?: string } | undefined };
@@ -186,7 +188,9 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 - **GuestHome → PersonaSelect** (`navigate`): "Log In / Sign Up" pill in the hero.
 - **PersonaSelect → RenterHome** (`replace`): "Continue as Renter".
 - **RenterHome → CheckIn** (`navigate`): tap a Move-In Ready card ("Check-In Now").
-- **RenterHome → ResidenceDashboard** (`navigate`): tap a current residence card (active lease) (past leases show "coming soon"). Back button / system back returns.
+- **CheckIn → Utilities → UtilityProviders**: the "Utilities" tile opens the Utilities list; a utility card opens its providers page (info only). "Confirm Utilities" navigates back to `CheckIn` with `utilitiesConfirmed: true` (`merge`), which ticks the tile.
+- **RenterHome → ManageResidence** (`navigate`): tap an Active Lease card ("Manage") (past leases show "coming soon"). Back button / system back returns.
+- **ManageResidence → Neyora** (`navigate('Neyora')`): the **Scheduling** shortcut (calendar icon, replaced Invoices) on the frosted `ResidenceHeroCard` opens the Neyora maintenance module (its Home, then its Calendar). Back / swipe returns to ManageResidence.
 - **PersonaSelect → Home** (`replace`): "Continue as PMS". The route for each persona is in `ROUTE_FOR_PERSONA` (`usePersonaSelection`).
 - **Home → Calendar**: "View Calendar" (ScheduleSection), "Schedule" (QuickActionBar), CALENDAR tab (BottomNavBar).
 - **Calendar → Home**: HOME tab in BottomNavBar or system back.
@@ -199,6 +203,106 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 4. Register `<Stack.Screen name="<Name>" component={<Name>Screen} />` in `RootNavigator.tsx`.
 5. Navigate with `navigate('<Name>')` or the `navigation` prop; wire `BottomNavBar` if it is a tab.
 6. Add a test in `__tests__/<Name>Screen.test.tsx`.
+
+---
+
+## 4b. Neyora Maintenance SDK (embedded module, client demo)
+
+**Goal**: show that **Neyora** (our maintenance app, separate repo `C:\neyora`) can be sold to other apps as a package. UrbanNest plays the "buyer app": it **installs** Neyora like any library and shows Neyora's real native screens inside itself.
+- No WebView, no deep link, and the Neyora app does **not** need to be installed on the phone.
+- **The Neyora folder is not needed to build or run UrbanNest.** The packed SDK file lives in this repo (`vendor/`), so a fresh clone works with `npm install` + `npm run android`.
+- No special Metro or Babel setup in UrbanNest: the package is plain relative-import code, like any other library.
+
+### How it works (simple)
+1. Neyora's Home + Calendar screens are **packed into one file**: `vendor/neyora-maintenance-sdk-0.1.0.tgz` (~3.3 MB, 42 files).
+2. `package.json` installs it: `"@neyora/maintenance-sdk": "file:vendor/neyora-maintenance-sdk-0.1.0.tgz"` → real copy in `node_modules/@neyora/maintenance-sdk`.
+3. `RootNavigator.tsx` uses it: `<Stack.Screen name="Neyora" component={NeyoraModule} />`.
+4. The **Scheduling** shortcut on the Manage page (frosted `ResidenceHeroCard`, calendar icon) opens it.
+
+### Neyora side (`C:\neyora\sdk\`)
+| File | What it does |
+| :--- | :--- |
+| `sdk/index.tsx` | Public API. `NeyoraProvider` wraps Neyora's own Redux store (kept separate from the host's store). `NeyoraModule` = provider + a nested native stack: `Home` (initial) → `Calendar`. No `NavigationContainer`, no Splash, no StatusBar/SafeArea provider (the host owns those). Optional `apiKey` prop (not checked yet). |
+| `sdk/index.d.ts` | Public types (`NeyoraProvider`, `NeyoraModule`, props), so the host's `tsc` doesn't type-check Neyora's source. |
+| `sdk/package.json` | Package `@neyora/maintenance-sdk` (version here = version of the .tgz), `main: index.tsx`, `types: index.d.ts`. React, react-native, navigation, redux, safe-area are **peerDependencies** (the host app provides them). |
+| `sdk/build.js` | Packs the SDK into the .tgz (see below). Output folder `sdk/build/` is git-ignored. |
+
+`sdk/index.tsx` core:
+```tsx
+import { Provider } from 'react-redux';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { store } from '../src/store';
+import { HomeScreen } from '../src/features/home';
+import { CalendarScreen } from '../src/features/calendar';
+
+export const NeyoraProvider = ({ children }) => <Provider store={store}>{children}</Provider>;
+const Stack = createNativeStackNavigator();
+export const NeyoraModule = ({ apiKey }) => (
+  <NeyoraProvider apiKey={apiKey}>
+    <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, animation: 'fade' }}>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Calendar" component={CalendarScreen} options={{ animation: 'slide_from_right' }} />
+    </Stack.Navigator>
+  </NeyoraProvider>
+);
+```
+Neyora's `HomeScreen` / `CalendarScreen` call `propNavigation.navigate('Calendar' | 'Home')` first, so they work inside the nested stack without changes.
+
+### What `sdk/build.js` does
+1. Starts at `sdk/index.tsx` and **follows every import** (`from`, `import`, `require`, incl. `.ios`/`.android` variants), so only files the SDK uses are packed (fonts, splash, unused images are left out).
+2. **Rewrites Neyora's `@/...` imports into relative paths** (`'@/config/theme'` → `'../../../config/theme'`). Both apps use `@/` for their own `src`, so without this the host would resolve Neyora's imports to its own files.
+3. **Checks** that every library the SDK imports is listed in `peerDependencies` (fails the build otherwise).
+4. Runs `npm pack` → `neyora-maintenance-sdk-<version>.tgz`.
+
+### Updating the SDK after changing Neyora
+```
+# in C:\neyora: (bump "version" in sdk/package.json for a new file name)
+node sdk/build.js ../UrbanNestMobile/vendor
+
+# in C:\UrbanNestMobile:
+npm install "@neyora/maintenance-sdk@file:vendor/neyora-maintenance-sdk-<version>.tgz"
+npm start -- --reset-cache
+```
+Delete the old .tgz from `vendor/` when the version changes. If the version stays the same, re-run `npm install` with the same path to refresh `node_modules`.
+
+### Adding a new Neyora screen to UrbanNest
+1. **Build the screen in Neyora** as usual (e.g. `src/features/maintenance/screens/RequestsScreen.tsx`, also in Neyora's own `RootNavigator`).
+2. **Register it in `C:\neyora\sdk\index.tsx`**, in the same stack as Home and Calendar:
+   ```tsx
+   import { RequestsScreen } from '../src/features/maintenance';
+   <Stack.Screen name="Requests" component={RequestsScreen} />
+   ```
+   Screens not listed there don't appear in UrbanNest. Their components, images and helpers are found automatically by `build.js`.
+3. **Repack and reinstall** (steps above, with a new version number).
+
+Only changed an existing screen (Home, Calendar or their parts)? Skip step 2.
+
+### Two rules for Neyora screens
+1. **Move between Neyora screens with the `navigation` prop**: `navigation.navigate('Requests')`. Neyora's global `navigate()` helper does nothing inside UrbanNest: it controls Neyora's own `NavigationContainer`, which only exists in the Neyora app. (Neyora is a room inside UrbanNest's house: the prop is the door inside the room; the global helper is a remote for a house that isn't there.)
+2. **Neyora borrows its libraries from UrbanNest.** The package brings no React, navigation, Redux, etc. of its own. If a Neyora screen starts using a new library (e.g. a date picker):
+   - `node sdk/build.js` stops and asks to add it to `peerDependencies` in `C:\neyora\sdk\package.json`: add it and rebuild;
+   - **install the same library in UrbanNest** (`npm install <library>`);
+   - plain-JS library: restart Metro (`npm start -- --reset-cache`) and reload. **Native library** (camera, maps, pickers, calendars…): rebuild the app with `npm run android` / `npm run ios`; a reload only refreshes JavaScript, not native code.
+
+### UrbanNest files touched
+- `package.json` / `package-lock.json`: the SDK dependency.
+- `vendor/neyora-maintenance-sdk-0.1.0.tgz`: the packed SDK (committed).
+- `src/types/navigation.ts`: `Neyora: undefined` in `RootStackParamList`.
+- `src/navigation/RootNavigator.tsx`: `import { NeyoraModule } from '@neyora/maintenance-sdk'` + `<Stack.Screen name="Neyora" component={NeyoraModule} options={{ animation: 'slide_from_right' }} />`.
+- `src/features/renter/hooks/useManageResidence.ts`: `openAction` → for `action.id === 'scheduling'` calls `navigation.navigate('Neyora')` (falls back to the global `navigate`); Maintenance and the other shortcuts show "coming soon".
+- `src/features/renter/constants.ts` (`MANAGE_ACTIONS`): Invoices → `{ id: 'scheduling', label: 'Scheduling', icon: 'lineCalendar' }`. Icon `src/assets/icons/manage/calendar.png` (Lucide `calendar`, added to `scripts/icons/draw_line_icons.ps1`), mapped in `renterAssets.ts`; `ManageActionIcon` gained `'lineCalendar'`. `ManageNavigation` gained an optional `navigate`.
+- `RenterTabBar` / `useRenterTabs` / `RenterTab`: **unchanged** (an earlier version swapped Profile for a Calendar tab that opened Neyora; reverted, Profile is back).
+- `metro.config.js` / `babel.config.js`: **unchanged** (an earlier version linked `../neyora` directly with `watchFolders` + a Babel alias override; replaced by the packed file).
+
+**Checks run**: `npx tsc --noEmit` passes; `npx react-native bundle --platform android --dev true --reset-cache` builds; the bundle loads 40 files from `node_modules/@neyora/maintenance-sdk`, **none** from `C:\neyora`, and only one `node_modules/react/index.js`. No fonts were needed (Neyora's screens use Inter and Playfair, which UrbanNest already has).
+
+### Run & test
+1. Stop any running Metro (Neyora's Metro also uses port 8081).
+2. `npm install`, then `npm start -- --reset-cache`, then `npm run android` (or press `r` to reload if UrbanNest is already installed; no native changes).
+3. Renter Home → **Manage** on an active residence → tap **Scheduling** on the frosted residence card → Neyora Home slides in → open Neyora's calendar → back twice returns to the Manage page. Works with the Neyora app uninstalled and without `C:\neyora` on the computer.
+
+### For the real product (not done yet)
+Publish the same package to a private npm registry / GitHub Packages (buyers run `npm install @neyora/maintenance-sdk`); give each buyer an API key and make the backend multi-tenant (each company sees only its own data); add a `theme` prop for buyer brand colours. **Native Android buyers**: an Android SDK (`.aar`, `Neyora.open(context)`) is built from the same screens in `C:\neyora` (`node sdk/build-android.js`; see Neyora's `project.md` → Section 4b "Android SDK"). Still to do: iOS (needs a Mac), Flutter plugin, web build.
 
 ---
 
@@ -362,6 +466,7 @@ Headings (Playfair Display — weight comes from the font file, never add `fontW
 | Preset | Font file | Size / Line height | Extra | Used for |
 | :--- | :--- | :--- | :--- | :--- |
 | `heroTitle` | `PlayfairDisplay-Bold` (800 ExtraBold in Figma, Bold until the ExtraBold .ttf is added) | 30 / 35.4 | letterSpacing -0.75, white | The one page-headline style: guest hero "Finding New Home is *Simple*", "Choose your persona", "My Residences", residence name in `ResidenceHero` |
+| `heroTitleCompact` | `PlayfairDisplay-Bold` (same as `heroTitle`) | 26 / 30.7 | letterSpacing -0.65, white | Smaller page headline for task pages: "Move-In Inspection" in `ResidenceHero` (via its `nameStyle` prop) |
 | `heroAccent` | `PlayfairDisplay-SemiBold` | 30 / 35.4 | letterSpacing -0.75, gold `heroAccent` | Highlighted word inside a `heroTitle` line ("*Simple*"); slant with `skewX(-10deg)` |
 | `greetingTitle` | `PlayfairDisplay-Regular` | 23 / 30 | white | Greeting headline on the old Home dashboard |
 | `sectionHeading` | `PlayfairDisplay-Medium` | 19 / 26 | `textPrimary` | **Left-aligned section titles** ("Rentals Near You", "Move-In Checklist", "Around Your Home"); also titles on dark cards ("Move-In Ready" status card, white) |
@@ -475,6 +580,26 @@ Shared look: radius `borderRadius.button` (10), text `typographyPresets.button` 
   rightIcon={<ArrowRightIcon size={ms(14)} color={colors.navy} />} style={{ alignSelf: 'center' }} />
 ```
 
+### 7. Pop-ups — always use `AppDialog` (`src/components/AppDialog.tsx`)
+**Every warning, confirmation or short choice uses the shared `AppDialog`, not the system `Alert`.** Centered white card (radius `xxl`) over a navy-dimmed page: round icon, title (`displayTitle`), message (`body`, `textSecondary`), then full-width stacked actions.
+
+| Option | Values |
+| :--- | :--- |
+| `tone` | `warning` (amber circle + triangle icon, for destructive / data-loss) · `info` (no icon unless `icon` is given; `chipBlue` circle when it is) |
+| `icon` | custom icon node, e.g. `VideoCameraIcon` / `UploadIcon` (navy, `ms(22)`) |
+| action `variant` | `brand` (main, default) · `soft` (other choice) · `danger` (soft red fill, red text: "Remove", "Discard") · `link` (quiet grey text: "Cancel", "Keep Editing") |
+
+Every action closes the dialog first; its `onPress` runs after the close animation (safe for opening the camera / photo picker). Backdrop tap and Android back close it like "Cancel".
+
+```tsx
+const dialog = useAppDialog();
+dialog.show({ tone: 'warning', title: 'Mark as all good?', message: 'This removes the issues you added.',
+  actions: [{ label: 'Yes, Mark All Good', variant: 'danger', onPress: apply },
+            { label: 'Keep My Issues', variant: 'link' }] });
+// in the screen
+<AppDialog {...dialog.props} />
+```
+
 Not yet on `Button` (special layouts — move them over if a variant fits): "Access Digital Key" (white pill with navy key circle, `CheckInStatusCard`), Pay Now / HOA buttons (`FinancialCard`), "Continue as …" (persona), side-menu Log In, icon-only round buttons (back, burger, Orbitl, search toggle — these stay circular).
 
 ---
@@ -507,10 +632,10 @@ Supports two operational modes:
 ### 0a. Guest Home (`src/features/guest/screens/GuestHomeScreen.tsx`)
 - **Role**: First screen after the splash; visitors browse before signing in.
 - **Sections** (top → bottom, `spacing.sectionGap` 40dp apart, page bg `pageTint`):
-  1. `HeroSection`: design hero image (`hero_bg.png`, baked text painted out) shown uncropped at `width / (1560/1620)`; bottom `Scrim` fade to `pageTint`. Header: logo + "Urban Nest" (Playfair Bold 21) and a frosted round **burger menu** button (same spot the Log In pill used to be). The burger opens **`GuestSideMenu`**: a full-height drawer (84% width, max 360, rounded left edge) that slides in from the right over a dimmed page. Compact navy header: compact white **Log In** button (36 high, sized to its label) + close, and a "New to Urban Nest? **Register**" link under it (Airbnb / Booking.com pattern); both → PersonaSelect for now (no logo / welcome text; the page already shows them); grouped options: Explore (Home, Search Homes, Rent a Home, Buy a Home, Featured Homes), Discover (Resources & Guides, Popular Cities), Support (Help & Support, About, Terms & Privacy — screens not built yet). Closes on backdrop tap, ✕, Android back or swipe right; the chosen option runs after the close animation (`onMenuSelect` in `GuestHomeScreen` scrolls to the section, sets Rent / Buy, or navigates). The header search icon and the hero subtitle are commented out. `heroTitle` + `heroAccent` headline ("Finding New Home is *Simple*"), white "Explore Homes →" button (scrolls to the search card), page dots.
+  1. `HeroSection`: design hero image (`hero_bg.png`, baked text painted out) shown uncropped at `width / (1560/1620)`; bottom `Scrim` fade to `pageTint`. Header: logo + "Urban Nest" (Playfair Bold 21) and a frosted round **burger menu** button (same spot the Log In pill used to be). The burger opens **`GuestSideMenu`**: a drawer (84% width, max 360, square corners) that slides in from the right over a dimmed page. It starts **below the status bar** (`top: insets.top` from `useStatusBarInsets`), so the status bar icons never sit on the drawer. While open, a full-width `headerDarkBlue` strip (height `insets.top`, fades in with the drawer) paints the status bar the app's dark blue (edge-to-edge Android ignores `StatusBar backgroundColor`). Compact navy header: compact white **Log In** button (36 high, sized to its label) + close, and a "New to Urban Nest? **Register**" link under it (Airbnb / Booking.com pattern); both → PersonaSelect for now (no logo / welcome text; the page already shows them); grouped options: Explore (Home, Search Homes, Rent a Home, Buy a Home, Featured Homes), Discover (Resources & Guides, Popular Cities), Support (Help & Support, About, Terms & Privacy — screens not built yet). Closes on backdrop tap, ✕, Android back or swipe right; the chosen option runs after the close animation (`onMenuSelect` in `GuestHomeScreen` scrolls to the section, sets Rent / Buy, or navigates). The header search icon and the hero subtitle are commented out. `heroTitle` + `heroAccent` headline ("Finding New Home is *Simple*"), white "Explore Homes →" button (scrolls to the search card), page dots.
   2. `SearchCard` (overlaps hero by 28dp): frosted light-blue card (`CARD_BG`: base `#EEF4FF`, `chipBlue` wash, `#518EF9` waves bottom-right, white glossy border). Header "Find your next home" / "Search with filters or ask Orbitl AI" + two buttons:
      - **Orbitl AI** (`OrbitlOrb`, 54): emblem sphere (`orbitl_sphere.png`) with cyan/violet glow, violet ripples and 3 orbiting rings with glowing dots (`OrbitlOrb.tsx`). Opens a bubble explaining voice search; "Tap to talk" opens `OrbitlListeningOverlay` (full-screen navy, big orb, "I'm listening…", voice bars, example phrases, stop button; UI only, speech-to-text TODO).
-     - **Search** (white round button): opens the filters; icon spins into the sliders icon while open. Panel = Rent | Buy segmented switch (Agents commented out), 2×2 fields and a gradient search button. Rent → "Rent / Month", "Rental Type", **Search Rentals**; Buy → "Price", "Property Type", **Search Homes for Sale** (`BUY_FILTERS`).
+     - **Filters** (white round button): always shows the sliders (filter) icon, open or closed (the old search icon is commented out); the icon spins in on each toggle. Opens the filters. Panel = Rent | Buy segmented switch (Agents commented out), 2×2 fields and a gradient search button. Rent → "Rent / Month", "Rental Type", **Search Rentals**; Buy → "Price", "Property Type", **Search Homes for Sale** (`BUY_FILTERS`).
      - One panel open at a time; both expand / collapse smoothly via `Collapsible.tsx` (height + fade + slide).
   3. `CategoryRow`: 5 `tileBlue` icon tiles.
   4. Featured: `CenteredHeader` (`eyebrow` / `displayTitle` / `sectionDescription`) + `FeaturedCarousel`: portrait cards (74% of screen width, max 340, height = width × 1.22) so both neighbours peek in; snapping and endless; side cards scale 0.92 + fade 0.8. **Auto-slides** to the next card every 4.5 s (timer resets after a swipe, paused while dragging; near the end of the repeated list it jumps invisibly back to the middle copy). The card is filled edge to edge by a muted, looping **video tour** (`react-native-video`, `FeaturedProperty.video`, free Mixkit 720p clips) over its poster photo; the centered card **and both neighbours** keep their videos loaded and playing (`VIDEO_RANGE`), so the next card is already playing when it slides in. Each video stays at opacity 0 over its poster photo until `onReadyForDisplay`, then fades in (no black frame); failed loads keep the photo.
@@ -536,7 +661,7 @@ Supports two operational modes:
   4. `RenterTabBar`: floating frosted capsule bar — Homes / Search / Alerts (dot) / Profile, icon above label. Same glass capsule as the filter (navy + white `Scrim` sheen + rim) springs between tabs; icons/labels cross-fade navy ↔ white. Tabs without a page slide over, show "coming soon", and glide back to Homes on close.
 - **Logic**: `useRenterHome` (filter, tab, counts, card + menu actions — "coming soon" alerts for now). Mock data in `renter/constants.ts`; photos in `src/assets/images/renter/` (cropped from the design) via `renterAssets.ts`. Cards fade up in sequence (off in tests).
 
-### 0d. Residence Dashboard (`src/features/renter/screens/ResidenceDashboardScreen.tsx`)
+### 0d. Residence Dashboard (`src/features/renter/screens/ResidenceDashboardScreen.tsx`) — unwired, replaced by Manage (0g)
 - **Role**: Detail page of the residence picked on My Residences (route param `residenceId`). Sections follow the "Urban Nest Residence Dashboard" design; the top is a distinct immersive property layout (not the navy header used elsewhere).
 - **Pieces** (page bg `pageTint`):
   0. `ResidenceHero`: full-bleed photo of that residence (width × 1.08) with parallax (half-speed drift, stretch on pull-down), top + bottom navy `Scrim`s; gold "WELCOME HOME, ALEX" eyebrow, Playfair 34 name, gold pin + street/city, glass pills "• Your Residence" + lease status. Title block fades/drifts up on scroll.
@@ -566,7 +691,31 @@ Supports two operational modes:
   3. `NeighborhoodCard` ("Around Your Home"): `segmentLabel` pill tabs (Schools / Hospitals / Parks; navy when selected) switch a 2-column grid of **photo cards** styled like the guest guide cards (white, hairline border): photo with white distance pill, eyebrow-style type in `primary`, 2-line name. `Button` `soft` "View on Map →". Photos `place_*.jpg` in `src/assets/images/renter/` (Unsplash; coaster = Wikimedia Commons CC0) via `NeighborhoodPlace.image`.
   4. `CuratedLivingCard`: photo with fade + gold kicker + `sectionHeading` title, white body (`body`), gold rule signature; `borderRadius.xl`, hairline border, `shadows.sm`.
 - **Logic**: `useCheckIn(residenceId, navigation)` — confirmed set, `canSubmit`, `submitted`, `toggleTask`, `submit` (Alert); key / places / map / profile show "coming soon". Mock data: `CHECK_IN_SUMMARY`, `CHECK_IN_TASKS`, `NEIGHBORHOOD`, `NEIGHBORHOOD_RADIUS`, `CURATED_LIVING`.
-- **Icons** added to `src/assets/icons/renter/`: inspect, bolt, wifi, shield, key, check, school, hospital, park (white 128px line PNGs drawn with System.Drawing, tinted via `RenterIcon`).
+- **Icons** added to `src/assets/icons/renter/`: inspect, bolt, wifi, shield, key, check, school, hospital, park, flame, waves (white 128px line PNGs drawn with System.Drawing, tinted via `RenterIcon`).
+
+### 0f. Utilities (`UtilitiesScreen.tsx`) and Utility Providers (`UtilityProvidersScreen.tsx`)
+- **Opened by**: the Check-In "Utilities" tile (`CHECK_IN_TASKS` item has `screen: 'Utilities'`). Routes `Utilities { residenceId }` and `UtilityProviders { residenceId, utilityId }`.
+- **Light pages** (no glass hero), shared pieces:
+  - `components/LightTopBar`: round white back button (`TILE_BORDER` edge), centered `sectionTitle` navy title, `ProfileAvatar`. Use it for any light renter page.
+  - `components/utilities/PageIntro`: `eyebrow` (`secondary`), `heroTitle` navy title (the app's page heading preset, as on My Residences), 36 × 3 navy rule, `body` intro in `textSecondary`.
+- **Utilities**: intro "Essential Services"; one `UtilityCard` per utility: full-width photo (`borderRadius.xxl`, ratio 0.66), navy `Scrim` at the bottom, white icon chip + dark "n providers" pill on top, `heroTitleCompact` white name, `heroSubtitle` hint, "View providers" + white `ArrowCircleIcon`. Then "Good to know" numbered tips (on the page) and `Button` `brand` "Confirm Utilities →" + `caption` footnote.
+- **Providers**: rounded utility photo with icon chip, `PageIntro` ("Service directory"), "n providers for your home", one `ProviderCard` each (tile fill / edge like the Check-In tiles): 56 px rounded photo thumbnail (`UtilityProvider.image`, `provider_*.jpg` 300 × 300; later the provider logo), `listingTitle` name, kind, short accent rule, description, uppercase tag pills, then contact rows (customer care and 24/7 emergency → `tel:`, website → browser, hours). Ends with a "Which provider is mine?" panel + service address facts, on the guest search card container (`CardBackground` + `CARD_BG` fill / white edge / blue glow) with dark text.
+- **Logic**: `useUtilities` (open a utility, `confirm`), `useUtilityProviders` (`call`, `openWebsite` via `Linking`; failures show an `AppDialog`). Mock data `UTILITIES` in `constants.ts`: placeholder provider names, 555 numbers and example.com sites until the backend sends real ones.
+- **Photos** `utility_*.jpg` (1000 × 620) in `src/assets/images/renter/`: Unsplash (electricity, water, sewer) and Wikimedia Commons CC BY-SA 4.0 (gas); credits in `renterAssets.ts`.
+
+### 0g. Manage — My Home (`src/features/renter/screens/ManageResidenceScreen.tsx`)
+- **Opened by**: "Manage" on an Active Lease card (route `ManageResidence { residenceId }`). Layout follows the "UrbanNest Premium Home Dashboard" design (Nov 2026), in the app's own colours (navy / `primary` / `ACCENTS`, no purple).
+- **Layout** (components in `components/manage/`), page bg `pageTint`, dark status bar:
+  - Background art: soft `radial-gradient` brand-blue glow top-left; residence photo on the right (62% width, from the page top down to 60% of the residence card, measured with `onLayout`), melted into `pageTint` with CSS `backgroundImage` linear gradients (left, top, bottom) — no hard edges.
+  - `ManageHeader`: white round back button (navy chevron, soft shadow), `BrandLockup` navy "Urban Nest" (18) + `caption` tagline "Your Home, Managed Better", white bell (red count badge, white rim), `ProfileAvatar` on `tileBlue`. "MY HOME" eyebrow (`secondary`), `heroTitle` navy "Good afternoon,\n" + name in `primary` (time-of-day greeting from the hook), `body` intro in `textSecondary`.
+  - `ResidenceHeroCard`: one-row navy glass card (radius 22, photo under a left-to-right navy gradient + top sheen, white 18% rim, `boxShadow`): left "● Active Lease" pill, `sectionTitle` white name (2 lines), pin + unit · city `caption`; right `ManageActionRow` (4 icon-only glass circles, 30) and a glowing `primary` arrow circle (40). Header: navy glass back button (as Check-In), plain navy bell, `tileBlue` avatar, navy eyebrow, `heroTitle` greeting with the name in `primary`, 36 × 3 `primary → headerGradientEnd` gradient rule; logo, tagline and intro line commented out.
+  - `ManageSectionHeader`: optional 24 `primary` line icon + `sectionHeading` + `cardSubtitle`, plain navy semibold "View All / See All →" link.
+  - "Quick Actions" (`QuickActionTiles`): 4 pastel tiles (`MANAGE_QUICK_ACTIONS`, `ACCENTS` bg + white top sheen, 22 accent icon, semibold navy `badge` title + `caption` detail), then `RentDueCard`: navy `gradients.button`, two soft glow circles, eyebrow, `heroTitleCompact` amount, "Payable by", `Button` `light` "Pay Now →", `CountdownRing` on the right.
+  - "This Week" (`WeekTimeline`, calendar icon): one white card; dot rail (next item solid navy, later `tileBlue`), 44 × 46 `TILE_BG` date badges (accent month, Playfair day), navy `cardTitle` + hint, `infoLight` tag pill or amount, chevron, hairline dividers.
+  - "Community Buzz" (`BuzzCarousel`, users icon): landscape cards (80% width, height × 0.62), white "Registration Open" pill + glass audience tag, one-line `heroTitleCompact` title, date / time; navy pill dots.
+  - "Help Desk" (`HelpDeskList`, headset icon): rows in one white card split by hairlines (64 × 56 photo, eyebrow category, one-line navy title, `#ticket · date`, status pill, chevron), then `Button` `soft` "Raise a Request".
+- **Logic**: `useManageResidence(residenceId, navigation)`; mock data `MANAGE_ACTIONS`, `MANAGE_QUICK_ACTIONS`, `RENT_DUE` (`dueDate`, `daysLeft`, `cycleDays`), `QUICK_ALERTS` (`month`, `day`, `amount?`, `tag?`), `COMMUNITY_BUZZ`, `HELP_DESK_TICKETS` in `constants.ts` (rent amount from the residence). Every action shows "coming soon" in an `AppDialog`.
+
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.
 - **Components**:
@@ -668,8 +817,9 @@ Supports two operational modes:
   - Instantly on tap anywhere on the splash screen.
 - **GuestHome ➔ PersonaSelect**: "Log In / Sign Up" pill.
 - **PersonaSelect ➔ RenterHome**: "Continue as Renter".
-- **RenterHome ➔ ResidenceDashboard**: tap a current residence card.
+- **RenterHome ➔ ManageResidence**: tap an Active Lease card ("Manage").
 - **RenterHome ➔ CheckIn**: tap a Move-In Ready card.
+- **ManageResidence ➔ Neyora** (installed SDK: Neyora Home ➔ Neyora Calendar): **Scheduling** shortcut on the frosted residence card. Back returns to ManageResidence.
 - **PersonaSelect ➔ Home**: "Continue as PMS".
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.
@@ -680,6 +830,8 @@ Supports two operational modes:
 
 ---
 ## 11. Development Rules
+
+0. **Status bar / safe area (Android edge-to-edge is on)**: every screen draws under the status bar, so always offset top content by the inset. Screens use `useSafeAreaInsets()`. Full-screen `Modal`s / overlays use `useStatusBarInsets()` (`src/hooks`): on Android its top is at least `StatusBar.currentHeight`, because some phones report a short top inset inside a Modal. Give such Modals `statusBarTranslucent` + `navigationBarTranslucent` so the insets match the window.
 
 1. **Design system fidelity**: no arbitrary colors or fonts. Colors come from `colors` / `gradients` in `theme.ts`, fonts from `typography`, text styles from `typographyPresets`.
    - **Typography is standardised to the Guest Home screen.** Every screen must reuse the same text styles the guest screen uses for the same kind of element. Never pick a font, weight or size because it looks nice.
@@ -733,6 +885,7 @@ Supports two operational modes:
 - `colors.buttonGradientStart` in `theme.ts` is `#032B57` while `gradients.button` uses `#03264C` — keep them consistent.
 - Poppins fonts are still in `src/assets/fonts/` though deprecated.
 - `useAppTheme` exposes `isDarkMode`, but there is no dark palette yet.
+- Neyora SDK (Section 4b) is demo-only: installed from a .tgz in `vendor/` (re-pack on every Neyora change), `apiKey` not checked, no `theme` prop, no private npm publish, no multi-tenant backend.
 - `heroTitle` should be Playfair Display ExtraBold (800): add `PlayfairDisplay-ExtraBold.ttf`, link it, and switch the preset's font.
 - Guest home: hero has 3 slides (design `hero_bg.png` + `hero_dusk_house.jpg` + `hero_pool_villa.jpg`, built by `scripts/brand/hero_grade.ps1`), auto-advancing every 5 s and looping; `rental_glass_villa.png` has the Premium badge baked in; need a text-free hero export; featured carousel still uses remote Unsplash images (city tiles are now bundled: `city_*.jpg` in `src/assets/images/guest/`, Unsplash License); Search / categories / See More / guides / cities buttons have no destination yet.
 

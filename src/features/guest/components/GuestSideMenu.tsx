@@ -23,7 +23,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useStatusBarInsets } from '@/hooks/useStatusBarInsets';
 import {
   BookmarkIcon,
   ChevronRightIcon,
@@ -152,7 +152,7 @@ export const GuestSideMenu: React.FC<Props> = ({
   onSelect,
 }) => {
   const { width } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
+  const insets = useStatusBarInsets();
   const drawerWidth = Math.min(width * 0.84, 360);
 
   // 0 = hidden off the right edge, 1 = fully open
@@ -235,6 +235,7 @@ export const GuestSideMenu: React.FC<Props> = ({
       transparent
       animationType="none"
       statusBarTranslucent
+      navigationBarTranslucent
       onRequestClose={onClose}
     >
       <StatusBar barStyle="light-content" />
@@ -246,17 +247,25 @@ export const GuestSideMenu: React.FC<Props> = ({
         />
       </Animated.View>
 
+      {/* Status bar turns the app's dark blue while the menu is open.
+          (Edge-to-edge Android ignores StatusBar backgroundColor, so paint it.) */}
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.statusBarFill, { height: insets.top, opacity: progress }]}
+      />
+
       <Animated.View
         {...pan.panHandlers}
         style={[
           styles.drawer,
-          { width: drawerWidth, transform: [{ translateX }] },
+          // Starts below the status bar so it never sits under the clock / icons
+          { top: insets.top, width: drawerWidth, transform: [{ translateX }] },
         ]}
         accessibilityViewIsModal
       >
         {/* Header: Log In / Sign Up + close (logo and welcome are already on the page) */}
         {/* Like Airbnb / Booking: one clear Log In button, Register as a link */}
-        <View style={[styles.header, { paddingTop: insets.top + spacing.lg }]}>
+        <View style={[styles.header, { paddingTop: spacing.lg }]}>
           <View style={styles.headerRow}>
             <Pressable
               onPress={() => choose('login')}
@@ -329,14 +338,22 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(11, 29, 58, 0.45)',
   },
+  statusBarFill: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.headerDarkBlue,
+  },
   drawer: {
     position: 'absolute',
     top: 0,
     bottom: 0,
     right: 0,
     overflow: 'hidden',
-    borderTopLeftRadius: borderRadius.xxl,
-    borderBottomLeftRadius: borderRadius.xxl,
+    // Square corners (rounded left edge removed)
+    // borderTopLeftRadius: borderRadius.xxl,
+    // borderBottomLeftRadius: borderRadius.xxl,
     backgroundColor: colors.surface,
     boxShadow: '-8px 0px 24px rgba(11, 29, 58, 0.25)',
   },

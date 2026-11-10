@@ -13,6 +13,9 @@ export * from './LoadingIndicator';
 export { default as LinearGradient } from './LinearGradient';
 export * from './LinearGradient';
 
+export { default as AppDialog } from './AppDialog';
+export * from './AppDialog';
+
 export { default as ProfileAvatar } from './ProfileAvatar';
 export * from './ProfileAvatar';
 

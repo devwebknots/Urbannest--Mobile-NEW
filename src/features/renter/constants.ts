@@ -4,21 +4,30 @@
 
 import { renterAssets } from './assets/renterAssets';
 import type {
+  BuzzEvent,
   CheckInSummary,
   CheckInTask,
   CommunityEvent,
   ConciergeService,
   FinancialSummary,
+  HelpDeskTicket,
+  InspectionArea,
+  IssueCategory,
   LeaseStatus,
+  ManageAction,
+  ManageQuickAction,
   NeighborhoodCategory,
+  QuickAlert,
   Residence,
   ResidenceFilter,
   ServiceRequest,
+  UtilityService,
 } from './types';
 
 export const RENTER_PROFILE = {
-  firstName: 'Alex',
-  initials: 'AM',
+  firstName: 'John',
+  fullName: 'John Doe',
+  initials: 'JD',
   unreadAlerts: 2,
 };
 
@@ -146,10 +155,241 @@ export const CHECK_IN_SUMMARY: CheckInSummary = {
 };
 
 export const CHECK_IN_TASKS: readonly CheckInTask[] = [
-  { id: 'inspection', label: 'Inspection', hint: 'Walkthrough report', icon: 'inspect', accent: 'blue' },
-  { id: 'utilities', label: 'Utilities', hint: 'Power & water live', icon: 'bolt', accent: 'amber' },
+  { id: 'inspection', label: 'Inspection', hint: 'Walkthrough report', icon: 'inspect', accent: 'blue', screen: 'InspectionArea' },
+  { id: 'utilities', label: 'Utilities', hint: 'Power & water live', icon: 'bolt', accent: 'amber', screen: 'Utilities' },
   { id: 'internet', label: 'Internet', hint: 'Fibre activated', icon: 'wifi', accent: 'violet' },
   { id: 'security', label: 'Home Security', hint: 'Alarm & access', icon: 'shield', accent: 'green' },
+];
+
+/* ---------- Move-in inspection (mock) ---------- */
+
+export const INSPECTION_AREAS: readonly InspectionArea[] = [
+  { id: 'living', label: 'Living Room', hint: 'Walls, floors & windows', image: renterAssets.areaLiving },
+  { id: 'dining', label: 'Dining', hint: 'Lighting & fixtures', image: renterAssets.areaDining },
+  { id: 'kitchen', label: 'Kitchen', hint: 'Appliances & plumbing', image: renterAssets.areaKitchen },
+  { id: 'bedrooms', label: 'Bedrooms', hint: 'Closets & fittings', image: renterAssets.areaBedroom },
+  { id: 'washrooms', label: 'Washrooms', hint: 'Water flow & drainage', image: renterAssets.areaWashroom },
+  { id: 'common', label: 'Common Areas', hint: 'Corridors & lobby', image: renterAssets.areaCommon },
+  { id: 'outside', label: 'Outside Areas', hint: 'Terrace & landscaping', image: renterAssets.areaOutside },
+];
+
+/** Issue categories for the area page dropdown (later from the backend) */
+export const ISSUE_CATEGORIES: readonly IssueCategory[] = [
+  { id: 'walls', label: 'Walls & Paint' },
+  { id: 'flooring', label: 'Flooring & Surfaces' },
+  { id: 'doors', label: 'Doors & Windows' },
+  { id: 'electrical', label: 'Electrical & Lighting' },
+  { id: 'plumbing', label: 'Plumbing & Leaks' },
+  { id: 'appliances', label: 'Appliances' },
+  { id: 'fixtures', label: 'Furniture & Fixtures' },
+  { id: 'cleanliness', label: 'Cleanliness' },
+  { id: 'pests', label: 'Pests' },
+  { id: 'other', label: 'Other' },
+];
+
+/** Most photos / videos one issue can have */
+export const MAX_ISSUE_MEDIA = 5;
+
+/* ---------- Move-in utilities (mock) ---------- */
+
+/**
+ * Utilities and their providers for the residence. Provider names, phone
+ * numbers (555) and websites (example.com) are placeholders until the
+ * backend sends the real ones for each home.
+ */
+export const UTILITIES: readonly UtilityService[] = [
+  {
+    id: 'electricity',
+    label: 'Electricity',
+    hint: 'Power for lights, heating & appliances',
+    description: 'Choose the energy partner on your lease to start service before move-in day.',
+    icon: 'bolt',
+    image: renterAssets.utilityElectricity,
+    providers: [
+      {
+        id: 'gateway-power',
+        name: 'Gateway Power & Light',
+        kind: 'Investor-owned utility',
+        description: 'Main grid supplier for the building, with smart billing and usage alerts.',
+        tags: ['Grid supplier', 'Smart billing'],
+        accent: 'blue',
+        image: renterAssets.providerGatewayPower,
+        phone: '(314) 555-0142',
+        emergency: '(314) 555-0199',
+        website: 'https://gatewaypower.example.com',
+        hours: 'Mon – Fri · 7 am – 7 pm',
+      },
+      {
+        id: 'prairie-wind',
+        name: 'Prairie Wind Energy',
+        kind: 'Renewable energy plan',
+        description: 'Optional 100% wind-powered plan, billed through your grid supplier.',
+        tags: ['100% renewable', 'Optional'],
+        accent: 'violet',
+        image: renterAssets.providerPrairieWind,
+        phone: '(636) 555-0118',
+        website: 'https://prairiewind.example.com',
+        hours: 'Mon – Sat · 8 am – 6 pm',
+      },
+      {
+        id: 'sunfield-solar',
+        name: 'Sunfield Solar Co-op',
+        kind: 'Community solar',
+        description: 'Subscribe to a share of a local solar farm and get credits on your power bill.',
+        tags: ['Community solar', 'Bill credits'],
+        accent: 'amber',
+        image: renterAssets.providerSunfieldSolar,
+        phone: '(636) 555-0153',
+        website: 'https://sunfieldsolar.example.com',
+        hours: 'Mon – Fri · 9 am – 5 pm',
+      },
+    ],
+  },
+  {
+    id: 'water',
+    label: 'Water Supply',
+    hint: 'Drinking water & household supply',
+    description: 'Water is billed by the city. Open an account in your name before you move in.',
+    icon: 'faucet',
+    image: renterAssets.utilityWater,
+    providers: [
+      {
+        id: 'city-water',
+        name: 'City Water Services',
+        kind: 'Municipal utility',
+        description: 'Supplies treated water to the building and reads your unit meter monthly.',
+        tags: ['City utility', 'Monthly billing'],
+        accent: 'blue',
+        image: renterAssets.providerCityWater,
+        phone: '(636) 555-0164',
+        emergency: '(636) 555-0170',
+        website: 'https://citywater.example.com',
+        hours: 'Mon – Fri · 8 am – 5 pm',
+      },
+      {
+        id: 'riverbend-water',
+        name: 'Riverbend Water District',
+        kind: 'Regional water district',
+        description: 'Backup supplier for the area. Runs water quality reports and boil-water notices.',
+        tags: ['Regional', 'Water quality'],
+        accent: 'violet',
+        image: renterAssets.providerRiverbendWater,
+        phone: '(636) 555-0176',
+        emergency: '(636) 555-0182',
+        website: 'https://riverbendwater.example.com',
+        hours: 'Mon – Fri · 7:30 am – 4:30 pm',
+      },
+      {
+        id: 'aquapure',
+        name: 'AquaPure Home Services',
+        kind: 'Water heater & softener service',
+        description: 'Services the water heater and softener in your unit. Book a check before move-in.',
+        tags: ['In-unit service', 'Bookings'],
+        accent: 'navy',
+        image: renterAssets.providerAquaPure,
+        phone: '(314) 555-0108',
+        website: 'https://aquapure.example.com',
+        hours: 'Mon – Sat · 8 am – 6 pm',
+      },
+    ],
+  },
+  {
+    id: 'gas',
+    label: 'Gas Connection',
+    hint: 'Cooking, heating & hot water',
+    description: 'Natural gas runs the stove and water heater. Book a meter reading for move-in day.',
+    icon: 'flame',
+    image: renterAssets.utilityGas,
+    providers: [
+      {
+        id: 'heartland-gas',
+        name: 'Heartland Natural Gas',
+        kind: 'Regulated gas utility',
+        description: 'Gas supply and meter service for the building. Smell gas? Call the 24/7 line.',
+        tags: ['Natural gas', 'Meter service'],
+        accent: 'amber',
+        image: renterAssets.providerHeartlandGas,
+        phone: '(314) 555-0127',
+        emergency: '(314) 555-0111',
+        website: 'https://heartlandgas.example.com',
+        hours: 'Mon – Fri · 7 am – 8 pm',
+      },
+      {
+        id: 'midwest-energy',
+        name: 'Midwest Energy Choice',
+        kind: 'Gas supply plan',
+        description: 'Optional fixed-rate gas plan. Delivery and meter service stay with your gas utility.',
+        tags: ['Fixed rate', 'Optional'],
+        accent: 'blue',
+        image: renterAssets.providerMidwestEnergy,
+        phone: '(314) 555-0161',
+        website: 'https://midwestenergychoice.example.com',
+        hours: 'Mon – Fri · 8 am – 6 pm',
+      },
+      {
+        id: 'gas-safety',
+        name: 'Gateway Gas Safety',
+        kind: 'Appliance & safety checks',
+        description: 'Connects your stove and checks gas appliances for leaks on move-in day.',
+        tags: ['Safety check', 'Move-in visit'],
+        accent: 'violet',
+        image: renterAssets.providerGasSafety,
+        phone: '(636) 555-0147',
+        emergency: '(636) 555-0149',
+        website: 'https://gatewaygassafety.example.com',
+        hours: 'Mon – Sat · 7 am – 7 pm',
+      },
+    ],
+  },
+  {
+    id: 'sewer',
+    label: 'Sewer',
+    hint: 'Wastewater & drainage',
+    description: 'Sewer service is linked to your water account and billed with it.',
+    icon: 'waves',
+    image: renterAssets.utilitySewer,
+    providers: [
+      {
+        id: 'lakeside-sanitary',
+        name: 'Lakeside Sanitary District',
+        kind: 'Public sewer district',
+        description: 'Wastewater collection and treatment. Report backups or blocked drains any time.',
+        tags: ['Public district', 'Billed with water'],
+        accent: 'navy',
+        image: renterAssets.providerLakesideSanitary,
+        phone: '(636) 555-0135',
+        emergency: '(636) 555-0188',
+        website: 'https://lakesidesanitary.example.com',
+        hours: 'Mon – Fri · 8 am – 4:30 pm',
+      },
+      {
+        id: 'county-wastewater',
+        name: 'County Wastewater Authority',
+        kind: 'Wastewater treatment',
+        description: 'Treats the district’s wastewater and handles main-line repairs on the street.',
+        tags: ['Treatment', 'Main lines'],
+        accent: 'blue',
+        image: renterAssets.providerCountyWastewater,
+        phone: '(636) 555-0193',
+        emergency: '(636) 555-0195',
+        website: 'https://countywastewater.example.com',
+        hours: 'Mon – Fri · 8 am – 5 pm',
+      },
+      {
+        id: 'metro-drain',
+        name: 'Metro Drain & Sewer Co.',
+        kind: 'Drain & sewer repair',
+        description: 'Clears blocked drains and sewer backups inside the building, day or night.',
+        tags: ['Drain cleaning', '24/7 callouts'],
+        accent: 'amber',
+        image: renterAssets.providerMetroDrain,
+        phone: '(314) 555-0139',
+        emergency: '(314) 555-0140',
+        website: 'https://metrodrain.example.com',
+        hours: 'Every day · 24 hours',
+      },
+    ],
+  },
 ];
 
 export const NEIGHBORHOOD_RADIUS = '5 km';
@@ -193,3 +433,105 @@ export const CURATED_LIVING = {
   body: 'offers more than just a residence. It is an intersection of architectural precision and community proximity, designed for the discerning tenant.',
   image: renterAssets.livingCurated,
 };
+
+/* ---------- Manage (my home, mock) ---------- */
+
+export const MANAGE_ACTIONS: readonly ManageAction[] = [
+  { id: 'maintenance', label: 'Maintenance', icon: 'lineWrench', accent: 'amber' },
+  { id: 'scheduling', label: 'Scheduling', icon: 'lineCalendar', accent: 'blue' },
+  { id: 'amenities', label: 'Amenities', icon: 'lineDumbbell', accent: 'green' },
+  { id: 'access', label: 'Access', icon: 'lineKey', accent: 'violet' },
+];
+
+/** Rent card on the Manage page (the amount comes from the residence) */
+export const RENT_DUE = {
+  dueDate: 'Nov 12, 2026',
+  daysLeft: 3,
+  /** Days in the billing cycle (drives the countdown ring) */
+  cycleDays: 30,
+};
+
+/** Pastel tiles under "Quick Actions" on the Manage page */
+export const MANAGE_QUICK_ACTIONS: readonly ManageQuickAction[] = [
+  { id: 'rent', title: 'Rent Due', detail: 'in 3 days', icon: 'calendar', accent: 'amber', highlight: true },
+  { id: 'maintenance', title: 'Maintenance', detail: 'Tomorrow', icon: 'wrench', accent: 'blue' },
+  { id: 'hoa', title: 'HOA Fee', detail: 'Pending', icon: 'bell', accent: 'violet' },
+  { id: 'more', title: 'More', detail: 'Actions', icon: 'grid', accent: 'green' },
+];
+
+/** "This Week" timeline on the Manage page, soonest first */
+export const QUICK_ALERTS: readonly QuickAlert[] = [
+  { id: 'pest', title: 'Pest Control', hint: 'Building-wide visit', month: 'NOV', day: '14', tag: 'Upcoming', accent: 'amber' },
+  { id: 'hoa', title: 'HOA Fee', hint: 'Pending payment', month: 'NOV', day: '15', amount: '$200.00', accent: 'blue' },
+  { id: 'check', title: 'Maintenance Check', hint: 'Annual unit check', month: 'NOV', day: '18', accent: 'green' },
+];
+
+export const COMMUNITY_BUZZ: readonly BuzzEvent[] = [
+  {
+    id: 'plant-day',
+    title: 'Plant Day',
+    host: 'By Management Team',
+    date: 'Nov 22, 2026',
+    time: '9:00 AM – 11:30 AM',
+    audience: 'Public',
+    registrationOpen: true,
+    image: renterAssets.areaOutside,
+  },
+  {
+    id: 'wine-tasting',
+    title: 'Sky Lounge Wine Tasting',
+    host: 'By Resident Club',
+    date: 'Nov 28, 2026',
+    time: '7:00 PM – 9:30 PM',
+    audience: 'Residents',
+    registrationOpen: true,
+    image: renterAssets.eventSkyLounge,
+  },
+  {
+    id: 'family-day',
+    title: 'Family Fun Day',
+    host: 'By Management Team',
+    date: 'Dec 6, 2026',
+    time: '10:00 AM – 4:00 PM',
+    audience: 'Public',
+    registrationOpen: false,
+    image: renterAssets.placeParkSwing,
+  },
+  {
+    id: 'lobby-social',
+    title: 'Lobby Coffee Morning',
+    host: 'By Concierge Desk',
+    date: 'Dec 13, 2026',
+    time: '8:30 AM – 10:00 AM',
+    audience: 'Residents',
+    registrationOpen: true,
+    image: renterAssets.areaCommon,
+  },
+];
+
+export const HELP_DESK_TICKETS: readonly HelpDeskTicket[] = [
+  {
+    id: 'URB-4921',
+    category: 'Plumbing',
+    title: 'Leak in plumbing unit in kitchen',
+    date: 'Jan 28, 2025',
+    status: 'Pending',
+    image: renterAssets.providerAquaPure,
+  },
+  {
+    id: 'URB-4917',
+    category: 'Electrical',
+    title: 'Short circuit in power unit',
+    date: 'Jan 28, 2025',
+    status: 'In Progress',
+    image: renterAssets.providerGatewayPower,
+  },
+  {
+    id: 'URB-4902',
+    category: 'Masonry',
+    title: 'Repair work in wall',
+    date: 'Jan 26, 2025',
+    status: 'Resolved',
+    image: renterAssets.providerCountyWastewater,
+  },
+];

@@ -2,8 +2,8 @@
  * SearchCard: "Find your next home" title with two buttons on the right:
  *  - Orbitl AI (glowing orb): opens a bubble explaining voice search,
  *    whose "Tap to talk" starts the full-screen listening view.
- *  - Search: opens a Rent / Buy switch, the filter fields and the search
- *    button; while open the icon switches to the filter (sliders) icon.
+ *  - Filters (sliders icon, open or closed): opens a Rent / Buy switch,
+ *    the filter fields and the search button.
  *    Rent / Buy changes the field labels and the button text.
  * Only one panel is open at a time. Overlaps the bottom of the hero.
  */
@@ -97,7 +97,7 @@ const Field: React.FC<{ label: string; value: string; icon: React.ReactNode }> =
   </Pressable>
 );
 
-/** Search icon that turns into the filter icon with a quick spin-in */
+/** Filter (sliders) icon, open or closed; spins in on each toggle */
 const SearchToggleIcon: React.FC<{ open: boolean }> = ({ open }) => {
   const swap = useRef(new Animated.Value(1)).current;
   const first = useRef(true);
@@ -121,11 +121,13 @@ const SearchToggleIcon: React.FC<{ open: boolean }> = ({ open }) => {
         ],
       }}
     >
+      {/* Filter icon open or closed (the search icon when closed is retired):
       {open ? (
         <SlidersIcon size={ms(17)} color={colors.navy} />
       ) : (
         <SearchIcon size={ms(19)} color={colors.navy} />
-      )}
+      )} */}
+      <SlidersIcon size={ms(17)} color={colors.navy} />
     </Animated.View>
   );
 };
