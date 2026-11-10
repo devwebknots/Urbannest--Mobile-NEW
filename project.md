@@ -302,7 +302,7 @@ Only changed an existing screen (Home, Calendar or their parts)? Skip step 2.
 3. Renter Home → **Manage** on an active residence → tap **Scheduling** on the frosted residence card → Neyora Home slides in → open Neyora's calendar → back twice returns to the Manage page. Works with the Neyora app uninstalled and without `C:\neyora` on the computer.
 
 ### For the real product (not done yet)
-Publish the same package to a private npm registry / GitHub Packages (buyers run `npm install @neyora/maintenance-sdk`); give each buyer an API key and make the backend multi-tenant (each company sees only its own data); add a `theme` prop for buyer brand colours; buyers on Flutter or native apps need a native wrapper.
+Publish the same package to a private npm registry / GitHub Packages (buyers run `npm install @neyora/maintenance-sdk`); give each buyer an API key and make the backend multi-tenant (each company sees only its own data); add a `theme` prop for buyer brand colours. **Native Android buyers**: an Android SDK (`.aar`, `Neyora.open(context)`) is built from the same screens in `C:\neyora` (`node sdk/build-android.js`; see Neyora's `project.md` → Section 4b "Android SDK"). Still to do: iOS (needs a Mac), Flutter plugin, web build.
 
 ---
 
