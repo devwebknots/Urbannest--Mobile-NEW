@@ -138,19 +138,32 @@ export function useMaintenanceRequest(
       await voice.stop();
     }
     const category = MAINTENANCE_CATEGORIES.find(c => c.id === categoryId)?.label ?? '';
-    const extras = [
-      media.length > 0 ? `${media.length} photo${media.length > 1 ? 's / videos' : ' / video'}` : '',
-      voice.note || voice.status === 'recording' ? 'a voice note' : '',
+    // "2 photos, 1 video, voice note"
+    const photos = media.filter(m => m.type === 'photo').length;
+    const videos = media.length - photos;
+    const attachments = [
+      photos ? `${photos} photo${photos > 1 ? 's' : ''}` : '',
+      videos ? `${videos} video${videos > 1 ? 's' : ''}` : '',
+      voice.note || voice.status === 'recording' ? 'voice note' : '',
     ].filter(Boolean);
+    // Mock reference until the request API returns a real ticket ID
+    const reference = `RE-${String(Date.now()).slice(-4)}`;
+
     showDialog({
-      tone: 'info',
-      title: 'Request submitted',
-      message: `${problem.trim()} (${category}) in ${locationLabel}${
-        extras.length ? `, with ${extras.join(' and ')}` : ''
-      }. Our team will get back to you shortly.`,
+      tone: 'success',
+      title: 'Request Submitted',
+      reference: `Request #${reference}`,
+      message: 'Our maintenance team has received your request and will be in touch shortly.',
+      details: [
+        { label: 'Category', value: category },
+        { label: 'Problem', value: problem.trim() },
+        { label: 'Location', value: locationLabel ?? '' },
+        ...(attachments.length ? [{ label: 'Attached', value: attachments.join(', ') }] : []),
+      ],
+      dismissible: false,
       actions: [{ label: 'Done', variant: 'brand', onPress: leave }],
     });
-  }, [canSubmit, voice, categoryId, media.length, problem, locationLabel, leave, showDialog]);
+  }, [canSubmit, voice, categoryId, media, problem, locationLabel, leave, showDialog]);
 
   return {
     profile: RENTER_PROFILE,

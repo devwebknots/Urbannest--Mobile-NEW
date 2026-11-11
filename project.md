@@ -588,11 +588,25 @@ Shared look: radius `borderRadius.button` (10), text `typographyPresets.button` 
 
 | Option | Values |
 | :--- | :--- |
-| `tone` | `warning` (amber circle + triangle icon, for destructive / data-loss) · `info` (no icon unless `icon` is given; `chipBlue` circle when it is) |
+| `tone` | `warning` (amber circle + triangle icon, for destructive / data-loss) · `info` (no icon unless `icon` is given; `chipBlue` circle when it is) · `success` (animated `SuccessBadge`, soft `chipBlue` wash at the top of the card, navy title; for "it worked" confirmations such as a submitted request) |
 | `icon` | custom icon node, e.g. `VideoCameraIcon` / `UploadIcon` (navy, `ms(22)`) |
+| `reference` | small `chipBlue` pill under the title (`badge` text), e.g. "Request #RE-5201" |
+| `details` | `{ label, value }[]` summary rows in a `pageTint` box (radius 12, hairline dividers): `cardSubtitle` label left, navy `bodyBold` value right (max 2 lines) |
+| `dismissible` | default `true`; `false` = backdrop tap / Android back do nothing, so the user presses the action (use for success) |
 | action `variant` | `brand` (main, default) · `soft` (other choice) · `danger` (soft red fill, red text: "Remove", "Discard") · `link` (quiet grey text: "Cancel", "Keep Editing") |
 
-Every action closes the dialog first; its `onPress` runs after the close animation (safe for opening the camera / photo picker). Backdrop tap and Android back close it like "Cancel".
+Every action closes the dialog first; its `onPress` runs after the close animation (safe for opening the camera / photo picker). Backdrop tap and Android back close it like "Cancel" (unless `dismissible: false`).
+
+**Motion (every dialog)**: the navy backdrop fades in while the card springs up (translateY 24 → 0, scale 0.92 → 1, damping 18 / stiffness 210); closing plays back in 180 ms, then the modal unmounts. Card has a soft `0 24 48` navy shadow. Native driver; no motion in tests.
+
+**`SuccessBadge`** (`src/components/SuccessBadge.tsx`, used by `tone: 'success'`): 64 navy gradient circle (`gradients.button`) with a 3 white rim, blue glow and white `CheckmarkIcon`. The circle springs in, the tick pops in (scale + small rotate), then two secondary-blue rings ripple outward and keep a calm pulse. Reduce Motion / tests: shown finished, no motion. Brand navy + secondary blue, not green (done colour rule).
+
+```tsx
+dialog.show({ tone: 'success', title: 'Request Submitted', reference: 'Request #RE-5201',
+  message: 'Our maintenance team has received your request…',
+  details: [{ label: 'Category', value: 'Plumbing' }, { label: 'Location', value: 'Kitchen, Suite 402' }],
+  dismissible: false, actions: [{ label: 'Done', variant: 'brand', onPress: leave }] });
+```
 
 ```tsx
 const dialog = useAppDialog();
@@ -746,7 +760,7 @@ We're Here.", `cardSubtitle` line; photo `request_hero.jpg` (cropped from the de
   - `VoiceNoteCard`: pale blue card, navy gradient mic button (renter line `mic`, white) with glow, divider, `cardTitle` "Describe by Voice" + hint, blue sound wave. **Records a voice note** (`hooks/useVoiceNote`, `react-native-nitro-sound` + `react-native-nitro-modules`): tap → microphone permission (Android runtime prompt, `RECORD_AUDIO` in the manifest; iOS asks on first record, `NSMicrophoneUsageDescription`; refused → "Microphone is off" dialog with Open Settings) → recording: white stop square in the button with a secondary-blue halo, red `error` dot + "Recording", "0:12 / 2:00 • Tap to stop", the wave moves; stops by itself at 2 min (`VOICE_NOTE_MAX_MS`). Recorded: play / pause button (drawn triangle / bars), "Voice note" + time ("0:04 / 0:12" while playing), the wave fills `primary` as it plays (rest `textSubtle`), small round delete button (asks first). Spinner in the button while the recorder starts / saves. Everything stops when the screen closes. Submitting while recording keeps what was said; the confirmation mentions the voice note and photos / videos. Native rebuild needed after install (Android; iOS `pod install`, Xcode 26+).
   - Detailed Description (note icon): multi-line field, `MAINTENANCE_DESCRIPTION_MAX` 500 with a "0 / 500" counter.
   - Add Evidence (image icon, optional): `EvidencePicker` two dashed tiles ("Upload Photos" / "Upload Video") → shared `useMediaPicker` (camera or library, max `MAX_ISSUE_MEDIA`), thumbnails with remove (`IssueMediaThumb`). Tapping a thumbnail opens `inspection/MediaPreview` (full-screen modal: photo fitted, or the video playing with the player's controls via `react-native-video`; solid close button).
-  - `Button` `brand` "Submit Request →" (enabled once category, problem and location are set) → "Request submitted" dialog → back. Shield-check icon + `cardSubtitle` entry-consent note.
+  - `Button` `brand` "Submit Request →" (enabled once category, problem and location are set) → `AppDialog` `tone: 'success'` "Request Submitted" (animated badge, "Request #RE-xxxx" chip (mock until the API returns an ID), summary rows Category / Problem / Location / Attached ("2 photos, 1 video, voice note"), `dismissible: false`) → "Done" goes back. Shield-check icon + `cardSubtitle` entry-consent note.
 - **Icon standard**: everything on this page uses the app's rounded **line** icons at the renter-set weight (stroke 2.2 on the 24 grid): existing `renterIcons` (faucet, bolt, wrench) plus new `airVent`, `ellipsis`, `mic`, `tools` (`draw_line_icons.ps1 -OutDir src/assets/icons/renter -Stroke 2.2 -Only air_vent,ellipsis,mic,tools`) and the label icons `lineLayers`, `lineAlert`, `linePin`, `lineNote`, `lineImagePlus`, `lineVideoPlus`, `lineBuilding`, `lineShieldCheck` (redrawn at -Stroke 2.2). No solid icons here (the solid set in `icons/maintenance` is only for the Maintenance page ticket tiles).
 - **Shared pieces added** (reuse for other forms / pickers): `src/components/IconTile` (now also used by the guest `CategoryRow`), `components/form/FormLabel` (navy line icon + `formHeading` sub-heading: Playfair Medium 15), `components/form/FormSelect`, `components/form/formStyles` (`field`, `input`, `placeholder`, `textArea`, `counter`), `hooks/useMediaPicker` (also used by `useInspectionArea`), `CategorySheet` `title` prop, `AccentSectionHeader` `page` + `subtitle`.
 - **Logic**: `useMaintenanceRequest(residenceId, navigation)`: category, problem, location (+ sheet open state), description, media, `canSubmit`, `submit`, `recordVoice`, `back` ("Discard this request?" when there is input). Data `MAINTENANCE_CATEGORIES`, `MAINTENANCE_DESCRIPTION_MAX`, `MAINTENANCE_REQUEST_HERO`.
