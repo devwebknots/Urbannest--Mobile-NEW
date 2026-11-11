@@ -752,6 +752,16 @@ We're Here.", `cardSubtitle` line; photo `request_hero.jpg` (cropped from the de
 - **Logic**: `useMaintenanceRequest(residenceId, navigation)`: category, problem, location (+ sheet open state), description, media, `canSubmit`, `submit`, `recordVoice`, `back` ("Discard this request?" when there is input). Data `MAINTENANCE_CATEGORIES`, `MAINTENANCE_DESCRIPTION_MAX`, `MAINTENANCE_REQUEST_HERO`.
 - **Not in the design build**: bottom tab bar (pushed page), notification bell (hidden app-wide), "Urban Nest" top-bar title, the big white form container (removed on request: fields sit on the page).
 
+### 0j. Ticket Details (`src/features/renter/screens/TicketDetailsScreen.tsx`)
+- **Opened by**: tapping an Active Ticket (card or chevron) on the Maintenance page (route `TicketDetails { residenceId, ticketId }`). Follows the "Urban Nest Faucet Repair Timeline" design, built only from app standards. Light page (`pageTint` + blue / lavender glow), no tab bar (pushed page).
+- **Layout** (components in `components/maintenance/details/`):
+  - **`components/NavyPageHeader`** (new, shared): navy band (`gradients.button`, 120°), app back button (navy glass circle + white `ChevronLeftIcon`, same as the Manage / Check-In headers), white `heroTitleCompact` "Ticket Details" + `heroSubtitle` "Maintenance Request", white building line art on the right (`renterAssets.headerBuildings`, lifted from the design as a transparent PNG, 55% opacity). Page content is passed as children and sits on a `pageTint` sheet with 28 (`borderRadius.header`) top corners overlapping the band. Light status bar. No avatar (as in the design).
+  - `TicketSummaryCard`: white card with a soft `chipBlue` wash (`CARD_RADIUS`), status pill (`badge`, `ACCENTS[statusAccent]`, amber "In Progress"), `sectionHeading` navy title, the ticket's 56 `ACCENTS` icon tile top right (same as its `TicketCard`), `cardSubtitle` "Ticket #ID • unit" (unit from the residence), `body` description, calendar + "Reported …". "Assigned to" strip on `pageTint`: technician photo circle (white rim, `assignee.photo`; `technician_marcus.jpg` cropped from the design; initials when there is no photo), `label` + navy `cardTitle` name, navy gradient (`gradients.button`) message button → "coming soon".
+  - "Activity Timeline" (`TicketTimeline`) laid on the page: markers on a vertical rail. Done = `DONE_BLUE` circle + white tick (app done colour, not navy), current = navy gradient circle with the line `tools` icon and a secondary-blue halo, pending = grey circle + dot. The rail below a done step is `DONE_BLUE`, otherwise `border`. Step: navy `cardTitle` (pending grey), `caption` time, `cardSubtitle` detail; optional work photo (`ticket_faucet_repair.jpg` cropped from the design, wide strip 0.36, navy bottom scrim, white `bodyMedium` caption, four-corner expand hint) → `PhotoViewer` (full-screen modal, `useStatusBarInsets`, solid close `CircleIconButton`).
+  - "Notification & Chats" (`AccentSectionHeader` + outline chevron → "coming soon") and `TicketMessages`: white card, underline tabs Notification / Chat History (`segmentLabel`, active `primary` text + 2 pt bar). Notification rows on `pageTint`: `infoLight` bell circle, `bodyBold` title, `caption` time, "Maintenance Id: #ID" (ID in `primary`) + message. Chat rows: initials circle, name, time, last message (2 lines). Empty text when a tab has nothing.
+- **Logic**: `useTicketDetails(residenceId, ticketId, navigation)`: ticket (from `MAINTENANCE_TICKETS`), details (`MAINTENANCE_TICKET_DETAILS[ticketId]`: status, description, reported, assignee, timeline, notifications, chats; mock for RE-5104 and RE-4092), tab, photo viewer, `messageAssignee` / `openMessages` ("coming soon"), `back`. Types `MaintenanceTicketDetails`, `TicketTimelineStep`, `TicketStepState`, `TicketNotification`, `TicketChat`.
+- **Not in the design build**: bottom tab bar (pushed page).
+
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.
 - **Components**:
@@ -858,6 +868,7 @@ We're Here.", `cardSubtitle` line; photo `request_hero.jpg` (cropped from the de
 - **ManageResidence ➔ Neyora** (installed SDK: Neyora Home ➔ Neyora Calendar): **Scheduling** shortcut on the frosted residence card. Back returns to ManageResidence.
 - **ManageResidence ➔ Maintenance**: **Maintenance** shortcut on the residence card. Back returns to ManageResidence.
 - **Maintenance ➔ MaintenanceRequest**: **+ Request** on the "Need a Fix?" banner. Back (asks first if the form has input) or "Done" after submitting returns to Maintenance.
+- **Maintenance ➔ TicketDetails**: tap an Active Ticket card. Back returns to Maintenance.
 - **PersonaSelect ➔ Home**: "Continue as PMS".
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.

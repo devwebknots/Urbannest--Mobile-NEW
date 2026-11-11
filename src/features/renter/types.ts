@@ -295,6 +295,59 @@ export interface ResolvedTicket {
   readonly completed: string;
 }
 
+/** Where a ticket step stands on the Ticket Details timeline */
+export type TicketStepState = 'done' | 'current' | 'pending';
+
+/** One step on the Ticket Details "Activity Timeline" */
+export interface TicketTimelineStep {
+  readonly id: string;
+  readonly title: string;
+  readonly detail: string;
+  /** e.g. "Oct 24, 16:15" or "Pending" */
+  readonly time: string;
+  readonly state: TicketStepState;
+  /** Optional work photo under the step */
+  readonly photo?: { readonly image: ImageSourcePropType; readonly caption: string };
+}
+
+/** System notification about a ticket ("Notification" tab) */
+export interface TicketNotification {
+  readonly id: string;
+  readonly title: string;
+  readonly time: string;
+  readonly message: string;
+}
+
+/** Chat thread about a ticket ("Chat History" tab) */
+export interface TicketChat {
+  readonly id: string;
+  readonly name: string;
+  readonly initials: string;
+  /** Profile photo; the initials show when there is none */
+  readonly photo?: ImageSourcePropType;
+  readonly message: string;
+  readonly time: string;
+}
+
+/** Everything the Ticket Details page shows beyond the list card */
+export interface MaintenanceTicketDetails {
+  /** Status pill, e.g. "In Progress" */
+  readonly status: string;
+  readonly statusAccent: ConciergeAccent;
+  readonly description: string;
+  /** e.g. "Reported yesterday at 4:15 PM" */
+  readonly reported: string;
+  /** Technician; the initials show when there is no photo */
+  readonly assignee: {
+    readonly name: string;
+    readonly initials: string;
+    readonly photo?: ImageSourcePropType;
+  };
+  readonly timeline: readonly TicketTimelineStep[];
+  readonly notifications: readonly TicketNotification[];
+  readonly chats: readonly TicketChat[];
+}
+
 /** News & Alerts photo card */
 export interface MaintenanceNews {
   readonly id: string;

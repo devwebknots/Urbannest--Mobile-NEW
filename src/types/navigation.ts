@@ -27,6 +27,8 @@ export type RootStackParamList = {
   Maintenance: { residenceId: string };
   /** New maintenance request form, opened by "+ Request" on Maintenance */
   MaintenanceRequest: { residenceId: string };
+  /** One ticket's status, timeline and messages, opened from Active Tickets */
+  TicketDetails: { residenceId: string; ticketId: string };
   /**
    * inspectionSubmitted is set by the inspection room page on "Finalize Inspection";
    * utilitiesConfirmed by the Utilities page on "Confirm Utilities"

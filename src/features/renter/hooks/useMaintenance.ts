@@ -21,7 +21,10 @@ import type { MaintenanceBanner, MaintenanceNews, MaintenanceTicket } from '../t
 
 export interface MaintenanceNavigation {
   goBack: () => void;
-  navigate?: (route: 'MaintenanceRequest', params: { residenceId: string }) => void;
+  navigate?: {
+    (route: 'MaintenanceRequest', params: { residenceId: string }): void;
+    (route: 'TicketDetails', params: { residenceId: string; ticketId: string }): void;
+  };
 }
 
 /** News cards shown per page */
@@ -50,9 +53,17 @@ export function useMaintenance(residenceId?: string, navigation?: MaintenanceNav
     }
   }, [navigation]);
 
+  // Active ticket: open its details (status, timeline, messages)
   const openTicket = useCallback(
-    (ticket: MaintenanceTicket) => soon(ticket.title, `Tracking for ticket #${ticket.id} is coming soon.`),
-    [soon],
+    (ticket: MaintenanceTicket) => {
+      const params = { residenceId: residence.id, ticketId: ticket.id };
+      if (navigation?.navigate) {
+        navigation.navigate('TicketDetails', params);
+      } else {
+        navigate('TicketDetails', params);
+      }
+    },
+    [navigation, residence.id],
   );
   const openNews = useCallback((item: MaintenanceNews) => soon(item.title), [soon]);
 

@@ -19,6 +19,7 @@ import type {
   MaintenanceCategory,
   MaintenanceNews,
   MaintenanceTicket,
+  MaintenanceTicketDetails,
   ManageQuickAction,
   NeighborhoodCategory,
   ResolvedTicket,
@@ -591,6 +592,137 @@ export const MAINTENANCE_TICKETS: readonly MaintenanceTicket[] = [
     meta: [{ icon: 'clock', label: 'Pending Parts' }],
   },
 ];
+
+/** Ticket Details page data, keyed by ticket ID (mock) */
+export const MAINTENANCE_TICKET_DETAILS: Readonly<Record<string, MaintenanceTicketDetails>> = {
+  'RE-5104': {
+    status: 'In Progress',
+    statusAccent: 'amber',
+    description:
+      'Water is pooling under the sink whenever the tap is running. Possible loose connection or gasket failure.',
+    reported: 'Reported yesterday at 4:15 PM',
+    assignee: {
+      name: 'Marcus Richardson',
+      initials: 'MR',
+      photo: renterAssets.technicianMarcus,
+    },
+    timeline: [
+      {
+        id: 'received',
+        title: 'Request Received',
+        detail: 'Maintenance request successfully logged and queued.',
+        time: 'Oct 24, 16:15',
+        state: 'done',
+      },
+      {
+        id: 'assigned',
+        title: 'Technician Assigned',
+        detail: 'Marcus Richardson has been assigned to your unit.',
+        time: 'Oct 24, 17:30',
+        state: 'done',
+      },
+      {
+        id: 'repair',
+        title: 'Repair in Progress',
+        detail: 'Marcus is replacing a worn O-ring in the swivel spout.',
+        time: 'Today, 09:12',
+        state: 'current',
+        photo: {
+          image: renterAssets.ticketFaucetRepair,
+          caption: 'Internal component inspection',
+        },
+      },
+      {
+        id: 'completion',
+        title: 'Completion',
+        detail: 'Awaiting final sign-off.',
+        time: 'Pending',
+        state: 'pending',
+      },
+    ],
+    notifications: [
+      {
+        id: 'n1',
+        title: 'System Generated',
+        time: 'Oct 24, 2023 • 11:05 AM',
+        message: 'Maintenance work completed\nReady for Verification',
+      },
+    ],
+    chats: [
+      {
+        id: 'c1',
+        name: 'Marcus Richardson',
+        initials: 'MR',
+        photo: renterAssets.technicianMarcus,
+        message: "I'll be there around 9 AM to replace the O-ring.",
+        time: '08:40 AM',
+      },
+      {
+        id: 'c2',
+        name: 'Front Desk',
+        initials: 'FD',
+        message: 'Your request has been passed to our plumbing team.',
+        time: 'Oct 24',
+      },
+    ],
+  },
+  'RE-4092': {
+    status: 'Scheduled',
+    statusAccent: 'blue',
+    description:
+      'Seasonal replacement of the HVAC air filter and a quick check of the vents and thermostat.',
+    reported: 'Reported Oct 20 at 10:05 AM',
+    assignee: {
+      name: 'James Turner',
+      initials: 'JT',
+      photo: renterAssets.technicianJames,
+    },
+    // Same steps as the design; only the technician's name differs
+    timeline: [
+      {
+        id: 'received',
+        title: 'Request Received',
+        detail: 'Maintenance request successfully logged and queued.',
+        time: 'Oct 24, 16:15',
+        state: 'done',
+      },
+      {
+        id: 'assigned',
+        title: 'Technician Assigned',
+        detail: 'James Turner has been assigned to your unit.',
+        time: 'Oct 24, 17:30',
+        state: 'done',
+      },
+      {
+        id: 'repair',
+        title: 'Repair in Progress',
+        detail: 'James is replacing a worn O-ring in the swivel spout.',
+        time: 'Today, 09:12',
+        state: 'current',
+        photo: {
+          image: renterAssets.ticketFaucetRepair,
+          caption: 'Internal component inspection',
+        },
+      },
+      {
+        id: 'completion',
+        title: 'Completion',
+        detail: 'Awaiting final sign-off.',
+        time: 'Pending',
+        state: 'pending',
+      },
+    ],
+    notifications: [
+      {
+        id: 'n1',
+        title: 'System Generated',
+        time: 'Oct 24, 2023 • 11:05 AM',
+        message: 'Maintenance work completed\nReady for Verification',
+      },
+    ],
+    chats: [],
+  },
+};
 
 export const RESOLVED_TICKETS: readonly ResolvedTicket[] = [
   { id: 'RE-3981', title: 'Water leakage in hall', completed: 'Completed 2 days ago' },

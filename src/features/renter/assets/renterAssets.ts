@@ -76,7 +76,20 @@ export const renterAssets = {
   // "Need a Fix?" card photo, cropped from the Maintenance Request design
   // (800 x 680, building with balconies under a light sky + soft arc)
   requestHero: require('@/assets/images/renter/request_hero.jpg'),
+  // Technician profile photo, cropped from the Ticket Details design (256 x 256)
+  technicianMarcus: require('@/assets/images/renter/technician_marcus.jpg'),
+  // Placeholder portrait (randomuser.me, 128 x 128) until real staff photos exist
+  technicianJames: require('@/assets/images/renter/technician_james.jpg'),
+  // Faucet work photo on the Ticket Details timeline, cropped from the
+  // design (1000 x 303; baked caption removed, bottom faded dark)
+  ticketFaucetRepair: require('@/assets/images/renter/ticket_faucet_repair.jpg'),
+  // White building line art (transparent PNG, 460 x 176) for the navy page
+  // header, lifted from the Ticket Details design
+  headerBuildings: require('@/assets/images/renter/header_buildings.png'),
 };
+
+/** Width / height of header_buildings.png */
+export const HEADER_BUILDINGS_ASPECT = 460 / 176;
 
 /** Line icons drawn for the dashboard (white PNGs, tinted in the app). */
 export const renterIcons = {
