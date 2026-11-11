@@ -2,8 +2,11 @@
  * Renter home data (mock until the leases API is wired).
  */
 
+import type { ImageSourcePropType } from 'react-native';
 import { renterAssets } from './assets/renterAssets';
 import type {
+  TicketChat,
+  TicketNotification,
   BuzzEvent,
   CheckInSummary,
   CheckInTask,
@@ -593,6 +596,63 @@ export const MAINTENANCE_TICKETS: readonly MaintenanceTicket[] = [
   },
 ];
 
+/**
+ * Older notification / chat history for a ticket (mock), shown after the
+ * design's own items so the "View all" page has a long list to scroll.
+ */
+const OLDER_TICKET_NOTIFICATIONS: readonly (readonly [string, string])[] = [
+  ['Oct 24, 2023 • 09:40 AM', 'Technician checked in at your unit'],
+  ['Oct 24, 2023 • 08:15 AM', 'Technician is on the way'],
+  ['Oct 23, 2023 • 06:30 PM', 'Replacement parts delivered'],
+  ['Oct 23, 2023 • 02:10 PM', 'Replacement parts ordered'],
+  ['Oct 23, 2023 • 11:00 AM', 'Visit confirmed for Oct 24, 9:00 AM'],
+  ['Oct 22, 2023 • 07:45 PM', 'Inspection notes added to your request'],
+  ['Oct 22, 2023 • 05:30 PM', 'Technician assigned to your request'],
+  ['Oct 22, 2023 • 04:20 PM', 'Priority set to Medium'],
+  ['Oct 22, 2023 • 04:16 PM', 'Photos received with your request'],
+  ['Oct 22, 2023 • 04:15 PM', 'Maintenance request received'],
+];
+
+function olderTicketNotifications(): TicketNotification[] {
+  return OLDER_TICKET_NOTIFICATIONS.map(([time, message], i) => ({
+    id: `older-${i}`,
+    title: 'System Generated',
+    time,
+    message,
+  }));
+}
+
+function olderTicketChats(tech: {
+  name: string;
+  initials: string;
+  photo?: ImageSourcePropType;
+}): TicketChat[] {
+  const you = { name: 'You', initials: RENTER_PROFILE.initials, fromMe: true };
+  const desk = { name: 'Front Desk', initials: 'FD' };
+  type Who = { name: string; initials: string; photo?: ImageSourcePropType; fromMe?: boolean };
+  // Newest first: [sender, message, day, time]
+  const rows: readonly (readonly [Who, string, string, string])[] = [
+    [tech, 'Parts are in. See you tomorrow morning.', 'Oct 23', '06:45 PM'],
+    [you, 'Great, thanks for the update!', 'Oct 23', '02:30 PM'],
+    [tech, 'I have ordered the replacement O-ring.', 'Oct 23', '02:12 PM'],
+    [tech, 'Please keep the area under the sink clear.', 'Oct 22', '06:05 PM'],
+    [you, 'Is there anything I should do before you come?', 'Oct 22', '06:01 PM'],
+    [desk, 'A technician will be assigned shortly.', 'Oct 22', '04:40 PM'],
+    [you, 'Thank you. The leak is getting worse.', 'Oct 22', '04:32 PM'],
+    [desk, 'We have received your request.', 'Oct 22', '04:20 PM'],
+  ];
+  return rows.map(([who, message, day, time], i) => ({
+    id: `older-chat-${i}`,
+    name: who.name,
+    initials: who.initials,
+    photo: who.photo,
+    fromMe: who.fromMe,
+    message,
+    day,
+    time,
+  }));
+}
+
 /** Ticket Details page data, keyed by ticket ID (mock) */
 export const MAINTENANCE_TICKET_DETAILS: Readonly<Record<string, MaintenanceTicketDetails>> = {
   'RE-5104': {
@@ -647,6 +707,7 @@ export const MAINTENANCE_TICKET_DETAILS: Readonly<Record<string, MaintenanceTick
         time: 'Oct 24, 2023 • 11:05 AM',
         message: 'Maintenance work completed\nReady for Verification',
       },
+      ...olderTicketNotifications(),
     ],
     chats: [
       {
@@ -655,6 +716,7 @@ export const MAINTENANCE_TICKET_DETAILS: Readonly<Record<string, MaintenanceTick
         initials: 'MR',
         photo: renterAssets.technicianMarcus,
         message: "I'll be there around 9 AM to replace the O-ring.",
+        day: 'Today',
         time: '08:40 AM',
       },
       {
@@ -662,8 +724,14 @@ export const MAINTENANCE_TICKET_DETAILS: Readonly<Record<string, MaintenanceTick
         name: 'Front Desk',
         initials: 'FD',
         message: 'Your request has been passed to our plumbing team.',
-        time: 'Oct 24',
+        day: 'Oct 24',
+        time: '05:30 PM',
       },
+      ...olderTicketChats({
+        name: 'Marcus Richardson',
+        initials: 'MR',
+        photo: renterAssets.technicianMarcus,
+      }),
     ],
   },
   'RE-4092': {
@@ -719,8 +787,13 @@ export const MAINTENANCE_TICKET_DETAILS: Readonly<Record<string, MaintenanceTick
         time: 'Oct 24, 2023 • 11:05 AM',
         message: 'Maintenance work completed\nReady for Verification',
       },
+      ...olderTicketNotifications(),
     ],
-    chats: [],
+    chats: olderTicketChats({
+      name: 'James Turner',
+      initials: 'JT',
+      photo: renterAssets.technicianJames,
+    }),
   },
 };
 

@@ -29,6 +29,8 @@ export type RootStackParamList = {
   MaintenanceRequest: { residenceId: string };
   /** One ticket's status, timeline and messages, opened from Active Tickets */
   TicketDetails: { residenceId: string; ticketId: string };
+  /** Full notification / chat history of a ticket ("View all" on Ticket Details) */
+  TicketMessages: { residenceId: string; ticketId: string; tab?: 'notifications' | 'chats' };
   /**
    * inspectionSubmitted is set by the inspection room page on "Finalize Inspection";
    * utilitiesConfirmed by the Utilities page on "Confirm Utilities"

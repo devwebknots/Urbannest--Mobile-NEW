@@ -16,11 +16,8 @@ import { ScrollView, StatusBar, StyleSheet, View, useWindowDimensions } from 're
 import { NavyPageHeader } from '../components/NavyPageHeader';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppDialog } from '@/components/AppDialog';
-import { ChevronRightIcon } from '@/components/icons';
 import { colors, spacing } from '@/config/theme';
-import { moderateScale as ms } from '@/utils/responsive';
-import { AccentSectionHeader } from '../components/AccentSectionHeader';
-import { CircleIconButton } from '../components/CircleIconButton';
+import { CollapsibleSection } from '../components/CollapsibleSection';
 import { Reveal } from '../components/Reveal';
 import { PhotoViewer } from '../components/maintenance/details/PhotoViewer';
 import { TicketMessages } from '../components/maintenance/details/TicketMessages';
@@ -66,38 +63,40 @@ export const TicketDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
           </Reveal>
 
           <Reveal delay={120}>
+            {/* Open at first */}
             <View style={styles.section}>
-              <AccentSectionHeader title="Activity Timeline" />
-              <View style={styles.content}>
+              <CollapsibleSection
+                title="Activity Timeline"
+                open={vm.timelineOpen}
+                onToggle={vm.toggleTimeline}
+              >
                 <TicketTimeline
                   steps={vm.details.timeline}
                   width={width}
                   onPhotoPress={vm.openPhoto}
                 />
-              </View>
+              </CollapsibleSection>
             </View>
           </Reveal>
 
+          {/* Closed at first */}
           <View style={styles.section}>
-            <AccentSectionHeader
+            <CollapsibleSection
               title="Notification & Chats"
-              right={
-                <CircleIconButton
-                  onPress={vm.openMessages}
-                  accessibilityLabel="Open all notifications and chats"
-                  icon={<ChevronRightIcon size={ms(12)} color={colors.navy} />}
-                />
-              }
-            />
-            <View style={styles.content}>
+              open={vm.messagesOpen}
+              onToggle={vm.toggleMessages}
+            >
               <TicketMessages
                 ticketId={vm.ticket.id}
                 tab={vm.tab}
                 onTabChange={vm.setTab}
                 notifications={vm.details.notifications}
                 chats={vm.details.chats}
+                previewCount={vm.messagesPreview}
+                onViewAll={vm.viewAllMessages}
+                onOpenChat={vm.openChat}
               />
-            </View>
+            </CollapsibleSection>
           </View>
         </NavyPageHeader>
       </ScrollView>
@@ -118,9 +117,6 @@ const styles = StyleSheet.create({
   },
   section: {
     marginTop: spacing.sectionGap,
-  },
-  content: {
-    marginTop: spacing.lg,
   },
 });
 

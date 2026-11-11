@@ -4,6 +4,7 @@ export { default as ManageResidenceScreen } from './screens/ManageResidenceScree
 export { default as MaintenanceScreen } from './screens/MaintenanceScreen';
 export { default as MaintenanceRequestScreen } from './screens/MaintenanceRequestScreen';
 export { default as TicketDetailsScreen } from './screens/TicketDetailsScreen';
+export { default as TicketMessagesScreen } from './screens/TicketMessagesScreen';
 export { default as CheckInScreen } from './screens/CheckInScreen';
 export { default as InspectionScreen } from './screens/InspectionScreen';
 export { default as InspectionAreaScreen } from './screens/InspectionAreaScreen';

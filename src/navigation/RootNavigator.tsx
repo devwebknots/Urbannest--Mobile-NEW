@@ -17,6 +17,7 @@ import {
   ManageResidenceScreen,
   RenterHomeScreen,
   TicketDetailsScreen,
+  TicketMessagesScreen,
   UtilitiesScreen,
   UtilityProvidersScreen,
 } from '@/features/renter';
@@ -85,6 +86,11 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="TicketDetails"
         component={TicketDetailsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="TicketMessages"
+        component={TicketMessagesScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen

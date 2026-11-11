@@ -1,27 +1,35 @@
 /**
  * useTicketDetails: ViewModel for the Ticket Details page (opened by
  * tapping an Active Ticket on the Maintenance page). Exposes the ticket,
- * its (mock) status, timeline, notifications and chats, the selected tab
- * and the full-screen photo viewer. Actions without a page yet show a
- * "coming soon" dialog.
+ * its (mock) status, timeline, notifications and chats, the selected tab,
+ * which sections are open (timeline open, notifications closed at first)
+ * and the full-screen photo viewer. Only the latest few notifications /
+ * chats show here; "View all" opens the full Notification & Chats page.
+ * Actions without a page yet show a "coming soon" dialog.
  */
 
 import { useCallback, useMemo, useState } from 'react';
-import type { ImageSourcePropType } from 'react-native';
+import { LayoutAnimation, type ImageSourcePropType } from 'react-native';
 import { useAppDialog } from '@/components/AppDialog';
-import { goBack } from '@/navigation/navigationRef';
+import { goBack, navigate } from '@/navigation/navigationRef';
 import {
   MAINTENANCE_TICKET_DETAILS,
   MAINTENANCE_TICKETS,
   RENTER_PROFILE,
   RESIDENCES,
 } from '../constants';
+import type { TicketMessagesTab } from '../types';
 
 export interface TicketDetailsNavigation {
   goBack: () => void;
+  navigate?: (
+    route: 'TicketMessages',
+    params: { residenceId: string; ticketId: string; tab: TicketMessagesTab },
+  ) => void;
 }
 
-export type TicketMessagesTab = 'notifications' | 'chats';
+/** Rows of each tab shown on this page; "View all" opens the rest */
+const MESSAGES_PREVIEW = 3;
 
 export function useTicketDetails(
   residenceId?: string,
@@ -56,11 +64,36 @@ export function useTicketDetails(
 
   const [tab, setTab] = useState<TicketMessagesTab>('notifications');
 
+  // Collapsible sections: timeline open, notifications closed at first
+  const [timelineOpen, setTimelineOpen] = useState(true);
+  const [messagesOpen, setMessagesOpen] = useState(false);
+  const toggleTimeline = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setTimelineOpen(o => !o);
+  }, []);
+  const toggleMessages = useCallback(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setMessagesOpen(o => !o);
+  }, []);
+
+  // "View all": the full, scrollable Notification & Chats page on that tab
+  const viewAllMessages = useCallback(
+    (openTab: TicketMessagesTab) => {
+      const params = { residenceId: residence.id, ticketId: ticket.id, tab: openTab };
+      if (navigation?.navigate) {
+        navigation.navigate('TicketMessages', params);
+      } else {
+        navigate('TicketMessages', params);
+      }
+    },
+    [navigation, residence.id, ticket.id],
+  );
+  // A chat row or the technician's message button: open the conversation
+  const openChat = useCallback(() => viewAllMessages('chats'), [viewAllMessages]);
+
   // Full-screen view of a timeline photo
   const [photo, setPhoto] = useState<ImageSourcePropType | null>(null);
   const closePhoto = useCallback(() => setPhoto(null), []);
-
-  const assigneeName = details.assignee.name;
 
   return {
     profile: RENTER_PROFILE,
@@ -69,12 +102,18 @@ export function useTicketDetails(
     unit: residence.unit,
     tab,
     setTab,
+    messagesPreview: MESSAGES_PREVIEW,
+    viewAllMessages,
+    openChat,
+    timelineOpen,
+    toggleTimeline,
+    messagesOpen,
+    toggleMessages,
     photo,
     openPhoto: setPhoto,
     closePhoto,
     back,
-    messageAssignee: () => soon(`Message ${assigneeName}`, 'Chat with your technician is coming soon.'),
-    openMessages: () => soon('Notification & Chats'),
+    messageAssignee: openChat,
     openProfile: () => soon('Profile'),
     dialog: dialog.props,
   };

@@ -318,7 +318,7 @@ export interface TicketNotification {
   readonly message: string;
 }
 
-/** Chat thread about a ticket ("Chat History" tab) */
+/** One chat message about a ticket ("Chat History"), newest first in lists */
 export interface TicketChat {
   readonly id: string;
   readonly name: string;
@@ -326,8 +326,16 @@ export interface TicketChat {
   /** Profile photo; the initials show when there is none */
   readonly photo?: ImageSourcePropType;
   readonly message: string;
+  /** Day chip in the chat, e.g. "Today" or "Oct 23" */
+  readonly day: string;
+  /** Clock time, e.g. "08:40 AM" */
   readonly time: string;
+  /** Sent by the renter: right-hand navy bubble */
+  readonly fromMe?: boolean;
 }
+
+/** Tabs of a ticket's "Notification & Chats" */
+export type TicketMessagesTab = 'notifications' | 'chats';
 
 /** Everything the Ticket Details page shows beyond the list card */
 export interface MaintenanceTicketDetails {
