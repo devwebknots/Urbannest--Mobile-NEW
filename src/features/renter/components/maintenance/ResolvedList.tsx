@@ -18,9 +18,11 @@ import { CARD_RADIUS } from './cardStyle';
 interface Props {
   items: readonly ResolvedTicket[];
   onViewAll: () => void;
+  /** Tap a row: that ticket's details (completed look) */
+  onOpen: (item: ResolvedTicket) => void;
 }
 
-export const ResolvedList: React.FC<Props> = ({ items, onViewAll }) => (
+export const ResolvedList: React.FC<Props> = ({ items, onViewAll, onOpen }) => (
   <View style={styles.card}>
     <View style={styles.header}>
       <View style={styles.tick}>
@@ -42,7 +44,13 @@ export const ResolvedList: React.FC<Props> = ({ items, onViewAll }) => (
     </View>
 
     {items.map(item => (
-      <View key={item.id} style={styles.row}>
+      <Pressable
+        key={item.id}
+        onPress={() => onOpen(item)}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.title}, ${item.completed}`}
+        style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      >
         <View style={styles.dot} />
         <Text style={styles.rowTitle} numberOfLines={1}>
           {item.title}
@@ -50,7 +58,7 @@ export const ResolvedList: React.FC<Props> = ({ items, onViewAll }) => (
         <Text style={styles.rowMeta} numberOfLines={1}>
           {item.completed}
         </Text>
-      </View>
+      </Pressable>
     ))}
   </View>
 );

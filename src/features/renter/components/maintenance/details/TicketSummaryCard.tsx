@@ -1,9 +1,11 @@
 /**
  * TicketSummaryCard: top card on the Ticket Details page. Status pill,
- * ticket title, ticket ID + unit, description and when it was reported;
- * the same tinted icon tile as the ticket's card on the Maintenance page
- * at the top right; then a pale "Assigned to" strip with the technician's
- * initials and a navy message button.
+ * ticket title, ticket ID + unit (or location), description and when it
+ * was reported; the same tinted icon tile as the ticket's card on the
+ * Maintenance page at the top right; then a pale "Assigned to" strip with
+ * the technician's photo and a navy message button.
+ * Completed tickets (Completed design): green "Completed" pill with a
+ * tick, and a photo of the area faded into the right instead of the tile.
  */
 
 import React from 'react';
@@ -26,11 +28,26 @@ interface Props {
 export const TicketSummaryCard: React.FC<Props> = ({ ticket, details, unit, onMessage }) => {
   const accent = ACCENTS[ticket.accent];
   const status = ACCENTS[details.statusAccent];
+  const photo = details.photo;
+  const hasPhoto = !!photo;
   return (
     <View style={styles.card}>
+      {/* Completed design: photo of the area faded into the right side */}
+      {photo ? (
+        <View pointerEvents="none" style={styles.photoWrap}>
+          <Image source={photo} style={styles.areaPhoto} resizeMode="cover" />
+          <View style={[StyleSheet.absoluteFill, styles.photoFade]} />
+        </View>
+      ) : null}
+
       <View style={styles.top}>
-        <View style={styles.heading}>
+        <View style={[styles.heading, hasPhoto && styles.textBeside]}>
           <View style={[styles.pill, { backgroundColor: status.bg }]}>
+            {details.completed ? (
+              <View style={styles.pillTick}>
+                <RenterIcon name="check" size={ms(9)} color={colors.white} />
+              </View>
+            ) : null}
             <Text style={[styles.pillText, { color: status.fg }]} numberOfLines={1}>
               {details.status}
             </Text>
@@ -39,26 +56,30 @@ export const TicketSummaryCard: React.FC<Props> = ({ ticket, details, unit, onMe
             {ticket.title}
           </Text>
         </View>
-        <View style={[styles.tile, { backgroundColor: accent.bg }]}>
-          <RenterIcon
-            name={ticket.icon}
-            size={ms(30)}
-            color={ticket.accent === 'amber' ? colors.warning : accent.fg}
-          />
-        </View>
+        {photo ? null : (
+          <View style={[styles.tile, { backgroundColor: accent.bg }]}>
+            <RenterIcon
+              name={ticket.icon}
+              size={ms(30)}
+              color={ticket.accent === 'amber' ? colors.warning : accent.fg}
+            />
+          </View>
+        )}
       </View>
 
-      <Text style={styles.ref}>
+      <Text style={[styles.ref, hasPhoto && styles.textBeside]}>
         Ticket #{ticket.id}
         <Text style={styles.dot}>{'  •  '}</Text>
-        {unit}
+        {details.location ?? unit}
       </Text>
-      <Text style={styles.description}>{details.description}</Text>
+      <Text style={[styles.description, hasPhoto && styles.textBeside]}>{details.description}</Text>
 
-      <View style={styles.reported}>
-        <CalendarIcon size={ms(14)} color={colors.textSecondary} />
-        <Text style={styles.reportedText}>{details.reported}</Text>
-      </View>
+      {details.reported ? (
+        <View style={styles.reported}>
+          <CalendarIcon size={ms(14)} color={colors.textSecondary} />
+          <Text style={styles.reportedText}>{details.reported}</Text>
+        </View>
+      ) : null}
 
       <View style={styles.assignee}>
         <View style={styles.avatar}>
@@ -119,9 +140,47 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: ms(5),
     paddingHorizontal: spacing.sm + 2,
     paddingVertical: ms(3),
     borderRadius: borderRadius.pill,
+  },
+  // Green tick in the "Completed" pill
+  pillTick: {
+    width: ms(15),
+    height: ms(15),
+    borderRadius: ms(7.5),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.success,
+  },
+  // Right half of the card, rounded with it (no overflow on the card, so
+  // its shadow stays)
+  photoWrap: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: '48%',
+    borderTopRightRadius: CARD_RADIUS,
+    borderBottomRightRadius: CARD_RADIUS,
+    overflow: 'hidden',
+  },
+  areaPhoto: {
+    width: '100%',
+    height: '100%',
+  },
+  // Melts the photo into the card on the left and under the technician strip
+  photoFade: {
+    backgroundImage:
+      'linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.55) 30%, rgba(255,255,255,0) 65%), linear-gradient(to top, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 45%)',
+  },
+  // Text stays clear of the photo
+  textBeside: {
+    width: '66%',
+    flex: 0,
   },
   pillText: {
     ...typographyPresets.badge,

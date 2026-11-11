@@ -3,6 +3,7 @@ export { default as ResidenceDashboardScreen } from './screens/ResidenceDashboar
 export { default as ManageResidenceScreen } from './screens/ManageResidenceScreen';
 export { default as MaintenanceScreen } from './screens/MaintenanceScreen';
 export { default as MaintenanceRequestScreen } from './screens/MaintenanceRequestScreen';
+export { default as ResolvedTicketsScreen } from './screens/ResolvedTicketsScreen';
 export { default as TicketDetailsScreen } from './screens/TicketDetailsScreen';
 export { default as TicketMessagesScreen } from './screens/TicketMessagesScreen';
 export { default as CheckInScreen } from './screens/CheckInScreen';

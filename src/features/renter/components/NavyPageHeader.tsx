@@ -118,6 +118,9 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   sheet: {
+    // At least as tall as its corners, so the band never shows below
+    // them when the sheet holds little (e.g. Resolved Tickets)
+    minHeight: SHEET_OVERLAP + spacing.sm,
     marginTop: -SHEET_OVERLAP,
     paddingTop: spacing.xl,
     borderTopLeftRadius: SHEET_OVERLAP,

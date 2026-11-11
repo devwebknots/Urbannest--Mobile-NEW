@@ -10,10 +10,11 @@
 
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { BellIcon } from '@/components/icons';
+import { BellIcon, RefreshIcon } from '@/components/icons';
 import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { moderateScale as ms } from '@/utils/responsive';
 import type { TicketChat, TicketNotification } from '../../../types';
+import { RenterIcon } from '../../dashboard/RenterIcon';
 
 interface NotificationRowProps {
   item: TicketNotification;
@@ -22,11 +23,39 @@ interface NotificationRowProps {
   onPage?: boolean;
 }
 
-export const NotificationRow: React.FC<NotificationRowProps> = ({ item, ticketId, onPage }) => (
-  <View style={[styles.row, onPage && styles.rowOnPage]}>
+/** Round icon on the left: blue bell, or a green status icon (completed design) */
+const NotificationIcon: React.FC<{ icon: TicketNotification['icon'] }> = ({ icon }) => {
+  if (icon === 'done') {
+    return (
+      <View style={[styles.bell, styles.iconDone]}>
+        <RenterIcon name="check" size={ms(16)} color={colors.white} />
+      </View>
+    );
+  }
+  if (icon === 'progress') {
+    return (
+      <View style={[styles.bell, styles.iconGreen]}>
+        <RefreshIcon size={ms(18)} color={colors.successDark} />
+      </View>
+    );
+  }
+  if (icon === 'assigned') {
+    return (
+      <View style={[styles.bell, styles.iconGreen]}>
+        <RenterIcon name="lineNote" size={ms(18)} color={colors.successDark} />
+      </View>
+    );
+  }
+  return (
     <View style={styles.bell}>
       <BellIcon size={ms(18)} color={colors.primary} />
     </View>
+  );
+};
+
+export const NotificationRow: React.FC<NotificationRowProps> = ({ item, ticketId, onPage }) => (
+  <View style={[styles.row, onPage && styles.rowOnPage]}>
+    <NotificationIcon icon={item.icon} />
     <View style={styles.body}>
       <View style={styles.head}>
         <Text style={styles.title} numberOfLines={1}>
@@ -36,9 +65,12 @@ export const NotificationRow: React.FC<NotificationRowProps> = ({ item, ticketId
           {item.time}
         </Text>
       </View>
-      <Text style={styles.text}>
-        Maintenance Id: <Text style={styles.id}>#{ticketId}</Text>
-      </Text>
+      {/* System notices carry the ticket ID; status updates just the message */}
+      {item.icon ? null : (
+        <Text style={styles.text}>
+          Maintenance Id: <Text style={styles.id}>#{ticketId}</Text>
+        </Text>
+      )}
       <Text style={styles.text}>{item.message}</Text>
     </View>
   </View>
@@ -114,6 +146,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.infoLight,
+  },
+  iconDone: {
+    backgroundColor: colors.success,
+  },
+  iconGreen: {
+    backgroundColor: colors.successLight,
   },
   avatar: {
     width: CIRCLE,

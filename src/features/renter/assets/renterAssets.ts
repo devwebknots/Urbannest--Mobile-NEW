@@ -83,6 +83,10 @@ export const renterAssets = {
   // Faucet work photo on the Ticket Details timeline, cropped from the
   // design (1000 x 303; baked caption removed, bottom faded dark)
   ticketFaucetRepair: require('@/assets/images/renter/ticket_faucet_repair.jpg'),
+  // From the Completed Ticket Details design: hall corner photo for the
+  // summary card (540 x 597) and the technician John (256 x 256)
+  ticketHallLeak: require('@/assets/images/renter/ticket_hall_leak.jpg'),
+  technicianJohn: require('@/assets/images/renter/technician_john.jpg'),
   // White building line art (transparent PNG, 460 x 176) for the navy page
   // header, lifted from the Ticket Details design
   headerBuildings: require('@/assets/images/renter/header_buildings.png'),

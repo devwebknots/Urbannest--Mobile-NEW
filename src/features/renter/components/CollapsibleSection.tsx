@@ -17,10 +17,18 @@ interface Props {
   title: string;
   open: boolean;
   onToggle: () => void;
+  /** Shown before the chevron, e.g. a "Completed" pill */
+  badge?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export const CollapsibleSection: React.FC<Props> = ({ title, open, onToggle, children }) => (
+export const CollapsibleSection: React.FC<Props> = ({
+  title,
+  open,
+  onToggle,
+  badge,
+  children,
+}) => (
   <View>
     <Pressable
       onPress={onToggle}
@@ -32,17 +40,20 @@ export const CollapsibleSection: React.FC<Props> = ({ title, open, onToggle, chi
       <AccentSectionHeader
         title={title}
         right={
-          <CircleIconButton
-            onPress={onToggle}
-            accessibilityLabel={open ? `Collapse ${title}` : `Expand ${title}`}
-            icon={
-              open ? (
-                <ChevronDownIcon size={ms(12)} color={colors.navy} />
-              ) : (
-                <ChevronRightIcon size={ms(12)} color={colors.navy} />
-              )
-            }
-          />
+          <View style={styles.right}>
+            {badge}
+            <CircleIconButton
+              onPress={onToggle}
+              accessibilityLabel={open ? `Collapse ${title}` : `Expand ${title}`}
+              icon={
+                open ? (
+                  <ChevronDownIcon size={ms(12)} color={colors.navy} />
+                ) : (
+                  <ChevronRightIcon size={ms(12)} color={colors.navy} />
+                )
+              }
+            />
+          </View>
         }
       />
     </Pressable>
@@ -51,6 +62,11 @@ export const CollapsibleSection: React.FC<Props> = ({ title, open, onToggle, chi
 );
 
 const styles = StyleSheet.create({
+  right: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
   pressed: {
     opacity: 0.7,
   },

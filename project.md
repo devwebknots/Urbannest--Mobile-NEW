@@ -772,6 +772,18 @@ We're Here.", `cardSubtitle` line; photo `request_hero.jpg` (cropped from the de
   - `ChatComposer` pinned under the chat: `formStyles` field (grows to ~5 lines, "Message Marcus..."), 48 navy gradient send button (`ArrowRightIcon`), faded until there is text; white bar with a hairline top edge.
 - **Logic**: `useTicketMessages(ticketId, tab, navigation)`: ticket, assignee, notifications, chats (sent messages on top of the mock history, newest first), tab, `draft` / `setDraft`, `canSend`, `send` (adds a "You" / Today / current time message locally; mock until a chat API exists), `back`. `TicketChat` now has `day`, `time` and `fromMe`.
 
+### 0l. Completed Ticket Details (same `TicketDetailsScreen`, `details.completed`)
+- **Opened by**: a row in Recently Resolved (Maintenance page) or a card on Resolved Tickets (0m). Follows the "Completed Water Leakage Ticket Details" design; same page and layout as 0j, the **green completed look only appears when the ticket is completed** (active tickets unchanged).
+- **Summary card**: green "Completed" pill (`ACCENTS.green`: `successLight` / `successDark`) with a 15 `success` tick circle; when `details.photo` is set, the area photo (`ticket_hall_leak.jpg`, cropped from the design) fills the right 48% of the card, faded white to the left and bottom, and the text keeps to the left 66% (no icon tile then). `details.location` ("3rd Floor") replaces the unit; no "Reported" line when `details.reported` is missing.
+- **Activity Timeline**: `CollapsibleSection` `badge` = "Completed" pill (`successLight` / `successDark`, `badge`) before the chevron. `TicketTimeline completed`: every tick `success` green, the rail green, the final "Completed" step on a `rgba(16,185,129,0.10)` wash (radius 12) with a `successDark` title; a short green stub joins the rail into the wash.
+- **Notifications**: `TicketNotification.icon`: `done` = `success` circle + white tick, `progress` = `successLight` circle + `RefreshIcon`, `assigned` = `successLight` circle + line note icon (all `successDark`); these rows skip the "Maintenance Id" line. Full-width `Button` `soft` "New Message" (message icon) under the rows opens the chat (replaces the "Open chat" link).
+- **Data**: `completedDetails()` builder in `constants.ts` (4 steps "Request Received", "Technician Assigned – {name}", "Repair In Progress", "Completed"; 3 notifications; a short chat). `W02015` "Water Leakage in Hall" uses the design's text, times, John (`technician_john.jpg`) and photo. `MAINTENANCE_TICKET_DETAILS` = active + resolved; `ALL_MAINTENANCE_TICKETS` for look-ups.
+
+### 0m. Resolved Tickets (`src/features/renter/screens/ResolvedTicketsScreen.tsx`)
+- **Opened by**: "View All" on Recently Resolved (route `ResolvedTickets { residenceId }`). No design: built from app pieces.
+- **Layout**: `FlatList` with `NavyPageHeader` "Resolved Tickets" + "N completed requests" as the list header (scrolls away), then one `TicketCard` per finished request (same card as Active Tickets; `accent: 'green'` so the tile and "… / Completed" pill are green), 16 between cards. Tap → Ticket Details (0l).
+- **Data / logic**: `RESOLVED_MAINTENANCE_TICKETS` (`ResolvedMaintenanceTicket` = `MaintenanceTicket` + `completed` label; newest first); `RESOLVED_TICKETS` (Recently Resolved) = its first three. `useResolvedTickets(residenceId, navigation)`: tickets, `openTicket`, `back`. `ResolvedList` rows now take `onOpen`.
+
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.
 - **Components**:
@@ -880,6 +892,7 @@ We're Here.", `cardSubtitle` line; photo `request_hero.jpg` (cropped from the de
 - **Maintenance ➔ MaintenanceRequest**: **+ Request** on the "Need a Fix?" banner. Back (asks first if the form has input) or "Done" after submitting returns to Maintenance.
 - **Maintenance ➔ TicketDetails**: tap an Active Ticket card. Back returns to Maintenance.
 - **TicketDetails ➔ TicketMessages**: "View all N notifications / chats" under the Notification & Chats preview. Back returns to Ticket Details.
+- **Maintenance ➔ ResolvedTickets**: "View All" on Recently Resolved. **ResolvedTickets ➔ TicketDetails** (completed): tap a card. A Recently Resolved row also opens its completed Ticket Details directly.
 - **PersonaSelect ➔ Home**: "Continue as PMS".
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.

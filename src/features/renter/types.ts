@@ -295,6 +295,12 @@ export interface ResolvedTicket {
   readonly completed: string;
 }
 
+/** A finished maintenance request (Resolved Tickets page, completed details) */
+export interface ResolvedMaintenanceTicket extends MaintenanceTicket {
+  /** e.g. "Completed 2 days ago" */
+  readonly completed: string;
+}
+
 /** Where a ticket step stands on the Ticket Details timeline */
 export type TicketStepState = 'done' | 'current' | 'pending';
 
@@ -316,6 +322,11 @@ export interface TicketNotification {
   readonly title: string;
   readonly time: string;
   readonly message: string;
+  /**
+   * Status icon (completed tickets): done = green tick, progress = green
+   * refresh, assigned = green note. None = blue bell + "Maintenance Id".
+   */
+  readonly icon?: 'done' | 'progress' | 'assigned';
 }
 
 /** One chat message about a ticket ("Chat History"), newest first in lists */
@@ -342,9 +353,15 @@ export interface MaintenanceTicketDetails {
   /** Status pill, e.g. "In Progress" */
   readonly status: string;
   readonly statusAccent: ConciergeAccent;
+  /** Finished: green look (tick pill, green timeline, "Completed" chips) */
+  readonly completed?: boolean;
   readonly description: string;
-  /** e.g. "Reported yesterday at 4:15 PM" */
-  readonly reported: string;
+  /** e.g. "Reported yesterday at 4:15 PM" (not shown when missing) */
+  readonly reported?: string;
+  /** Where in the building, e.g. "3rd Floor"; defaults to the home's unit */
+  readonly location?: string;
+  /** Photo of the area, faded into the right of the summary card */
+  readonly photo?: ImageSourcePropType;
   /** Technician; the initials show when there is no photo */
   readonly assignee: {
     readonly name: string;

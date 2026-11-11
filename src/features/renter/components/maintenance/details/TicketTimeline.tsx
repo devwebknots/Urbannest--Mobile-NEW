@@ -7,6 +7,9 @@
  *  - pending: pale grey circle with a grey dot
  * The line below a done step is secondary blue, the rest light grey.
  * A step can carry a work photo (tap for full screen).
+ * Completed tickets (Completed design): every tick and the line are green,
+ * and the final "Completed" step sits on a pale green wash with a green
+ * title.
  */
 
 import React from 'react';
@@ -22,14 +25,19 @@ interface Props {
   /** Screen width, for the photo size */
   width: number;
   onPhotoPress: (image: ImageSourcePropType) => void;
+  /** Finished ticket: green ticks and line, last step on a green wash */
+  completed?: boolean;
 }
 
 const MARKER = ms(36);
 
-const Marker: React.FC<{ state: TicketStepState }> = ({ state }) => {
+const Marker: React.FC<{ state: TicketStepState; completed: boolean }> = ({
+  state,
+  completed,
+}) => {
   if (state === 'done') {
     return (
-      <View style={[styles.marker, styles.done]}>
+      <View style={[styles.marker, styles.done, completed && styles.doneGreen]}>
         <RenterIcon name="check" size={ms(13)} color={colors.white} />
       </View>
     );
@@ -58,7 +66,12 @@ const ExpandHint: React.FC = () => (
   </View>
 );
 
-export const TicketTimeline: React.FC<Props> = ({ steps, width, onPhotoPress }) => {
+export const TicketTimeline: React.FC<Props> = ({
+  steps,
+  width,
+  onPhotoPress,
+  completed = false,
+}) => {
   const photoWidth = Math.round(width - spacing.screenHorizontal * 2 - MARKER - spacing.lg);
   // Wide strip like the design (photo is 1000 x 303, cover trims the sides a little)
   const photoHeight = Math.round(photoWidth * 0.36);
@@ -67,18 +80,35 @@ export const TicketTimeline: React.FC<Props> = ({ steps, width, onPhotoPress }) 
       {steps.map((step, i) => {
         const last = i === steps.length - 1;
         const pending = step.state === 'pending';
+        // Completed ticket: the final "Completed" step sits on a green wash
+        const highlight = completed && last;
         return (
-          <View key={step.id} style={styles.step}>
+          <View key={step.id} style={[styles.step, highlight && styles.stepHighlight]}>
             <View style={styles.rail}>
-              <Marker state={step.state} />
+              {/* Carries the line down to the marker inside the wash */}
+              {highlight ? <View style={[styles.stub, styles.lineGreen]} /> : null}
+              <Marker state={step.state} completed={completed} />
               {last ? null : (
-                <View style={[styles.line, step.state === 'done' && styles.lineDone]} />
+                <View
+                  style={[
+                    styles.line,
+                    step.state === 'done' && (completed ? styles.lineGreen : styles.lineDone),
+                  ]}
+                />
               )}
             </View>
 
             <View style={[styles.body, !last && styles.bodySpaced]}>
               <View style={styles.head}>
-                <Text style={[styles.title, pending && styles.titlePending]}>{step.title}</Text>
+                <Text
+                  style={[
+                    styles.title,
+                    pending && styles.titlePending,
+                    highlight && styles.titleGreen,
+                  ]}
+                >
+                  {step.title}
+                </Text>
                 <Text style={styles.time} numberOfLines={1}>
                   {step.time}
                 </Text>
@@ -144,6 +174,9 @@ const styles = StyleSheet.create({
     borderRadius: ms(15),
     backgroundColor: DONE_BLUE,
   },
+  doneGreen: {
+    backgroundColor: colors.success,
+  },
   current: {
     width: MARKER,
     height: MARKER,
@@ -177,6 +210,23 @@ const styles = StyleSheet.create({
   lineDone: {
     backgroundColor: DONE_BLUE,
   },
+  lineGreen: {
+    backgroundColor: colors.success,
+  },
+  // Final step of a completed ticket: pale green wash (success at 10%)
+  stepHighlight: {
+    marginHorizontal: -spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(16,185,129,0.10)',
+  },
+  stub: {
+    position: 'absolute',
+    top: -spacing.sm,
+    width: 2,
+    height: spacing.sm + ms(3),
+  },
   body: {
     flex: 1,
     paddingTop: ms(7),
@@ -196,6 +246,9 @@ const styles = StyleSheet.create({
   },
   titlePending: {
     color: colors.textSecondary,
+  },
+  titleGreen: {
+    color: colors.successDark,
   },
   time: {
     ...typographyPresets.caption,

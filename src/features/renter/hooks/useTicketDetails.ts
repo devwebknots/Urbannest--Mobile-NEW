@@ -14,7 +14,7 @@ import { useAppDialog } from '@/components/AppDialog';
 import { goBack, navigate } from '@/navigation/navigationRef';
 import {
   MAINTENANCE_TICKET_DETAILS,
-  MAINTENANCE_TICKETS,
+  ALL_MAINTENANCE_TICKETS,
   RENTER_PROFILE,
   RESIDENCES,
 } from '../constants';
@@ -41,7 +41,7 @@ export function useTicketDetails(
     [residenceId],
   );
   const ticket = useMemo(
-    () => MAINTENANCE_TICKETS.find(t => t.id === ticketId) ?? MAINTENANCE_TICKETS[0],
+    () => ALL_MAINTENANCE_TICKETS.find(t => t.id === ticketId) ?? ALL_MAINTENANCE_TICKETS[0],
     [ticketId],
   );
   const details = MAINTENANCE_TICKET_DETAILS[ticket.id] ?? MAINTENANCE_TICKET_DETAILS['RE-5104'];
@@ -99,6 +99,8 @@ export function useTicketDetails(
     profile: RENTER_PROFILE,
     ticket,
     details,
+    /** Finished ticket: green completed look */
+    completed: !!details.completed,
     unit: residence.unit,
     tab,
     setTab,

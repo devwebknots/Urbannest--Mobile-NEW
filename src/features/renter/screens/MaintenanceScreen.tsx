@@ -93,7 +93,7 @@ export const MaintenanceScreen: React.FC<Props> = ({ navigation, route }) => {
         </View>
 
         <View style={styles.resolved}>
-          <ResolvedList items={vm.resolved} onViewAll={vm.seeAllResolved} />
+          <ResolvedList items={vm.resolved} onViewAll={vm.seeAllResolved} onOpen={vm.openTicket} />
         </View>
 
         <View style={styles.section}>

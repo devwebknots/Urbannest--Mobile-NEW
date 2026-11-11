@@ -27,7 +27,9 @@ export type RootStackParamList = {
   Maintenance: { residenceId: string };
   /** New maintenance request form, opened by "+ Request" on Maintenance */
   MaintenanceRequest: { residenceId: string };
-  /** One ticket's status, timeline and messages, opened from Active Tickets */
+  /** Every finished request ("View All" on Recently Resolved) */
+  ResolvedTickets: { residenceId: string };
+  /** One ticket's status, timeline and messages (active or completed) */
   TicketDetails: { residenceId: string; ticketId: string };
   /** Full notification / chat history of a ticket ("View all" on Ticket Details) */
   TicketMessages: { residenceId: string; ticketId: string; tab?: 'notifications' | 'chats' };

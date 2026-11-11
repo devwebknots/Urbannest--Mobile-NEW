@@ -8,7 +8,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { goBack } from '@/navigation/navigationRef';
-import { MAINTENANCE_TICKET_DETAILS, MAINTENANCE_TICKETS, RENTER_PROFILE } from '../constants';
+import { ALL_MAINTENANCE_TICKETS, MAINTENANCE_TICKET_DETAILS, RENTER_PROFILE } from '../constants';
 import type { TicketChat, TicketMessagesTab } from '../types';
 
 export interface TicketMessagesNavigation {
@@ -29,7 +29,7 @@ export function useTicketMessages(
   navigation?: TicketMessagesNavigation,
 ) {
   const ticket = useMemo(
-    () => MAINTENANCE_TICKETS.find(t => t.id === ticketId) ?? MAINTENANCE_TICKETS[0],
+    () => ALL_MAINTENANCE_TICKETS.find(t => t.id === ticketId) ?? ALL_MAINTENANCE_TICKETS[0],
     [ticketId],
   );
   const details = MAINTENANCE_TICKET_DETAILS[ticket.id] ?? MAINTENANCE_TICKET_DETAILS['RE-5104'];

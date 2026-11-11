@@ -25,6 +25,7 @@ import type {
   MaintenanceTicketDetails,
   ManageQuickAction,
   NeighborhoodCategory,
+  ResolvedMaintenanceTicket,
   ResolvedTicket,
   QuickAlert,
   Residence,
@@ -653,8 +654,8 @@ function olderTicketChats(tech: {
   }));
 }
 
-/** Ticket Details page data, keyed by ticket ID (mock) */
-export const MAINTENANCE_TICKET_DETAILS: Readonly<Record<string, MaintenanceTicketDetails>> = {
+/** Ticket Details data for the active tickets, keyed by ticket ID (mock) */
+const ACTIVE_TICKET_DETAILS: Readonly<Record<string, MaintenanceTicketDetails>> = {
   'RE-5104': {
     status: 'In Progress',
     statusAccent: 'amber',
@@ -797,10 +798,268 @@ export const MAINTENANCE_TICKET_DETAILS: Readonly<Record<string, MaintenanceTick
   },
 };
 
-export const RESOLVED_TICKETS: readonly ResolvedTicket[] = [
-  { id: 'RE-3981', title: 'Water leakage in hall', completed: 'Completed 2 days ago' },
-  { id: 'RE-3940', title: 'Smart Lock Re-calibration', completed: 'Completed 4 days ago' },
-  { id: 'RE-3902', title: 'Balcony Door Alignment', completed: 'Completed Oct 15' },
+/** Finished requests, newest first (Resolved Tickets page; mock) */
+export const RESOLVED_MAINTENANCE_TICKETS: readonly ResolvedMaintenanceTicket[] = [
+  {
+    id: 'W02015',
+    category: 'Plumbing / Completed',
+    title: 'Water Leakage in Hall',
+    description: 'Water leakage reported in the hall near the elevator. The source was sealed and verified.',
+    icon: 'plumbing',
+    accent: 'green',
+    meta: [
+      { icon: 'calendar', label: 'Oct 8' },
+      { icon: 'user', label: 'John' },
+    ],
+    completed: 'Completed 2 days ago',
+  },
+  {
+    id: 'RE-3940',
+    category: 'Security / Completed',
+    title: 'Smart Lock Re-calibration',
+    description: 'Front door smart lock was not responding to the app. Lock re-paired and tested.',
+    icon: 'lineWrench',
+    accent: 'green',
+    meta: [
+      { icon: 'calendar', label: 'Oct 6' },
+      { icon: 'user', label: 'James T.' },
+    ],
+    completed: 'Completed 4 days ago',
+  },
+  {
+    id: 'RE-3902',
+    category: 'General / Completed',
+    title: 'Balcony Door Alignment',
+    description: 'Balcony sliding door was dragging on the track. Rollers adjusted and track cleaned.',
+    icon: 'lineWrench',
+    accent: 'green',
+    meta: [
+      { icon: 'calendar', label: 'Oct 3' },
+      { icon: 'user', label: 'Marcus R.' },
+    ],
+    completed: 'Completed Oct 15',
+  },
+  {
+    id: 'RE-3870',
+    category: 'HVAC / Completed',
+    title: 'Bathroom Exhaust Fan',
+    description: 'Exhaust fan was rattling and not clearing steam. Fan motor replaced.',
+    icon: 'hvac',
+    accent: 'green',
+    meta: [
+      { icon: 'calendar', label: 'Sep 30' },
+      { icon: 'user', label: 'James T.' },
+    ],
+    completed: 'Completed Sep 30',
+  },
+  {
+    id: 'RE-3855',
+    category: 'Electrical / Completed',
+    title: 'Kitchen Light Flicker',
+    description: 'Ceiling light in the kitchen kept flickering. Loose fitting fixed and bulb replaced.',
+    icon: 'electrical',
+    accent: 'green',
+    meta: [
+      { icon: 'calendar', label: 'Sep 26' },
+      { icon: 'user', label: 'John' },
+    ],
+    completed: 'Completed Sep 26',
+  },
+];
+
+/** "Recently Resolved" on the Maintenance page: the newest three */
+export const RESOLVED_TICKETS: readonly ResolvedTicket[] = RESOLVED_MAINTENANCE_TICKETS.slice(
+  0,
+  3,
+).map(({ id, title, completed }) => ({ id, title, completed }));
+
+type Technician = { name: string; initials: string; photo?: ImageSourcePropType };
+
+const JOHN: Technician = { name: 'John', initials: 'J', photo: renterAssets.technicianJohn };
+const JAMES: Technician = {
+  name: 'James Turner',
+  initials: 'JT',
+  photo: renterAssets.technicianJames,
+};
+const MARCUS: Technician = {
+  name: 'Marcus Richardson',
+  initials: 'MR',
+  photo: renterAssets.technicianMarcus,
+};
+
+/**
+ * Details of a finished ticket, following the Completed Ticket Details
+ * design: four green steps ending in "Completed", and three status
+ * notifications (completed / in progress / assigned), newest first.
+ */
+function completedDetails(args: {
+  description: string;
+  location?: string;
+  photo?: ImageSourcePropType;
+  tech: Technician;
+  day: string;
+  /** Times of: received, assigned, repair started, completed */
+  times: readonly [string, string, string, string];
+  repairDetail: string;
+  resolvedMessage: string;
+  workingMessage: string;
+}): MaintenanceTicketDetails {
+  const { tech, day, times } = args;
+  const first = tech.name.split(' ')[0];
+  const at = (t: string) => `${day}, ${t}`;
+  return {
+    status: 'Completed',
+    statusAccent: 'green',
+    completed: true,
+    description: args.description,
+    location: args.location,
+    photo: args.photo,
+    assignee: tech,
+    timeline: [
+      {
+        id: 'received',
+        title: 'Request Received',
+        detail: 'Maintenance request successfully logged and queued.',
+        time: at(times[0]),
+        state: 'done',
+      },
+      {
+        id: 'assigned',
+        title: `Technician Assigned – ${first}`,
+        detail: `${first} has been assigned to your request.`,
+        time: at(times[1]),
+        state: 'done',
+      },
+      {
+        id: 'repair',
+        title: 'Repair In Progress',
+        detail: args.repairDetail,
+        time: at(times[2]),
+        state: 'done',
+      },
+      {
+        id: 'completion',
+        title: 'Completed',
+        detail: 'Repair completed and verified.',
+        time: at(times[3]),
+        state: 'done',
+      },
+    ],
+    notifications: [
+      {
+        id: 'done',
+        title: 'Maintenance Completed',
+        time: at(times[3]),
+        message: args.resolvedMessage,
+        icon: 'done',
+      },
+      {
+        id: 'progress',
+        title: 'Repair In Progress',
+        time: at(times[2]),
+        message: args.workingMessage,
+        icon: 'progress',
+      },
+      {
+        id: 'assigned',
+        title: 'Technician Assigned',
+        time: at(times[1]),
+        message: `${first} has been assigned to your request.`,
+        icon: 'assigned',
+      },
+    ],
+    chats: [
+      {
+        id: 'r1',
+        ...tech,
+        message: 'All done. Everything has been fixed and checked.',
+        day,
+        time: times[3],
+      },
+      {
+        id: 'r2',
+        name: 'You',
+        initials: RENTER_PROFILE.initials,
+        fromMe: true,
+        message: 'Thanks, I will be home in the afternoon.',
+        day,
+        time: times[1],
+      },
+      {
+        id: 'r3',
+        ...tech,
+        message: `Hi, I'm ${first}. I'll take care of this today.`,
+        day,
+        time: times[1],
+      },
+    ],
+  };
+}
+
+/** Ticket Details data for the finished tickets (completed look) */
+const RESOLVED_TICKET_DETAILS: Readonly<Record<string, MaintenanceTicketDetails>> = {
+  // Text, times and photos from the Completed Ticket Details design
+  W02015: completedDetails({
+    description:
+      'Water leakage reported in the hall near the elevator. The source was sealed and verified with no further leakage.',
+    location: '3rd Floor',
+    photo: renterAssets.ticketHallLeak,
+    tech: JOHN,
+    day: 'Oct 8',
+    times: ['10:24 AM', '10:36 AM', '01:15 PM', '04:45 PM'],
+    repairDetail: 'Leakage area identified and repair work started.',
+    resolvedMessage: 'The water leakage issue in the hall has been resolved.',
+    workingMessage: 'Technician John is working on the reported leakage.',
+  }),
+  'RE-3940': completedDetails({
+    description: 'Front door smart lock was not responding to the app. Lock re-paired and tested.',
+    tech: JAMES,
+    day: 'Oct 6',
+    times: ['09:10 AM', '09:32 AM', '11:05 AM', '12:20 PM'],
+    repairDetail: 'Lock reset and re-paired with the app.',
+    resolvedMessage: 'Your smart lock is working again.',
+    workingMessage: 'Technician James is re-calibrating your smart lock.',
+  }),
+  'RE-3902': completedDetails({
+    description:
+      'Balcony sliding door was dragging on the track. Rollers adjusted and track cleaned.',
+    tech: MARCUS,
+    day: 'Oct 3',
+    times: ['08:45 AM', '09:20 AM', '02:00 PM', '03:10 PM'],
+    repairDetail: 'Door rollers adjusted and the track cleaned.',
+    resolvedMessage: 'Your balcony door now slides smoothly.',
+    workingMessage: 'Technician Marcus is aligning your balcony door.',
+  }),
+  'RE-3870': completedDetails({
+    description: 'Exhaust fan was rattling and not clearing steam. Fan motor replaced.',
+    tech: JAMES,
+    day: 'Sep 30',
+    times: ['07:50 AM', '08:15 AM', '10:30 AM', '11:45 AM'],
+    repairDetail: 'Old fan motor removed and a new one fitted.',
+    resolvedMessage: 'Your bathroom exhaust fan has been replaced.',
+    workingMessage: 'Technician James is replacing the fan motor.',
+  }),
+  'RE-3855': completedDetails({
+    description: 'Ceiling light in the kitchen kept flickering. Loose fitting fixed and bulb replaced.',
+    tech: JOHN,
+    day: 'Sep 26',
+    times: ['06:20 PM', '06:40 PM', '07:30 PM', '08:05 PM'],
+    repairDetail: 'Light fitting tightened and the bulb replaced.',
+    resolvedMessage: 'The kitchen light flicker has been fixed.',
+    workingMessage: 'Technician John is fixing the kitchen light.',
+  }),
+};
+
+/** Ticket Details data for every ticket (active + finished), by ticket ID */
+export const MAINTENANCE_TICKET_DETAILS: Readonly<Record<string, MaintenanceTicketDetails>> = {
+  ...ACTIVE_TICKET_DETAILS,
+  ...RESOLVED_TICKET_DETAILS,
+};
+
+/** Every ticket (active + finished), to look one up by ID */
+export const ALL_MAINTENANCE_TICKETS: readonly MaintenanceTicket[] = [
+  ...MAINTENANCE_TICKETS,
+  ...RESOLVED_MAINTENANCE_TICKETS,
 ];
 
 export const MAINTENANCE_NEWS: readonly MaintenanceNews[] = [

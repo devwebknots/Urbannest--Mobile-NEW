@@ -22,7 +22,7 @@ import type { MaintenanceBanner, MaintenanceNews, MaintenanceTicket } from '../t
 export interface MaintenanceNavigation {
   goBack: () => void;
   navigate?: {
-    (route: 'MaintenanceRequest', params: { residenceId: string }): void;
+    (route: 'MaintenanceRequest' | 'ResolvedTickets', params: { residenceId: string }): void;
     (route: 'TicketDetails', params: { residenceId: string; ticketId: string }): void;
   };
 }
@@ -53,9 +53,9 @@ export function useMaintenance(residenceId?: string, navigation?: MaintenanceNav
     }
   }, [navigation]);
 
-  // Active ticket: open its details (status, timeline, messages)
+  // Active or resolved ticket: open its details (status, timeline, messages)
   const openTicket = useCallback(
-    (ticket: MaintenanceTicket) => {
+    (ticket: Pick<MaintenanceTicket, 'id'>) => {
       const params = { residenceId: residence.id, ticketId: ticket.id };
       if (navigation?.navigate) {
         navigation.navigate('TicketDetails', params);
@@ -76,6 +76,17 @@ export function useMaintenance(residenceId?: string, navigation?: MaintenanceNav
       navigate('MaintenanceRequest', params);
     }
   }, [navigation, residence.id]);
+
+  // Recently Resolved "View All": every finished request
+  const seeAllResolved = useCallback(() => {
+    const params = { residenceId: residence.id };
+    if (navigation?.navigate) {
+      navigation.navigate('ResolvedTickets', params);
+    } else {
+      navigate('ResolvedTickets', params);
+    }
+  }, [navigation, residence.id]);
+
   const openBanner = useCallback(
     (item: MaintenanceBanner) => soon(item.title, 'Full details are coming soon.'),
     [soon],
@@ -107,7 +118,7 @@ export function useMaintenance(residenceId?: string, navigation?: MaintenanceNav
     openTicket,
     openNews,
     newRequest,
-    seeAllResolved: () => soon('Recently Resolved'),
+    seeAllResolved,
     openProfile: () => soon('Profile'),
     dialog: dialog.props,
   };

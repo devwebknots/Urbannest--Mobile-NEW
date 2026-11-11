@@ -8,6 +8,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/Button';
+import { MessageBubbleIcon } from '@/components/icons';
 import { CARD_RADIUS } from '../cardStyle';
 import { colors, spacing, typographyPresets } from '@/config/theme';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
@@ -26,6 +27,8 @@ interface Props {
   previewCount: number;
   onViewAll: (tab: TicketMessagesTab) => void;
   onOpenChat: (chat: TicketChat) => void;
+  /** Completed design: full-width "New Message" button under the rows */
+  onNewMessage?: () => void;
 }
 
 export const TicketMessages: React.FC<Props> = ({
@@ -37,11 +40,12 @@ export const TicketMessages: React.FC<Props> = ({
   previewCount,
   onViewAll,
   onOpenChat,
+  onNewMessage,
 }) => {
   const total = tab === 'notifications' ? notifications.length : chats.length;
-  // Notifications: link only when some are hidden. Chat: always offer to
-  // open the conversation (to read it all or write a new message).
-  const showLink = tab === 'chats' || total > previewCount;
+  // Notifications: link only when some are hidden. Chat: offer to open the
+  // conversation, unless the "New Message" button already does that.
+  const showLink = tab === 'chats' ? !onNewMessage : total > previewCount;
   return (
     <View style={styles.card}>
       <MessageTabs
@@ -76,6 +80,17 @@ export const TicketMessages: React.FC<Props> = ({
           style={styles.viewAll}
         />
       ) : null}
+
+      {onNewMessage ? (
+        <Button
+          title="New Message"
+          variant="soft"
+          size="md"
+          onPress={onNewMessage}
+          leftIcon={<MessageBubbleIcon size={ms(18)} color={colors.navy} />}
+          style={styles.newMessage}
+        />
+      ) : null}
     </View>
   );
 };
@@ -103,6 +118,9 @@ const styles = StyleSheet.create({
   viewAll: {
     alignSelf: 'center',
     marginTop: spacing.md,
+  },
+  newMessage: {
+    marginTop: spacing.lg,
   },
 });
 

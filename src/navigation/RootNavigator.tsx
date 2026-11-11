@@ -16,6 +16,7 @@ import {
   MaintenanceScreen,
   ManageResidenceScreen,
   RenterHomeScreen,
+  ResolvedTicketsScreen,
   TicketDetailsScreen,
   TicketMessagesScreen,
   UtilitiesScreen,
@@ -81,6 +82,11 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="MaintenanceRequest"
         component={MaintenanceRequestScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="ResolvedTickets"
+        component={ResolvedTicketsScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen

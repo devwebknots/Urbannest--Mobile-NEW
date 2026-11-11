@@ -12,11 +12,11 @@
  */
 
 import React from 'react';
-import { ScrollView, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { NavyPageHeader } from '../components/NavyPageHeader';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppDialog } from '@/components/AppDialog';
-import { colors, spacing } from '@/config/theme';
+import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { CollapsibleSection } from '../components/CollapsibleSection';
 import { Reveal } from '../components/Reveal';
 import { PhotoViewer } from '../components/maintenance/details/PhotoViewer';
@@ -69,11 +69,19 @@ export const TicketDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
                 title="Activity Timeline"
                 open={vm.timelineOpen}
                 onToggle={vm.toggleTimeline}
+                badge={
+                  vm.completed ? (
+                    <View style={styles.donePill}>
+                      <Text style={styles.donePillText}>Completed</Text>
+                    </View>
+                  ) : null
+                }
               >
                 <TicketTimeline
                   steps={vm.details.timeline}
                   width={width}
                   onPhotoPress={vm.openPhoto}
+                  completed={vm.completed}
                 />
               </CollapsibleSection>
             </View>
@@ -95,6 +103,7 @@ export const TicketDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
                 previewCount={vm.messagesPreview}
                 onViewAll={vm.viewAllMessages}
                 onOpenChat={vm.openChat}
+                onNewMessage={vm.completed ? vm.openChat : undefined}
               />
             </CollapsibleSection>
           </View>
@@ -117,6 +126,17 @@ const styles = StyleSheet.create({
   },
   section: {
     marginTop: spacing.sectionGap,
+  },
+  // "Completed" chip on the timeline header (completed tickets)
+  donePill: {
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: 3,
+    borderRadius: borderRadius.pill,
+    backgroundColor: colors.successLight,
+  },
+  donePillText: {
+    ...typographyPresets.badge,
+    color: colors.successDark,
   },
 });
 
