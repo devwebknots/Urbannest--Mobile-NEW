@@ -111,6 +111,8 @@ export const colors = {
   gold: '#F5B83D',
   goldBadgeBg: 'rgba(58, 40, 6, 0.85)',
   favorite: '#EF4444',
+  // Soft card fill that matches the property details art (floor plan card)
+  surfaceSoft: '#F6F9FD',
 } as const;
 
 export const gradients = {
@@ -432,6 +434,15 @@ export const typographyPresets: Record<string, TextStyle> = {
     fontSize: scaleFont(16),
     lineHeight: scaleFont(22),
     color: colors.textPrimary,
+    fontWeight: typography.fontWeight.bold,
+  },
+  // Big blue rent on a details page, e.g. "1,100 USD" (pair with a small "/ Month")
+  priceLarge: {
+    fontFamily: typography.fontFamily.body.bold,
+    fontSize: scaleFont(26),
+    lineHeight: scaleFont(32),
+    letterSpacing: -0.4,
+    color: colors.primary,
     fontWeight: typography.fontWeight.bold,
   },
   caption: {

@@ -279,6 +279,87 @@ $icons = [ordered]@{
     'path:M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
     'path:m9 12 2 2 4-4'
   )
+  # ---- Guest property details (draw into icons/property at -Stroke 2.2):
+  #      -Only arrow_left,share,crown,house,database,receipt,shield_check,shield,sparkles,bus,calendar_days,zap,building,note,open_external
+  # lucide: arrow-left
+  'arrow_left' = @(
+    'path:m12 19-7-7 7-7',
+    'path:M19 12H5'
+  )
+  # lucide: share
+  'share' = @(
+    'path:M12 2v13',
+    'path:m16 6-4-4-4 4',
+    'path:M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8'
+  )
+  # lucide: crown
+  'crown' = @(
+    'path:M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z',
+    'path:M5 21h14'
+  )
+  # lucide: house
+  'house' = @(
+    'path:M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8',
+    'path:M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'
+  )
+  # lucide: database (reads as a coin stack: costs, deposits)
+  'database' = @(
+    'path:M3 5a9 3 0 1 0 18 0a9 3 0 1 0-18 0',
+    'path:M3 5V19A9 3 0 0 0 21 19V5',
+    'path:M3 12A9 3 0 0 0 21 12'
+  )
+  # lucide: shield
+  'shield' = @(
+    'path:M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'
+  )
+  # lucide: sparkles
+  'sparkles' = @(
+    'path:M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z',
+    'path:M20 3v4',
+    'path:M22 5h-4',
+    'path:M4 17v2',
+    'path:M5 18H3'
+  )
+  # lucide: bus-front
+  'bus' = @(
+    'path:M4 6 2 7',
+    'path:M10 6h4',
+    'path:m22 7-2-1',
+    'path:M6 3h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z',
+    'path:M4 11h16',
+    'path:M8 15h.01',
+    'path:M16 15h.01',
+    'path:M6 19v2',
+    'path:M18 21v-2'
+  )
+  # lucide: calendar-days
+  'calendar_days' = @(
+    'path:M8 2v4',
+    'path:M16 2v4',
+    'path:M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
+    'path:M3 10h18',
+    'path:M8 14h.01',
+    'path:M12 14h.01',
+    'path:M16 14h.01',
+    'path:M8 18h.01',
+    'path:M12 18h.01',
+    'path:M16 18h.01'
+  )
+  # lucide: zap
+  'zap' = @(
+    'path:M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z'
+  )
+  # lucide: wallet (Costs & Fees: Rent & Fees; also draw 'layers' into icons/property)
+  'wallet' = @(
+    'path:M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1',
+    'path:M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4'
+  )
+  # lucide: square-arrow-out-up-right ("View Floor Plan")
+  'open_external' = @(
+    'path:M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6',
+    'path:m21 3-9 9',
+    'path:M15 3h6v6'
+  )
 }
 
 New-Item -ItemType Directory -Force $OutDir | Out-Null

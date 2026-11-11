@@ -151,6 +151,7 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
               items={FEATURED_PROPERTIES}
               favorites={vm.favorites}
               onToggleFavorite={vm.toggleFavorite}
+              onOpen={vm.openProperty}
             />
           </View>
         </View>
@@ -169,6 +170,7 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
                 item={item}
                 favorite={vm.favorites.has(item.id)}
                 onToggleFavorite={() => vm.toggleFavorite(item.id)}
+                onPress={() => vm.openProperty(item.id)}
               />
             ))}
           </View>

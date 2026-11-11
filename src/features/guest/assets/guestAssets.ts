@@ -32,3 +32,48 @@ export const GUEST_IMAGE_ASPECT = {
   guideFeatured: 1432 / 806,
   guideThumb: 696 / 338,
 };
+
+/**
+ * Property details page art, cut from the "Luxury Home Rental" design:
+ * floor_plan.png: the 3D floor plan from the Details card (1200 x 478),
+ * text above it removed, baked "View Floor Plan" button painted out, top
+ * and side edges faded so it melts into any card background.
+ * Gallery interiors reuse the sharp renter room photos.
+ */
+export const propertyAssets = {
+  floorPlan: require('@/assets/images/guest/floor_plan.png'),
+  interiorLiving: require('@/assets/images/renter/area_living.jpg'),
+  interiorBedroom: require('@/assets/images/renter/area_bedroom.jpg'),
+  interiorDining: require('@/assets/images/renter/area_dining.jpg'),
+  interiorOutside: require('@/assets/images/renter/area_outside.jpg'),
+};
+
+/** Width / height of the property details art */
+export const PROPERTY_IMAGE_ASPECT = {
+  floorPlan: 1200 / 478,
+};
+
+/**
+ * Line icons for the property details page (Lucide, ISC licence; white
+ * PNGs tinted in the app). Drawn at the renter-set weight:
+ * scripts/icons/draw_line_icons.ps1 -OutDir src/assets/icons/property -Stroke 2.2
+ */
+export const propertyIcons = {
+  arrowLeft: require('@/assets/icons/property/arrow_left.png'),
+  share: require('@/assets/icons/property/share.png'),
+  crown: require('@/assets/icons/property/crown.png'),
+  house: require('@/assets/icons/property/house.png'),
+  coins: require('@/assets/icons/property/database.png'),
+  receipt: require('@/assets/icons/property/receipt.png'),
+  shieldCheck: require('@/assets/icons/property/shield_check.png'),
+  shield: require('@/assets/icons/property/shield.png'),
+  sparkles: require('@/assets/icons/property/sparkles.png'),
+  bus: require('@/assets/icons/property/bus.png'),
+  calendar: require('@/assets/icons/property/calendar_days.png'),
+  bolt: require('@/assets/icons/property/zap.png'),
+  building: require('@/assets/icons/property/building.png'),
+  document: require('@/assets/icons/property/note.png'),
+  openExternal: require('@/assets/icons/property/open_external.png'),
+  wallet: require('@/assets/icons/property/wallet.png'),
+  layers: require('@/assets/icons/property/layers.png'),
+};

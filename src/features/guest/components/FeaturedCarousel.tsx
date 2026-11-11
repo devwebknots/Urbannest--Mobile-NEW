@@ -49,6 +49,8 @@ interface Props {
   items: FeaturedProperty[];
   favorites: Set<string>;
   onToggleFavorite: (id: string) => void;
+  /** Tap a card to open its details */
+  onOpen?: (id: string) => void;
 }
 
 declare const process: { env: { NODE_ENV?: string } };
@@ -77,6 +79,7 @@ export const FeaturedCarousel: React.FC<Props> = ({
   items,
   favorites,
   onToggleFavorite,
+  onOpen,
 }) => {
   const { width } = useWindowDimensions();
   // Narrow enough that both neighbours clearly peek in
@@ -200,6 +203,7 @@ export const FeaturedCarousel: React.FC<Props> = ({
               loadVideo={Math.abs(index - activeIndex) <= VIDEO_RANGE}
               favorite={favorites.has(item.id)}
               onToggleFavorite={() => onToggleFavorite(item.id)}
+              onPress={onOpen ? () => onOpen(item.id) : undefined}
             />
           </Animated.View>
         );
@@ -219,7 +223,8 @@ const FeaturedCard: React.FC<{
   loadVideo: boolean;
   favorite: boolean;
   onToggleFavorite: () => void;
-}> = ({ item, width, height, loadVideo, favorite, onToggleFavorite }) => {
+  onPress?: () => void;
+}> = ({ item, width, height, loadVideo, favorite, onToggleFavorite, onPress }) => {
   const [videoFailed, setVideoFailed] = useState(false);
   const showVideo = loadVideo && !!item.video && !videoFailed;
   // Video stays invisible (poster shows) until its first frame is ready,
@@ -238,7 +243,13 @@ const FeaturedCard: React.FC<{
     }).start();
 
   return (
-    <View style={[styles.cardShadow, { width, height }]}>
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      accessibilityRole="button"
+      accessibilityLabel={item.type}
+      style={[styles.cardShadow, { width, height }]}
+    >
       <View style={styles.card}>
         {/* Poster photo: shows until the video's first frame is ready */}
         <Image
@@ -335,7 +346,7 @@ const FeaturedCard: React.FC<{
           </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

@@ -3,12 +3,14 @@
  * featured carousel and city tiles still use remote placeholders.
  */
 
-import { guestAssets } from './assets/guestAssets';
+import { guestAssets, propertyAssets } from './assets/guestAssets';
 import type {
   Category,
   City,
+  CostGroup,
   FeaturedProperty,
   Guide,
+  PropertyFeature,
   RentalListing,
 } from './types';
 
@@ -198,3 +200,58 @@ export const BUY_FILTERS = {
   rentalType: 'Single Family',
   bedrooms: '3 Bed',
 };
+
+// ---- Property details (text from the "Luxury Home Rental" design) ----
+
+/** Room photos shown after the listing photo in the details gallery */
+export const PROPERTY_GALLERY_ROOMS = [
+  propertyAssets.interiorLiving,
+  propertyAssets.interiorBedroom,
+  propertyAssets.interiorDining,
+  propertyAssets.interiorOutside,
+];
+
+export const PROPERTY_RATING = { rating: 4.8, reviews: 120 };
+
+export const PROPERTY_COSTS: CostGroup[] = [
+  {
+    id: 'rent',
+    title: 'Rent & Fees',
+    icon: 'wallet',
+    rows: [
+      { label: 'Base rent :', value: '$2,725 – $4,850 / Month' },
+      { label: 'Water & Sewer fee :', value: 'Varies' },
+    ],
+  },
+  {
+    id: 'optional',
+    title: 'Optional Charges',
+    icon: 'layers',
+    rows: [
+      { label: 'Pet rent :', value: '$50/Month' },
+      { label: 'Storage Fee :', value: '$75 /Month' },
+      { label: 'Parking Fee :', value: '$195 /Month' },
+      { label: 'Renters insurance Fee :', value: '$15 /Month' },
+    ],
+  },
+  {
+    id: 'oneTime',
+    title: 'Mandatory One-time Fees',
+    icon: 'shieldCheck',
+    rows: [
+      { label: 'Security Deposit :', value: '$50/Month' },
+      { label: 'Application Fee :', value: 'Contact for Details' },
+      { label: 'Administration Fee :', value: 'Contact for Details' },
+    ],
+  },
+];
+
+/** Two columns, read left to right like the design */
+export const PROPERTY_FEATURES: PropertyFeature[] = [
+  { id: 'smart', label: 'Smart Home Features', icon: 'house' },
+  { id: 'transit', label: 'Near Public Transport / Metro', icon: 'bus' },
+  { id: 'security', label: '24x7 Security & CCTV', icon: 'shield' },
+  { id: 'lease', label: 'Short-term / Long-term Lease Options', icon: 'calendar' },
+  { id: 'ev', label: 'EV Charging', icon: 'bolt' },
+  { id: 'deposit', label: 'Zero Deposit / Low Deposit Option', icon: 'coins' },
+];

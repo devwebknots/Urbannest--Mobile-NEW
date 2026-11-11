@@ -58,3 +58,70 @@ export interface City {
   listings: string;
   image: ImageSourcePropType;
 }
+
+export type PropertyIconName =
+  | 'arrowLeft'
+  | 'share'
+  | 'crown'
+  | 'house'
+  | 'coins'
+  | 'receipt'
+  | 'shieldCheck'
+  | 'shield'
+  | 'sparkles'
+  | 'bus'
+  | 'calendar'
+  | 'bolt'
+  | 'building'
+  | 'document'
+  | 'openExternal'
+  | 'wallet'
+  | 'layers';
+
+/** One label / value line in Costs & Fees, e.g. "Pet rent : $50/Month" */
+export interface CostRow {
+  label: string;
+  value: string;
+}
+
+/** A Costs & Fees group: "Rent & Fees", "Optional Charges", ... */
+export interface CostGroup {
+  id: string;
+  title: string;
+  icon: PropertyIconName;
+  rows: CostRow[];
+}
+
+export interface PropertyFeature {
+  id: string;
+  label: string;
+  icon: PropertyIconName;
+}
+
+/** Any listing a guest can open (Rentals Near You or Featured) */
+export interface PropertySummary {
+  id: string;
+  name: string;
+  address: string;
+  /** e.g. "1,850 USD" */
+  price: string;
+  /** Shown before the price, e.g. "Starting at" */
+  pricePrefix?: string;
+  beds: string;
+  baths: string;
+  sqft: string;
+  image: ImageSourcePropType;
+}
+
+/** Everything on the property details page */
+export interface PropertyDetails extends PropertySummary {
+  rating: number;
+  reviews: number;
+  premium: boolean;
+  /** Hero photos: the listing photo first, then rooms */
+  gallery: ImageSourcePropType[];
+  description: string;
+  floorPlan: ImageSourcePropType;
+  costs: CostGroup[];
+  features: PropertyFeature[];
+}

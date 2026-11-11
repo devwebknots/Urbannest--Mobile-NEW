@@ -145,6 +145,7 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | :--- | :--- | :--- |
 | `Splash` (initial) | `SplashScreen` (`@/features/splash`) | `gestureEnabled: false`, `animation: 'none'` |
 | `GuestHome` | `GuestHomeScreen` (`@/features/guest`) | `gestureEnabled: false` |
+| `PropertyDetails` | `PropertyDetailsScreen` (`@/features/guest`), params `{ propertyId }` | `animation: 'slide_from_right'` |
 | `PersonaSelect` | `PersonaSelectScreen` (`@/features/persona`) | `gestureEnabled: false` |
 | `RenterHome` | `RenterHomeScreen` (`@/features/renter`) | `animation: 'slide_from_right'` |
 | `ManageResidence` | `ManageResidenceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
@@ -162,7 +163,7 @@ Global `screenOptions`: `{ headerShown: false, animation: 'fade' }` — every sc
 ### Param lists (`src/types/navigation.ts`, re-exported by `src/navigation/types.ts`)
 ```ts
 export type RootStackParamList = {
-  Splash: undefined; GuestHome: undefined; PersonaSelect: undefined; RenterHome: undefined; ManageResidence: { residenceId: string }; ResidenceDashboard: { residenceId: string } /* unwired */; CheckIn: { residenceId: string }; Neyora: undefined; Auth: undefined; Main: undefined;
+  Splash: undefined; GuestHome: undefined; PropertyDetails: { propertyId: string }; PersonaSelect: undefined; RenterHome: undefined; ManageResidence: { residenceId: string }; ResidenceDashboard: { residenceId: string } /* unwired */; CheckIn: { residenceId: string }; Neyora: undefined; Auth: undefined; Main: undefined;
   Home: undefined; Calendar: undefined; Login: undefined;
 };
 export type AuthStackParamList = { Login: undefined; Register: undefined; ForgotPassword: { email?: string } | undefined };
@@ -188,6 +189,7 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 ### Current flow
 - **Splash → GuestHome** (`replace`): when the splash video ends, or tap anywhere.
 - **GuestHome → PersonaSelect** (`navigate`): "Log In / Sign Up" pill in the hero.
+- **GuestHome → PropertyDetails** (`navigate`, `{ propertyId }`): tap a Rentals Near You card or a Featured carousel card. Similar Deals cards `push` another PropertyDetails on top; back returns. Apply Now / Book a Tour → AppDialog → "Log In / Sign Up" → PersonaSelect.
 - **PersonaSelect → RenterHome** (`replace`): "Continue as Renter".
 - **RenterHome → CheckIn** (`navigate`): tap a Move-In Ready card ("Check-In Now").
 - **CheckIn → Utilities → UtilityProviders**: the "Utilities" tile opens the Utilities list; a utility card opens its providers page (info only). "Confirm Utilities" navigates back to `CheckIn` with `utilitiesConfirmed: true` (`merge`), which ticks the tile.
@@ -442,6 +444,7 @@ Defined in `src/config/theme.ts`:
 | `gold` | `#F5B83D` | Star in Exclusive / Premium badges, badge border |
 | `goldBadgeBg` | `rgba(58, 40, 6, 0.85)` | "Exclusive" badge background |
 | `favorite` | `#EF4444` | Filled favorite heart |
+| `surfaceSoft` | `#F6F9FD` | Soft card fill matching the property details art (Details / floor plan card, floor plan viewer) |
 
 ### 2. Linear Gradients
 Managed via `src/components/LinearGradient.tsx`:
@@ -484,6 +487,7 @@ Body (Inter):
 | `listingTitle` | `Inter-SemiBold` 600 | 15 / 20 | `navy` | Property / residence card names |
 | `cardTitle` | `Inter-SemiBold` 600 | 14.5 / 20 | `textPrimary` | Titles inside small cards |
 | `price` | `Inter-Bold` 700 | 16 / 22 | — | Listing prices only |
+| `priceLarge` | `Inter-Bold` 700 | 26 / 32, -0.4 | `primary` | Big rent on a details page ("1,850 USD"), paired with a small "/ Month" |
 | `body` | `Inter-Regular` 400 | 13.5 / 19 | `#334155` | Paragraphs, descriptions, progress labels |
 | `bodyMedium` | `Inter-Medium` 500 | 13.5 / 19 | `#334155` | Medium-emphasis body text |
 | `bodyBold` | `Inter-SemiBold` 600 | 13.5 / 19 | `textPrimary` | Fact values (Lease ID, dates), checklist tile labels, counts |
@@ -661,7 +665,25 @@ Supports two operational modes:
   6. `GuidesSection`: large card (1432:806) + two thumbs (696:338), 20dp spacing.
   7. `CitiesSection`: horizontal city tiles (100×116).
   8. `TrustBar`: Verified / Secure / Support.
-- **Logic**: `useGuestHome` (tab mode, favorites, Log In → PersonaSelect). Data in `guest/constants.ts`; images in `src/assets/images/guest/` via `guestAssets.ts`. View-drawn icons in `guest/components/GuestIcons.tsx`.
+- **Logic**: `useGuestHome` (tab mode, favorites, Log In → PersonaSelect, `openProperty(id)` → PropertyDetails). Data in `guest/constants.ts`; images in `src/assets/images/guest/` via `guestAssets.ts`. View-drawn icons in `guest/components/GuestIcons.tsx`.
+
+### 0a-2. Property Details (`src/features/guest/screens/PropertyDetailsScreen.tsx`)
+- **Opened by**: any guest listing card (route `PropertyDetails { propertyId }`; ids from `RENTALS_NEAR_YOU` and `FEATURED_PROPERTIES`). Follows the "Luxury Home Rental App Interface" design (Nov 2026). Page bg `pageTint`, light status bar, no tab bar.
+- **Sections** (components in `guest/components/property/`), `spacing.sectionGap` apart:
+  1. `PropertyGallery`: paging photo slider (`width × 0.62 + insets.top`), dark top scrim + 36dp fade into `pageTint`; solid `CircleIconButton`s (back arrow, heart, share; 42); `PremiumPill size="lg"` (navy pill, gold crown) bottom left, white "1 / 5" counter bottom right; thumbnail strip (5 per width, radius 12): tap jumps; the current photo is full strength, the others 55% (no selected stroke, per the UI rules). Photos auto-slide every 4 s (`AUTO_MS`, loops back to the first; waits while swiping; the timer restarts after a swipe or thumbnail tap; off in tests).
+  2. Head: name `heroTitleCompact` navy + white rating pill (gold `StarGlyph`, "4.8 (120)"), `MapPinIcon` + address (`body`), `priceLarge` + "/ Month", `PropertyStatsBar` (bed / bath / area, thin dividers, translucent white strip).
+  3. `PropertyDetailsCard`: compact card on the guest search card's background (`CardBackground` + the `SearchCard` shell: `CARD_BG.base`, glassy white edge, soft blue shadow). "Details" in `sectionHeading` navy (same as every section title) + short `cardSubtitle` description, the design's 3D floor plan (`floor_plan.png`, 1200×478, all edges faded so it sits on the waves) at 86% card width, centered; small white "View Floor Plan" pill → `FloorPlanViewer` (full-screen modal, close button, Android back).
+  4. `CostsFeesCard` — interactive **monthly cost estimator** (Nov 2026; accordion, tabs and a navy "rent card + ledger" were rejected as old-app looks). `PropertySectionTitle` "Costs & Fees", then one card (`chipBlue` → white 170° wash, white rim, soft secondary-blue shadow, radius 20):
+     - `eyebrow` "Estimated monthly", live total in `priceLarge` (base rent range + picked extras, pops with a spring on change) + "/ month", `cardSubtitle` note (base rent, water & sewer, "Extras +$X").
+     - Optional charges as `pageTint` tiles (no heading or hint), two columns (`caption` name, `bodyBold` navy price + "/mo"); tap toggles. Picked = soft secondary-blue tick circle only (no stroke / fill change); unpicked tiles show no icon.
+     - "Due at move-in": one-time fees as `body` label / `bodyBold` navy value rows, hairline dividers.
+     - Data: `PROPERTY_COSTS` groups [rent, optional, one-time]; dollar amounts parsed from the design text. State `extras` / `toggleExtra` in `usePropertyDetails`.
+  5. Special features: `PropertySectionTitle` + `SpecialFeatures` (two columns, rows share height; `chipBlue` 60% chips, white rim, navy icon + 12pt label).
+  6. Similar Deals: `PropertySectionTitle` + `Button` `link` "See all →" (coming soon dialog); side-scrolling `SimilarDealCard`s (two per width, snap): photo with small `PremiumPill`, name + heart, price "/Month", address, bed / bath / area.
+  7. Fixed footer over a fade into `pageTint`: `Button` `light` with navy border "Apply Now" (document icon) + `brand` "Book a Tour" (calendar icon).
+- **Logic**: `usePropertyDetails(propertyId, navigation)`: one `PropertySummary` list (`GUEST_LISTINGS`, rental prices "$ 1,850" → "1,850 USD"), details built with the design's shared content (`PROPERTY_COSTS`, `PROPERTY_FEATURES`, `PROPERTY_RATING`, description template filled per listing), gallery = listing photo + renter room photos (`PROPERTY_GALLERY_ROOMS`). Favourites (local), share (`Share.share`), Apply / Book a Tour → AppDialog asking guests to Log In / Sign Up.
+- **Icons**: Lucide line icons at the renter weight, `src/assets/icons/property/` (`propertyIcons`, `PropertyIcon`), drawn with `scripts/icons/draw_line_icons.ps1 -OutDir src/assets/icons/property -Stroke 2.2 -Only …` (list in the script).
+- **Test**: `__tests__/PropertyDetailsScreen.test.tsx`.
 
 ### 0b. Persona Select (`src/features/persona/screens/PersonaSelectScreen.tsx`)
 - **Role**: Opened from "Log In / Sign Up" on the guest home; pick Renter, Landlord or Property Manager (or Add Persona).

@@ -6,7 +6,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NeyoraModule } from '@neyora/maintenance-sdk';
-import { GuestHomeScreen } from '@/features/guest';
+import { GuestHomeScreen, PropertyDetailsScreen } from '@/features/guest';
 import { HomeScreen } from '@/features/home';
 import { PersonaSelectScreen } from '@/features/persona';
 import {
@@ -48,6 +48,11 @@ export const RootNavigator: React.FC = () => (
         name="GuestHome"
         component={GuestHomeScreen}
         options={{ gestureEnabled: false }}
+      />
+      <Stack.Screen
+        name="PropertyDetails"
+        component={PropertyDetailsScreen}
+        options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen
         name="PersonaSelect"
