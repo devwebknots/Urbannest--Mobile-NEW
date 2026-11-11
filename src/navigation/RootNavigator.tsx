@@ -12,6 +12,7 @@ import { PersonaSelectScreen } from '@/features/persona';
 import {
   CheckInScreen,
   InspectionAreaScreen,
+  MaintenanceRequestScreen,
   MaintenanceScreen,
   ManageResidenceScreen,
   RenterHomeScreen,
@@ -73,6 +74,11 @@ export const RootNavigator: React.FC = () => (
         component={MaintenanceScreen}
         // TEMP for testing (initial route): the first residence
         initialParams={{ residenceId: 'obsidian' }}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="MaintenanceRequest"
+        component={MaintenanceRequestScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen

@@ -150,6 +150,7 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | `ManageResidence` | `ManageResidenceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | ~~`ResidenceDashboard`~~ | Unwired (commented out in the navigator); `ResidenceDashboardScreen` kept in `@/features/renter` | — |
 | `Maintenance` | `MaintenanceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
+| `MaintenanceRequest` | `MaintenanceRequestScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | `CheckIn` | `CheckInScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | `Neyora` | `NeyoraModule` (`@neyora/maintenance-sdk`, an installed package; see Section 4b) | `animation: 'slide_from_right'` |
 | `Home` | `HomeScreen` (`@/features/home`) | stack default |
@@ -471,6 +472,7 @@ Headings (Playfair Display — weight comes from the font file, never add `fontW
 | `heroAccent` | `PlayfairDisplay-SemiBold` | 30 / 35.4 | letterSpacing -0.75, gold `heroAccent` | Highlighted word inside a `heroTitle` line ("*Simple*"); slant with `skewX(-10deg)` |
 | `greetingTitle` | `PlayfairDisplay-Regular` | 23 / 30 | white | Greeting headline on the old Home dashboard |
 | `sectionHeading` | `PlayfairDisplay-Medium` | 19 / 26 | `textPrimary` | **Left-aligned section titles** ("Rentals Near You", "Move-In Checklist", "Around Your Home"); also titles on dark cards ("Move-In Ready" status card, white) |
+| `formHeading` | `PlayfairDisplay-Medium` | 15 / 20 | navy | Form sub-headings next to a line icon (`FormLabel`: "Category", "Problem", "Location" on the maintenance request form) |
 | `displayTitle` | `PlayfairDisplay-SemiBold` | 18 / 24.75 | center | Centered section titles ("Most Exclusive Homes Just For You") |
 | `sectionTitle` | `PlayfairDisplay-Medium` | 17 / 24 | letterSpacing -0.3 | Top-bar titles (`DetailTopBar`) |
 | `brandTitle` | `PlayfairDisplay-Bold` | 21 | white | "Urban Nest" logo text in page headers |
@@ -734,6 +736,22 @@ Supports two operational modes:
 - **Logic**: `useMaintenance(residenceId, navigation)`; mock data `MAINTENANCE_BANNERS`, `MAINTENANCE_TICKETS`, `RESOLVED_TICKETS`, `MAINTENANCE_NEWS` in `constants.ts`. The hook also owns the news paging (`visibleNews`, `canPrevNews` / `canNextNews`, `prevNews` / `nextNews`), so the screen only draws. Actions show "coming soon" in an `AppDialog`.
 - **Icons** added: solid ticket icons `src/assets/icons/maintenance/{hvac,plumbing,electrical}.png` (`renterIcons.hvac` etc.), drawn by `scripts/icons/draw_solid_icons.ps1` (filled shapes on a 100 grid, rendered 4x and scaled down). `draw_line_icons.ps1` gained an `-Only` switch to redraw just the named line icons.
 
+### 0i. Maintenance Request (`src/features/renter/screens/MaintenanceRequestScreen.tsx`)
+- **Opened by**: "+ Request" on the Maintenance page (route `MaintenanceRequest { residenceId }`). Follows the "Urban Nest Maintenance Request" design, built only from app standards. Light page (`pageTint` + blue / lavender glow), `KeyboardAvoidingView` + `keyboardShouldPersistTaps`, no tab bar (pushed page).
+- **Layout**: `LightTopBar` (back + avatar) → `AccentSectionHeader page` "Maintenance Request" + subtitle → `RequestHero` (`chipBlue` card, white rounded-square icon box with the renter `wrench`, `heroTitleCompact` navy "Need a Fix?
+We're Here.", `cardSubtitle` line; photo `request_hero.jpg` (cropped from the design) on the right, faded into the card) → **form laid on the page, no outer white box** (like the guest home sections; side margins 20, 24 between fields):
+  - Category: `FormLabel` (layers) + `CategoryPicker` = row of the shared **`IconTile`** (same tiles as the guest home categories: 54 `tileBlue` square, white rim, navy icon, Inter Medium 11 label) with renter line icons `faucet` / `bolt` / `airVent` / `wrench` / `ellipsis` for Plumbing / Electrical / HVAC / General / Other; the chosen one gets the soft blue `DONE_BLUE`-style corner tick (no border / fill change).
+  - Problem (alert icon): one-line `TextInput` (max 80) in `formStyles.field`.
+  - Location (pin icon): `FormSelect` with the building icon → `CategorySheet` titled "Choose a location" listing this home's rooms (`INSPECTION_AREAS` + unit, e.g. "Kitchen, Suite 402").
+  - `VoiceNoteCard`: pale blue card, navy gradient mic button (renter line `mic`, white) with glow, divider, `cardTitle` "Describe by Voice" + hint, decorative blue sound wave. Recording is not built yet → "coming soon" dialog.
+  - Detailed Description (note icon): multi-line field, `MAINTENANCE_DESCRIPTION_MAX` 500 with a "0 / 500" counter.
+  - Add Evidence (image icon, optional): `EvidencePicker` two dashed tiles ("Upload Photos" / "Upload Video") → shared `useMediaPicker` (camera or library, max `MAX_ISSUE_MEDIA`), thumbnails with remove (`IssueMediaThumb`).
+  - `Button` `brand` "Submit Request →" (enabled once category, problem and location are set) → "Request submitted" dialog → back. Shield-check icon + `cardSubtitle` entry-consent note.
+- **Icon standard**: everything on this page uses the app's rounded **line** icons at the renter-set weight (stroke 2.2 on the 24 grid): existing `renterIcons` (faucet, bolt, wrench) plus new `airVent`, `ellipsis`, `mic` (`draw_line_icons.ps1 -OutDir src/assets/icons/renter -Stroke 2.2 -Only air_vent,ellipsis,mic`) and the label icons `lineLayers`, `lineAlert`, `linePin`, `lineNote`, `lineImagePlus`, `lineVideoPlus`, `lineBuilding`, `lineShieldCheck` (redrawn at -Stroke 2.2). No solid icons here (the solid set in `icons/maintenance` is only for the Maintenance page ticket tiles).
+- **Shared pieces added** (reuse for other forms / pickers): `src/components/IconTile` (now also used by the guest `CategoryRow`), `components/form/FormLabel` (navy line icon + `formHeading` sub-heading: Playfair Medium 15), `components/form/FormSelect`, `components/form/formStyles` (`field`, `input`, `placeholder`, `textArea`, `counter`), `hooks/useMediaPicker` (also used by `useInspectionArea`), `CategorySheet` `title` prop, `AccentSectionHeader` `page` + `subtitle`.
+- **Logic**: `useMaintenanceRequest(residenceId, navigation)`: category, problem, location (+ sheet open state), description, media, `canSubmit`, `submit`, `recordVoice`, `back` ("Discard this request?" when there is input). Data `MAINTENANCE_CATEGORIES`, `MAINTENANCE_DESCRIPTION_MAX`, `MAINTENANCE_REQUEST_HERO`.
+- **Not in the design build**: bottom tab bar (pushed page), notification bell (hidden app-wide), "Urban Nest" top-bar title, the big white form container (removed on request: fields sit on the page).
+
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.
 - **Components**:
@@ -839,6 +857,7 @@ Supports two operational modes:
 - **RenterHome ➔ CheckIn**: tap a Move-In Ready card.
 - **ManageResidence ➔ Neyora** (installed SDK: Neyora Home ➔ Neyora Calendar): **Scheduling** shortcut on the frosted residence card. Back returns to ManageResidence.
 - **ManageResidence ➔ Maintenance**: **Maintenance** shortcut on the residence card. Back returns to ManageResidence.
+- **Maintenance ➔ MaintenanceRequest**: **+ Request** on the "Need a Fix?" banner. Back (asks first if the form has input) or "Done" after submitting returns to Maintenance.
 - **PersonaSelect ➔ Home**: "Continue as PMS".
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.

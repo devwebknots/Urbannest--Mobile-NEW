@@ -260,6 +260,16 @@ export interface MaintenanceBanner {
 /** Solid ticket icons (assets/icons/maintenance), wrench as a general fallback */
 export type MaintenanceTicketIcon = 'hvac' | 'plumbing' | 'electrical' | 'lineWrench';
 
+/** Line icons (renter set) on the maintenance request category tiles */
+export type MaintenanceCategoryIcon = 'faucet' | 'bolt' | 'airVent' | 'wrench' | 'ellipsis';
+
+/** Category tile on the maintenance request form */
+export interface MaintenanceCategory {
+  readonly id: string;
+  readonly label: string;
+  readonly icon: MaintenanceCategoryIcon;
+}
+
 /** One meta item under an active ticket (date, technician, parts status) */
 export interface MaintenanceTicketMeta {
   readonly icon: 'calendar' | 'user' | 'clock';

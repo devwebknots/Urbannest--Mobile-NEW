@@ -73,6 +73,9 @@ export const renterAssets = {
   bannerScheduled: require('@/assets/images/renter/banner_scheduled.jpg'),
   bannerMonsoon: require('@/assets/images/renter/banner_monsoon.jpg'),
   bannerRepair: require('@/assets/images/renter/banner_repair.jpg'),
+  // "Need a Fix?" card photo, cropped from the Maintenance Request design
+  // (800 x 680, building with balconies under a light sky + soft arc)
+  requestHero: require('@/assets/images/renter/request_hero.jpg'),
 };
 
 /** Line icons drawn for the dashboard (white PNGs, tinted in the app). */
@@ -107,6 +110,20 @@ export const renterIcons = {
   hvac: require('@/assets/icons/maintenance/hvac.png'),
   plumbing: require('@/assets/icons/maintenance/plumbing.png'),
   electrical: require('@/assets/icons/maintenance/electrical.png'),
+  // Maintenance request category + voice icons, same weight as the set above
+  // (draw_line_icons.ps1 -OutDir src/assets/icons/renter -Stroke 2.2)
+  airVent: require('@/assets/icons/renter/air_vent.png'),
+  ellipsis: require('@/assets/icons/renter/ellipsis.png'),
+  mic: require('@/assets/icons/renter/mic.png'),
+  // Maintenance request form labels (Lucide, draw_line_icons.ps1 -Stroke 2.2)
+  lineLayers: require('@/assets/icons/manage/layers.png'),
+  lineAlert: require('@/assets/icons/manage/alert.png'),
+  linePin: require('@/assets/icons/manage/pin.png'),
+  lineNote: require('@/assets/icons/manage/note.png'),
+  lineImagePlus: require('@/assets/icons/manage/image_plus.png'),
+  lineVideoPlus: require('@/assets/icons/manage/video_plus.png'),
+  lineBuilding: require('@/assets/icons/manage/building.png'),
+  lineShieldCheck: require('@/assets/icons/manage/shield_check.png'),
 };
 
 /** Width / height of residences_header.jpg */

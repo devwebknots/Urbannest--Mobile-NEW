@@ -16,6 +16,9 @@ export * from './LinearGradient';
 export { default as AppDialog } from './AppDialog';
 export * from './AppDialog';
 
+export { default as IconTile } from './IconTile';
+export * from './IconTile';
+
 export { default as ProfileAvatar } from './ProfileAvatar';
 export * from './ProfileAvatar';
 

@@ -18,14 +18,8 @@
  */
 
 import { createElement, useCallback, useMemo, useState } from 'react';
-import {
-  Asset,
-  ImagePickerResponse,
-  launchCamera,
-  launchImageLibrary,
-} from 'react-native-image-picker';
 import { useAppDialog } from '@/components/AppDialog';
-import { UploadIcon, VideoCameraIcon } from '@/components/icons';
+import { UploadIcon } from '@/components/icons';
 import { colors } from '@/config/theme';
 import { moderateScale as ms } from '@/utils/responsive';
 import { goBack, navigate } from '@/navigation/navigationRef';
@@ -39,6 +33,7 @@ import {
 import { inspectionAreaStore, useInspectionAreaStore } from '../store/inspectionAreaStore';
 import type { AreaStatus, InspectionIssue, IssueMedia } from '../types';
 import type { InspectionNavigation } from './useInspection';
+import { useMediaPicker } from './useMediaPicker';
 
 interface Draft {
   categoryId?: string;
@@ -51,11 +46,6 @@ const EMPTY_DRAFT: Draft = { description: '', media: [] };
 const NO_ISSUES: readonly InspectionIssue[] = [];
 
 const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
-const toMedia = (asset: Asset): IssueMedia | null =>
-  asset.uri
-    ? { uri: asset.uri, type: asset.type?.startsWith('video') ? 'video' : 'photo' }
-    : null;
 
 export function useInspectionArea(
   residenceId?: string,
@@ -167,63 +157,16 @@ export function useInspectionArea(
     setDraft(d => ({ ...d, description }));
   }, []);
 
-  const addMediaFrom = useCallback((response: ImagePickerResponse) => {
-    if (response.didCancel) {
-      return;
-    }
-    if (response.errorCode) {
-      showDialog({
-        tone: 'warning',
-        title: 'Could not add file',
-        message: response.errorMessage ?? 'Please try again.',
-        actions: [{ label: 'OK' }],
-      });
-      return;
-    }
-    const picked = (response.assets ?? []).map(toMedia).filter((m): m is IssueMedia => m !== null);
+  const onPickMedia = useCallback((picked: readonly IssueMedia[]) => {
     setDraft(d => ({ ...d, media: [...d.media, ...picked].slice(0, MAX_ISSUE_MEDIA) }));
-  }, [showDialog]);
-
-  const addMedia = useCallback(
-    (type: 'photo' | 'video') => {
-      const left = MAX_ISSUE_MEDIA - draft.media.length;
-      if (left <= 0) {
-        showDialog({
-          tone: 'info',
-          title: 'Limit reached',
-          message: `You can add up to ${MAX_ISSUE_MEDIA} photos or videos per issue.`,
-          actions: [{ label: 'OK' }],
-        });
-        return;
-      }
-      const isVideo = type === 'video';
-      const camera = isVideo
-        ? { mediaType: 'video' as const, videoQuality: 'medium' as const, durationLimit: 60 }
-        : { mediaType: 'photo' as const, quality: 0.8 as const, maxWidth: 1600, maxHeight: 1600 };
-      showDialog({
-        tone: 'info',
-        icon: createElement(isVideo ? VideoCameraIcon : UploadIcon, {
-          size: ms(22),
-          color: colors.navy,
-        }),
-        title: isVideo ? 'Add a video' : 'Add a photo',
-        message: isVideo ? 'Record a short clip (up to 60s) or pick one.' : 'Take a new photo or pick one.',
-        actions: [
-          {
-            label: isVideo ? 'Record Video' : 'Take Photo',
-            onPress: () => launchCamera(camera).then(addMediaFrom),
-          },
-          {
-            label: 'Choose from Library',
-            variant: 'soft',
-            onPress: () => launchImageLibrary({ ...camera, selectionLimit: left }).then(addMediaFrom),
-          },
-          { label: 'Cancel', variant: 'link' },
-        ],
-      });
-    },
-    [draft.media.length, addMediaFrom, showDialog],
-  );
+  }, []);
+  const addMedia = useMediaPicker({
+    count: draft.media.length,
+    max: MAX_ISSUE_MEDIA,
+    limitLabel: 'per issue',
+    showDialog,
+    onPick: onPickMedia,
+  });
 
   const removeMedia = useCallback((index: number) => {
     setDraft(d => ({ ...d, media: d.media.filter((_, i) => i !== index) }));

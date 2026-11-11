@@ -1,13 +1,13 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { HomeIcon } from '@/components/icons';
-import { borderRadius, colors, spacing, typography } from '@/config/theme';
-import { moderateScale as ms, scaleFont } from '@/utils/responsive';
+import { ICON_TILE_ICON, IconTile } from '@/components/IconTile';
+import { colors, spacing } from '@/config/theme';
 import type { Category, CategoryKey } from '../types';
 import { ApartmentsIcon, BuildingIcon, LayersIcon } from './GuestIcons';
 
 const CategoryIcon: React.FC<{ id: CategoryKey }> = ({ id }) => {
-  const size = ms(22);
+  const size = ICON_TILE_ICON;
   const color = colors.navy;
   switch (id) {
     case 'multi':
@@ -29,19 +29,12 @@ interface Props {
 export const CategoryRow: React.FC<Props> = ({ categories, onPress }) => (
   <View style={styles.row}>
     {categories.map(c => (
-      <Pressable
+      <IconTile
         key={c.key}
-        style={styles.item}
+        icon={<CategoryIcon id={c.key} />}
+        label={c.label}
         onPress={() => onPress?.(c.key)}
-        accessibilityRole="button"
-      >
-        <View style={styles.tile}>
-          <CategoryIcon id={c.key} />
-        </View>
-        <Text style={styles.label} numberOfLines={1}>
-          {c.label}
-        </Text>
-      </Pressable>
+      />
     ))}
   </View>
 );
@@ -51,27 +44,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
-  },
-  item: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  tile: {
-    width: ms(54),
-    height: ms(54),
-    borderRadius: borderRadius.xl,
-    backgroundColor: colors.tileBlue,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  label: {
-    marginTop: spacing.sm,
-    fontFamily: typography.fontFamily.body.medium,
-    fontSize: scaleFont(11),
-    color: colors.textPrimary,
-    fontWeight: typography.fontWeight.medium,
   },
 });
 

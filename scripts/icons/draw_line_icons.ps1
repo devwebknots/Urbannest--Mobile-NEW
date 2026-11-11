@@ -194,10 +194,89 @@ $icons = [ordered]@{
     'path:M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z',
     'circle:16.5,7.5,0.5'
   )
+  # ---- Maintenance request form labels ----
+  # lucide: layers
+  'layers' = @(
+    'path:M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z',
+    'path:M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12',
+    'path:M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17'
+  )
+  # lucide: triangle-alert
+  'alert' = @(
+    'path:m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3',
+    'path:M12 9v4',
+    'path:M12 17h.01'
+  )
+  # lucide: map-pin
+  'pin' = @(
+    'path:M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0',
+    'circle:12,10,3'
+  )
+  # lucide: file-text
+  'note' = @(
+    'path:M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z',
+    'path:M14 2v4a2 2 0 0 0 2 2h4',
+    'path:M10 9H8',
+    'path:M16 13H8',
+    'path:M16 17H8'
+  )
+  # lucide: image-plus
+  'image_plus' = @(
+    'path:M16 5h6',
+    'path:M19 2v6',
+    'path:M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5',
+    'path:m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21',
+    'circle:9,9,2'
+  )
+  # lucide: video (camera + lens) with a small plus, like image-plus
+  'video_plus' = @(
+    'path:m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5',
+    'path:M4 6h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z',
+    'path:M20 0.5v5',
+    'path:M17.5 3h5'
+  )
+  # lucide: building-2
+  'building' = @(
+    'path:M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z',
+    'path:M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2',
+    'path:M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2',
+    'path:M10 6h4',
+    'path:M10 10h4',
+    'path:M10 14h4',
+    'path:M10 18h4'
+  )
+  # ---- Maintenance request: category + voice (draw into icons/renter at -Stroke 2.2
+  #      so they match the renter dashboard set) ----
+  # lucide: air-vent (HVAC)
+  'air_vent' = @(
+    'path:M6 12H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2',
+    'path:M6 8h12',
+    'path:M18.3 17.7a2.5 2.5 0 0 1-3.16 3.83 2.53 2.53 0 0 1-1.14-2V12',
+    'path:M6.6 15.6A2 2 0 1 0 10 17v-5'
+  )
+  # lucide: ellipsis (Other)
+  'ellipsis' = @(
+    'circle:12,12,1',
+    'circle:19,12,1',
+    'circle:5,12,1'
+  )
+  # lucide: mic
+  'mic' = @(
+    'path:M12 19v3',
+    'path:M19 10v2a7 7 0 0 1-14 0v-2',
+    'path:M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z'
+  )
+  # lucide: shield-check
+  'shield_check' = @(
+    'path:M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z',
+    'path:m9 12 2 2 4-4'
+  )
 }
 
 New-Item -ItemType Directory -Force $OutDir | Out-Null
 $out = (Resolve-Path $OutDir).Path
+# "-Only a,b" from the command line arrives as one string: split it
+$Only = @($Only | ForEach-Object { $_ -split ',' } | Where-Object { $_ })
 foreach ($name in $icons.Keys) {
   if ($Only.Count -gt 0 -and $Only -notcontains $name) { continue }
   $file = Join-Path $out "$name.png"

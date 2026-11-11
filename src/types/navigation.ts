@@ -25,6 +25,8 @@ export type RootStackParamList = {
   ManageResidence: { residenceId: string };
   /** Maintenance hub, opened by the Maintenance shortcut on the Manage page */
   Maintenance: { residenceId: string };
+  /** New maintenance request form, opened by "+ Request" on Maintenance */
+  MaintenanceRequest: { residenceId: string };
   /**
    * inspectionSubmitted is set by the inspection room page on "Finalize Inspection";
    * utilitiesConfirmed by the Utilities page on "Confirm Utilities"

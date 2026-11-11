@@ -7,7 +7,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { useAppDialog } from '@/components/AppDialog';
-import { goBack } from '@/navigation/navigationRef';
+import { goBack, navigate } from '@/navigation/navigationRef';
 import {
   MAINTENANCE_BANNER_ASPECT,
   MAINTENANCE_BANNERS,
@@ -21,6 +21,7 @@ import type { MaintenanceBanner, MaintenanceNews, MaintenanceTicket } from '../t
 
 export interface MaintenanceNavigation {
   goBack: () => void;
+  navigate?: (route: 'MaintenanceRequest', params: { residenceId: string }) => void;
 }
 
 /** News cards shown per page */
@@ -54,6 +55,16 @@ export function useMaintenance(residenceId?: string, navigation?: MaintenanceNav
     [soon],
   );
   const openNews = useCallback((item: MaintenanceNews) => soon(item.title), [soon]);
+
+  // "+ Request": open the maintenance request form for this home
+  const newRequest = useCallback(() => {
+    const params = { residenceId: residence.id };
+    if (navigation?.navigate) {
+      navigation.navigate('MaintenanceRequest', params);
+    } else {
+      navigate('MaintenanceRequest', params);
+    }
+  }, [navigation, residence.id]);
   const openBanner = useCallback(
     (item: MaintenanceBanner) => soon(item.title, 'Full details are coming soon.'),
     [soon],
@@ -84,7 +95,7 @@ export function useMaintenance(residenceId?: string, navigation?: MaintenanceNav
     openBanner,
     openTicket,
     openNews,
-    newRequest: () => soon('New Request', 'Raising a maintenance request is coming soon.'),
+    newRequest,
     seeAllResolved: () => soon('Recently Resolved'),
     openProfile: () => soon('Profile'),
     dialog: dialog.props,

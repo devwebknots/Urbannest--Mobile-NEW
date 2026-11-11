@@ -1,7 +1,8 @@
 /**
  * CategorySheet: bottom sheet listing the issue categories (the area page's
  * "Category" dropdown). The current choice shows a navy tick. Closes on
- * backdrop tap, Android back, or picking a category.
+ * backdrop tap, Android back, or picking a category. Also used for other
+ * single-choice lists (e.g. the maintenance request "Location") via `title`.
  */
 
 import React from 'react';
@@ -19,6 +20,8 @@ interface Props {
   selectedId?: string;
   onSelect: (id: string) => void;
   onClose: () => void;
+  /** Sheet heading, default "Choose a category" */
+  title?: string;
 }
 
 export const CategorySheet: React.FC<Props> = ({
@@ -27,14 +30,15 @@ export const CategorySheet: React.FC<Props> = ({
   selectedId,
   onSelect,
   onClose,
+  title = 'Choose a category',
 }) => {
   const insets = useSafeAreaInsets();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close categories" />
+      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close" />
       <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
         <View style={styles.handle} />
-        <Text style={styles.title}>Choose a category</Text>
+        <Text style={styles.title}>{title}</Text>
         <ScrollView style={styles.list} bounces={false}>
           {categories.map((c, i) => {
             const on = c.id === selectedId;

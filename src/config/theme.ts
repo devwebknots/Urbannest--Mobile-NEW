@@ -410,6 +410,14 @@ export const typographyPresets: Record<string, TextStyle> = {
     lineHeight: scaleFont(26),
     color: colors.textPrimary,
   },
+  // Smaller sectionHeading for form sub-headings next to a line icon
+  // ("Category", "Problem", "Location" on the maintenance request form)
+  formHeading: {
+    fontFamily: typography.fontFamily.heading.medium,
+    fontSize: scaleFont(15),
+    lineHeight: scaleFont(20),
+    color: colors.navy,
+  },
   eyebrow: {
     fontFamily: typography.fontFamily.body.medium,
     fontSize: scaleFont(11),
