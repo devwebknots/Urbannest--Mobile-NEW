@@ -68,6 +68,11 @@ export const renterAssets = {
   providerGasSafety: require('@/assets/images/renter/provider_gas_safety.jpg'),
   providerMetroDrain: require('@/assets/images/renter/provider_metro_drain.jpg'),
   providerCountyWastewater: require('@/assets/images/renter/provider_county_wastewater.jpg'),
+  // Maintenance page sliding banners (supplied artwork, text baked in;
+  // resized from 6688 x 3764 to 1280 x 720)
+  bannerScheduled: require('@/assets/images/renter/banner_scheduled.jpg'),
+  bannerMonsoon: require('@/assets/images/renter/banner_monsoon.jpg'),
+  bannerRepair: require('@/assets/images/renter/banner_repair.jpg'),
 };
 
 /** Line icons drawn for the dashboard (white PNGs, tinted in the app). */

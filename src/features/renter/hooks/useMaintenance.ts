@@ -1,7 +1,7 @@
 /**
  * useMaintenance: ViewModel for the Maintenance page (opened from the
  * Maintenance shortcut on the Manage page). Exposes the (mock)
- * announcements, active tickets, recently resolved list and news.
+ * sliding banners, active tickets, recently resolved list and news.
  * Actions without a page yet show a "coming soon" dialog.
  */
 
@@ -9,14 +9,15 @@ import { useCallback, useMemo, useState } from 'react';
 import { useAppDialog } from '@/components/AppDialog';
 import { goBack } from '@/navigation/navigationRef';
 import {
-  MAINTENANCE_ANNOUNCEMENTS,
+  MAINTENANCE_BANNER_ASPECT,
+  MAINTENANCE_BANNERS,
   MAINTENANCE_NEWS,
   MAINTENANCE_TICKETS,
   RENTER_PROFILE,
   RESIDENCES,
   RESOLVED_TICKETS,
 } from '../constants';
-import type { MaintenanceAnnouncement, MaintenanceNews, MaintenanceTicket } from '../types';
+import type { MaintenanceBanner, MaintenanceNews, MaintenanceTicket } from '../types';
 
 export interface MaintenanceNavigation {
   goBack: () => void;
@@ -53,8 +54,8 @@ export function useMaintenance(residenceId?: string, navigation?: MaintenanceNav
     [soon],
   );
   const openNews = useCallback((item: MaintenanceNews) => soon(item.title), [soon]);
-  const openAnnouncement = useCallback(
-    (item: MaintenanceAnnouncement) => soon(item.title, 'Full details are coming soon.'),
+  const openBanner = useCallback(
+    (item: MaintenanceBanner) => soon(item.title, 'Full details are coming soon.'),
     [soon],
   );
 
@@ -70,7 +71,8 @@ export function useMaintenance(residenceId?: string, navigation?: MaintenanceNav
   return {
     profile: RENTER_PROFILE,
     residence,
-    announcements: MAINTENANCE_ANNOUNCEMENTS,
+    banners: MAINTENANCE_BANNERS,
+    bannerAspect: MAINTENANCE_BANNER_ASPECT,
     tickets: MAINTENANCE_TICKETS,
     resolved: RESOLVED_TICKETS,
     visibleNews,
@@ -79,7 +81,7 @@ export function useMaintenance(residenceId?: string, navigation?: MaintenanceNav
     prevNews,
     nextNews,
     back,
-    openAnnouncement,
+    openBanner,
     openTicket,
     openNews,
     newRequest: () => soon('New Request', 'Raising a maintenance request is coming soon.'),

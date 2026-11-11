@@ -15,7 +15,7 @@ import type {
   IssueCategory,
   LeaseStatus,
   ManageAction,
-  MaintenanceAnnouncement,
+  MaintenanceBanner,
   MaintenanceNews,
   MaintenanceTicket,
   ManageQuickAction,
@@ -542,35 +542,15 @@ export const HELP_DESK_TICKETS: readonly HelpDeskTicket[] = [
 
 /* ---------- Maintenance (mock) ---------- */
 
-export const MAINTENANCE_ANNOUNCEMENTS: readonly MaintenanceAnnouncement[] = [
-  {
-    id: 'rooftop',
-    tag: 'New Amenity',
-    title: 'Rooftop Lounge Expansion',
-    highlight: 'Opening Friday',
-    body: 'Join us for the grand unveiling of our newly renovated sky deck with panoramic views and artisan cocktails.',
-    cta: 'Learn More',
-    image: renterAssets.sterling,
-  },
-  {
-    id: 'fitness',
-    tag: 'Upgrade',
-    title: 'Fitness Studio Refresh',
-    highlight: 'Now Open',
-    body: 'New strength racks, cardio machines and a stretching zone are ready on level two, open 24/7 for residents.',
-    cta: 'Learn More',
-    image: renterAssets.areaCommon,
-  },
-  {
-    id: 'lockers',
-    tag: 'Service',
-    title: 'Smart Package Lockers',
-    highlight: 'In the Lobby',
-    body: 'Collect deliveries any time with a one-time code sent to your phone the moment a parcel arrives.',
-    cta: 'Learn More',
-    image: renterAssets.azure,
-  },
+/** Sliding banners at the top of the Maintenance page (artwork 16:9) */
+export const MAINTENANCE_BANNERS: readonly MaintenanceBanner[] = [
+  { id: 'scheduled', title: 'Scheduled Maintenance', image: renterAssets.bannerScheduled },
+  { id: 'monsoon', title: 'Monsoon Maintenance Drive', image: renterAssets.bannerMonsoon },
+  { id: 'repair', title: 'Repair & Upkeep Work in Progress', image: renterAssets.bannerRepair },
 ];
+
+/** Width / height of the banner artwork */
+export const MAINTENANCE_BANNER_ASPECT = 1280 / 720;
 
 export const MAINTENANCE_TICKETS: readonly MaintenanceTicket[] = [
   {

@@ -245,17 +245,15 @@ export type HelpDeskStatus = 'Pending' | 'In Progress' | 'Resolved';
 
 /* ---------- Maintenance ---------- */
 
-/** Slide in the announcement carousel at the top of the Maintenance page */
-export interface MaintenanceAnnouncement {
+/**
+ * Sliding banner at the top of the Maintenance page. The artwork already
+ * holds the headline, text and button; `title` is for screen readers and
+ * the details dialog.
+ */
+export interface MaintenanceBanner {
   readonly id: string;
-  /** Gold pill, e.g. "New Amenity" */
-  readonly tag: string;
-  /** Navy part of the headline, e.g. "Rooftop Lounge Expansion" */
   readonly title: string;
-  /** Blue line under the title, e.g. "Opening Friday" */
-  readonly highlight: string;
-  readonly body: string;
-  readonly cta: string;
+  /** 16:9 artwork */
   readonly image: ImageSourcePropType;
 }
 

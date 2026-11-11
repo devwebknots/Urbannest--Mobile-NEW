@@ -2,7 +2,7 @@
  * MaintenanceScreen: maintenance hub for an active lease, opened from the
  * Maintenance shortcut on the Manage page. Top to bottom:
  *  - light top bar: back, "Maintenance", avatar
- *  - announcement carousel (white card, photo melting in on the right)
+ *  - sliding banners (16:9 artwork, auto-slides, dots underneath)
  *  - "Need a Fix?" banner with "+ Request"
  *  - Active Tickets: one white card per open request
  *  - Recently Resolved: list card with "View All"
@@ -21,7 +21,7 @@ import { AccentSectionHeader } from '../components/AccentSectionHeader';
 import { CircleIconButton } from '../components/CircleIconButton';
 import { Reveal } from '../components/Reveal';
 import { LightTopBar } from '../components/LightTopBar';
-import { AnnouncementCarousel } from '../components/maintenance/AnnouncementCarousel';
+import { BannerCarousel } from '../components/maintenance/BannerCarousel';
 import { NewsCard } from '../components/maintenance/NewsCard';
 import { RequestBanner } from '../components/maintenance/RequestBanner';
 import { ResolvedList } from '../components/maintenance/ResolvedList';
@@ -61,10 +61,11 @@ export const MaintenanceScreen: React.FC<Props> = ({ navigation, route }) => {
 
         <Reveal delay={60}>
           <View style={styles.carousel}>
-            <AnnouncementCarousel
-              items={vm.announcements}
+            <BannerCarousel
+              banners={vm.banners}
+              aspect={vm.bannerAspect}
               width={width}
-              onPress={vm.openAnnouncement}
+              onPress={vm.openBanner}
             />
           </View>
         </Reveal>
