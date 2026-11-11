@@ -115,6 +115,8 @@ export const renterIcons = {
   airVent: require('@/assets/icons/renter/air_vent.png'),
   ellipsis: require('@/assets/icons/renter/ellipsis.png'),
   mic: require('@/assets/icons/renter/mic.png'),
+  // Crossed wrench + screwdriver ("Need a Fix?" badge)
+  tools: require('@/assets/icons/renter/tools.png'),
   // Maintenance request form labels (Lucide, draw_line_icons.ps1 -Stroke 2.2)
   lineLayers: require('@/assets/icons/manage/layers.png'),
   lineAlert: require('@/assets/icons/manage/alert.png'),

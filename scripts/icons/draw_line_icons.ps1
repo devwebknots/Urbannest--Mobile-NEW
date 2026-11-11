@@ -260,6 +260,14 @@ $icons = [ordered]@{
     'circle:19,12,1',
     'circle:5,12,1'
   )
+  # tools: lucide wrench (head top right) crossed with a screwdriver
+  # (flat tip top left, rounded handle bottom right) - "Need a Fix?" badge
+  'tools' = @(
+    'path:M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
+    'path:M4.2 4.2l8.3 8.3',
+    'path:M2.6 4.6l2-2',
+    'path:M14.91 12.09L21.41 18.59A2 2 0 0 1 18.59 21.41L12.09 14.91A2 2 0 0 1 14.91 12.09Z'
+  )
   # lucide: mic
   'mic' = @(
     'path:M12 19v3',

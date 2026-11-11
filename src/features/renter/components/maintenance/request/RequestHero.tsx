@@ -1,7 +1,7 @@
 /**
  * RequestHero: "Need a Fix? We're Here." card at the top of the
  * maintenance request form. Pale blue card: white rounded icon box (app
- * standard, like the Check-In tiles) with the wrench,
+ * standard, like the Check-In tiles) with crossed tools,
  * navy Playfair headline and a short line on the left; a
  * building photo (with its soft sky arc) on the right melting into the
  * card.
@@ -33,7 +33,7 @@ export const RequestHero: React.FC<Props> = ({ image, width }) => {
 
       <View style={styles.copy}>
         <View style={styles.badge}>
-          <RenterIcon name="wrench" size={ms(20)} color={colors.navy} />
+          <RenterIcon name="tools" size={ms(22)} color={colors.navy} />
         </View>
         <Text style={styles.title}>Need a Fix?{'\n'}We're Here.</Text>
         <Text style={styles.body}>Raise a maintenance request and get it resolved quickly.</Text>
