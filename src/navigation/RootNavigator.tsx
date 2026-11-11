@@ -5,10 +5,18 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NeyoraModule } from '@neyora/maintenance-sdk';
 import { GuestHomeScreen } from '@/features/guest';
 import { HomeScreen } from '@/features/home';
 import { PersonaSelectScreen } from '@/features/persona';
-import { CheckInScreen, RenterHomeScreen, ResidenceDashboardScreen } from '@/features/renter';
+import {
+  CheckInScreen,
+  InspectionAreaScreen,
+  ManageResidenceScreen,
+  RenterHomeScreen,
+  UtilitiesScreen,
+  UtilityProvidersScreen,
+} from '@/features/renter';
 import { SplashScreen } from '@/features/splash';
 import { LoginScreen } from '@/features/auth/screens/LoginScreen';
 import { navigationRef } from './navigationRef';
@@ -46,14 +54,49 @@ export const RootNavigator: React.FC = () => (
         component={RenterHomeScreen}
         options={{ animation: 'slide_from_right' }}
       />
+      {/* Unwired: "Manage" now opens ManageResidence.
+          ResidenceDashboardScreen is kept in features/renter.
       <Stack.Screen
         name="ResidenceDashboard"
         component={ResidenceDashboardScreen}
+        options={{ animation: 'slide_from_right' }}
+      /> */}
+      <Stack.Screen
+        name="ManageResidence"
+        component={ManageResidenceScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen
         name="CheckIn"
         component={CheckInScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      {/* Unwired: the room page (InspectionArea) now covers the numbered
+          Inspection list. InspectionScreen is kept in features/renter.
+      <Stack.Screen
+        name="Inspection"
+        component={InspectionScreen}
+        options={{ animation: 'slide_from_right' }}
+      /> */}
+      <Stack.Screen
+        name="InspectionArea"
+        component={InspectionAreaScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="Utilities"
+        component={UtilitiesScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="UtilityProviders"
+        component={UtilityProvidersScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      {/* Neyora maintenance SDK, installed as a package */}
+      <Stack.Screen
+        name="Neyora"
+        component={NeyoraModule}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen name="Home" component={HomeScreen} />

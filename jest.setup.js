@@ -11,3 +11,8 @@ jest.mock('react-native-video', () => {
     ViewType: { TEXTURE: 0, SURFACE: 1, SURFACE_SECURE: 2 },
   };
 });
+
+jest.mock('react-native-image-picker', () => ({
+  launchCamera: jest.fn(() => Promise.resolve({ didCancel: true })),
+  launchImageLibrary: jest.fn(() => Promise.resolve({ didCancel: true })),
+}));

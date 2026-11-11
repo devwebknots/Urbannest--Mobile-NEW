@@ -366,6 +366,15 @@ export const typographyPresets: Record<string, TextStyle> = {
     letterSpacing: -0.75,
     color: colors.white,
   },
+  // Smaller page headline: same font as heroTitle at 26 / 30.7, -0.65
+  // tracking (same proportions). For task pages, e.g. "Move-In Inspection".
+  heroTitleCompact: {
+    fontFamily: typography.fontFamily.heading.bold,
+    fontSize: scaleFont(26),
+    lineHeight: scaleFont(30.7),
+    letterSpacing: -0.65,
+    color: colors.white,
+  },
   // Accent word inside heroTitle, e.g. "Simple". Same size, Playfair SemiBold,
   // gold. For an italic look use transform skewX (no italic font file;
   // fontStyle: "italic" can fall back to the system font on Android).

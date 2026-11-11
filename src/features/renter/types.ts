@@ -88,7 +88,80 @@ export interface CheckInTask {
   readonly hint: string;
   readonly icon: CheckInIcon;
   readonly accent: ConciergeAccent;
+  /**
+   * Set when the item is completed on its own screen. Tapping the tile opens
+   * that screen; the tile only ticks once that screen is submitted.
+   */
+  readonly screen?: 'InspectionArea' | 'Utilities';
 }
+
+/* ---------- Utilities (move-in) ---------- */
+
+export type UtilityIcon = 'bolt' | 'faucet' | 'flame' | 'waves';
+
+/** A company that supplies one utility at the residence (mock; later from the backend) */
+export interface UtilityProvider {
+  readonly id: string;
+  readonly name: string;
+  /** Kind of provider, e.g. "Investor-owned utility" */
+  readonly kind: string;
+  readonly description: string;
+  readonly tags: readonly string[];
+  readonly accent: ConciergeAccent;
+  /** Square thumbnail next to the name (later the provider's logo) */
+  readonly image: ImageSourcePropType;
+  readonly phone: string;
+  /** 24/7 outage / leak line, when the provider has one */
+  readonly emergency?: string;
+  /** Full URL, opened in the browser */
+  readonly website: string;
+  readonly hours: string;
+}
+
+/** One utility on the Utilities page (Electricity, Water, ...) */
+export interface UtilityService {
+  readonly id: string;
+  readonly label: string;
+  /** One line on the utility card */
+  readonly hint: string;
+  /** Intro under the title on the providers page */
+  readonly description: string;
+  readonly icon: UtilityIcon;
+  readonly image: ImageSourcePropType;
+  readonly providers: readonly UtilityProvider[];
+}
+
+/** One room / area on the move-in inspection page */
+export interface InspectionArea {
+  readonly id: string;
+  readonly label: string;
+  /** What to check, e.g. "Walls, floors & windows" */
+  readonly hint: string;
+  readonly image: ImageSourcePropType;
+}
+
+/** Issue category in the area page's dropdown, e.g. "Walls & Paint" */
+export interface IssueCategory {
+  readonly id: string;
+  readonly label: string;
+}
+
+/** Photo or video attached to an issue (local file from camera / gallery) */
+export interface IssueMedia {
+  readonly uri: string;
+  readonly type: 'photo' | 'video';
+}
+
+/** One issue reported for an area during the move-in inspection */
+export interface InspectionIssue {
+  readonly id: string;
+  readonly categoryId: string;
+  readonly description: string;
+  readonly media: readonly IssueMedia[];
+}
+
+/** Area result: "allGood" (no issues) or "issues" (at least one issue) */
+export type AreaStatus = 'unset' | 'allGood' | 'issues';
 
 export interface CheckInSummary {
   readonly leaseId: string;
@@ -112,4 +185,70 @@ export interface NeighborhoodCategory {
   readonly icon: NeighborhoodIcon;
   readonly accent: ConciergeAccent;
   readonly places: readonly NeighborhoodPlace[];
+}
+
+/* ---------- Manage (my home) ---------- */
+
+export type ManageActionIcon = 'lineWrench' | 'lineReceipt' | 'lineCalendar' | 'lineDumbbell' | 'lineKey';
+
+/** One quick tile under the Manage header (Maintenance, Scheduling, ...) */
+export interface ManageAction {
+  readonly id: string;
+  readonly label: string;
+  readonly icon: ManageActionIcon;
+  readonly accent: ConciergeAccent;
+}
+
+export type ManageQuickActionIcon = 'calendar' | 'wrench' | 'bell' | 'grid';
+
+/** Pastel tile in the Manage "Quick Actions" row, e.g. "Rent Due / in 3 days" */
+export interface ManageQuickAction {
+  readonly id: string;
+  readonly title: string;
+  readonly detail: string;
+  readonly icon: ManageQuickActionIcon;
+  readonly accent: ConciergeAccent;
+  /** Show the detail line in the accent colour, e.g. "in 3 days" */
+  readonly highlight?: boolean;
+}
+
+/** Upcoming item on the Manage timeline (HOA fee, pest control, ...) */
+export interface QuickAlert {
+  readonly id: string;
+  readonly title: string;
+  /** Small line under the title, e.g. "Pending payment" */
+  readonly hint: string;
+  /** Date badge, e.g. "NOV" + "14" */
+  readonly month: string;
+  readonly day: string;
+  /** Shown on the right for payments */
+  readonly amount?: string;
+  /** Small status pill on the right, e.g. "Upcoming" */
+  readonly tag?: string;
+  /** Badge month colour */
+  readonly accent: ConciergeAccent;
+}
+
+/** Community Buzz carousel event */
+export interface BuzzEvent {
+  readonly id: string;
+  readonly title: string;
+  readonly host: string;
+  readonly date: string;
+  readonly time: string;
+  readonly audience: 'Public' | 'Residents';
+  readonly registrationOpen: boolean;
+  readonly image: ImageSourcePropType;
+}
+
+export type HelpDeskStatus = 'Pending' | 'In Progress' | 'Resolved';
+
+/** Help Desk ticket (a service request with a photo) */
+export interface HelpDeskTicket {
+  readonly id: string;
+  readonly category: string;
+  readonly title: string;
+  readonly date: string;
+  readonly status: HelpDeskStatus;
+  readonly image: ImageSourcePropType;
 }

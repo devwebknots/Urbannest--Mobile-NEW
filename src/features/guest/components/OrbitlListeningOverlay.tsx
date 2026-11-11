@@ -7,7 +7,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Modal, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useStatusBarInsets } from '@/hooks/useStatusBarInsets';
 import { CloseIcon } from '@/components/icons';
 import { borderRadius, colors, spacing, typography, typographyPresets } from '@/config/theme';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
@@ -92,7 +92,7 @@ const CyclingPrompt: React.FC<{ prompts: string[]; animate: boolean }> = ({ prom
 };
 
 export const OrbitlListeningOverlay: React.FC<Props> = ({ visible, prompts, onClose }) => {
-  const insets = useSafeAreaInsets();
+  const insets = useStatusBarInsets();
   const animate = useOrbitlMotion();
   const enter = useRef(new Animated.Value(0)).current;
 
@@ -112,6 +112,7 @@ export const OrbitlListeningOverlay: React.FC<Props> = ({ visible, prompts, onCl
       transparent
       animationType="fade"
       statusBarTranslucent
+      navigationBarTranslucent
       onRequestClose={onClose}
     >
       <StatusBar barStyle="light-content" />

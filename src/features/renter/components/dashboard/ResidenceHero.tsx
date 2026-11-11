@@ -7,7 +7,15 @@
  */
 
 import React, { useState } from 'react';
-import { Animated, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
+import {
+  Animated,
+  ImageSourcePropType,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+} from 'react-native';
 import { MapPinIcon } from '@/components/icons';
 import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
@@ -31,6 +39,12 @@ interface Props {
   scrollY: Animated.Value;
   /** Frosted-glass blur behind the text */
   glass?: boolean;
+  /** Override the title text style (default: heroTitle) */
+  nameStyle?: StyleProp<TextStyle>;
+  /** Colour laid over the glass blur (default: light white frost) */
+  glassTint?: string;
+  /** Tighter spacing inside the glass, so it is shorter */
+  compact?: boolean;
 }
 
 export const ResidenceHero: React.FC<Props> = ({
@@ -47,6 +61,9 @@ export const ResidenceHero: React.FC<Props> = ({
   sheetOverlap,
   scrollY,
   glass = false,
+  nameStyle,
+  glassTint,
+  compact = false,
 }) => {
   const imageStyle = {
     transform: [
@@ -119,31 +136,36 @@ export const ResidenceHero: React.FC<Props> = ({
           />
           {/* White frost over the blur (plain View: the app's LinearGradient
               only draws its preset brand gradients) */}
-          <View style={styles.glassFrost} />
+          <View style={[styles.glassFrost, glassTint ? { backgroundColor: glassTint } : null]} />
           <View style={styles.glassEdge} />
         </Animated.View>
       ) : null}
 
       <Animated.View
         onLayout={e => setGlassHeight(Math.round(e.nativeEvent.layout.height + GLASS_TOP))}
-        style={[styles.copy, { paddingBottom: sheetOverlap + (glass ? spacing.sm : spacing.xl) }, copyStyle]}
+        style={[
+          styles.copy,
+          { paddingBottom: sheetOverlap + (compact ? spacing.xs : glass ? spacing.sm : spacing.xl) },
+          compact && styles.copyCompact,
+          copyStyle,
+        ]}
       >
         {eyebrow === '' ? null : (
           <Text style={styles.eyebrow}>{eyebrow ?? `Welcome home, ${firstName}`}</Text>
         )}
-        <Text style={styles.name}>{name}</Text>
-        <View style={styles.addressRow}>
+        <Text style={[styles.name, nameStyle, compact && styles.nameCompact]}>{name}</Text>
+        <View style={[styles.addressRow, compact && styles.addressCompact]}>
           <MapPinIcon size={ms(15)} color={colors.heroAccent} style={styles.pin} />
           <Text style={styles.address} numberOfLines={2}>
             {street}, {city}
           </Text>
         </View>
-        <View style={styles.pills}>
-          <View style={styles.pill}>
+        <View style={[styles.pills, compact && styles.pillsCompact]}>
+          <View style={[styles.pill, compact && styles.pillCompact]}>
             <View style={styles.dot} />
             <Text style={styles.pillText}>{primaryPill}</Text>
           </View>
-          <View style={[styles.pill, styles.pillGhost]}>
+          <View style={[styles.pill, styles.pillGhost, compact && styles.pillCompact]}>
             <Text style={styles.pillText}>{statusLabel}</Text>
           </View>
         </View>
@@ -238,6 +260,23 @@ const styles = StyleSheet.create({
   pillText: {
     ...typographyPresets.badge,
     color: colors.white,
+  },
+  // compact: shorter glass, even padding above the title
+  copyCompact: {
+    paddingTop: spacing.md,
+  },
+  nameCompact: {
+    marginTop: 0,
+  },
+  addressCompact: {
+    marginTop: spacing.xs,
+  },
+  pillsCompact: {
+    marginTop: spacing.sm,
+  },
+  pillCompact: {
+    height: ms(26),
+    paddingHorizontal: spacing.md,
   },
 });
 
