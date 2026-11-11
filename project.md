@@ -149,6 +149,7 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | `RenterHome` | `RenterHomeScreen` (`@/features/renter`) | `animation: 'slide_from_right'` |
 | `ManageResidence` | `ManageResidenceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | ~~`ResidenceDashboard`~~ | Unwired (commented out in the navigator); `ResidenceDashboardScreen` kept in `@/features/renter` | — |
+| `Maintenance` | `MaintenanceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | `CheckIn` | `CheckInScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | `Neyora` | `NeyoraModule` (`@neyora/maintenance-sdk`, an installed package; see Section 4b) | `animation: 'slide_from_right'` |
 | `Home` | `HomeScreen` (`@/features/home`) | stack default |
@@ -289,7 +290,7 @@ Only changed an existing screen (Home, Calendar or their parts)? Skip step 2.
 - `vendor/neyora-maintenance-sdk-0.1.0.tgz`: the packed SDK (committed).
 - `src/types/navigation.ts`: `Neyora: undefined` in `RootStackParamList`.
 - `src/navigation/RootNavigator.tsx`: `import { NeyoraModule } from '@neyora/maintenance-sdk'` + `<Stack.Screen name="Neyora" component={NeyoraModule} options={{ animation: 'slide_from_right' }} />`.
-- `src/features/renter/hooks/useManageResidence.ts`: `openAction` → for `action.id === 'scheduling'` calls `navigation.navigate('Neyora')` (falls back to the global `navigate`); Maintenance and the other shortcuts show "coming soon".
+- `src/features/renter/hooks/useManageResidence.ts`: `openAction` → for `action.id === 'scheduling'` calls `navigation.navigate('Neyora')` (falls back to the global `navigate`); Maintenance opens the Maintenance page (Section 10, 0h); the other shortcuts show "coming soon".
 - `src/features/renter/constants.ts` (`MANAGE_ACTIONS`): Invoices → `{ id: 'scheduling', label: 'Scheduling', icon: 'lineCalendar' }`. Icon `src/assets/icons/manage/calendar.png` (Lucide `calendar`, added to `scripts/icons/draw_line_icons.ps1`), mapped in `renterAssets.ts`; `ManageActionIcon` gained `'lineCalendar'`. `ManageNavigation` gained an optional `navigate`.
 - `RenterTabBar` / `useRenterTabs` / `RenterTab`: **unchanged** (an earlier version swapped Profile for a Calendar tab that opened Neyora; reverted, Profile is back).
 - `metro.config.js` / `babel.config.js`: **unchanged** (an earlier version linked `../neyora` directly with `watchFolders` + a Babel alias override; replaced by the packed file).
@@ -714,7 +715,24 @@ Supports two operational modes:
   - "This Week" (`WeekTimeline`, calendar icon): one white card; dot rail (next item solid navy, later `tileBlue`), 44 × 46 `TILE_BG` date badges (accent month, Playfair day), navy `cardTitle` + hint, `infoLight` tag pill or amount, chevron, hairline dividers.
   - "Community Buzz" (`BuzzCarousel`, users icon): landscape cards (80% width, height × 0.62), white "Registration Open" pill + glass audience tag, one-line `heroTitleCompact` title, date / time; navy pill dots.
   - "Help Desk" (`HelpDeskList`, headset icon): rows in one white card split by hairlines (64 × 56 photo, eyebrow category, one-line navy title, `#ticket · date`, status pill, chevron), then `Button` `soft` "Raise a Request".
-- **Logic**: `useManageResidence(residenceId, navigation)`; mock data `MANAGE_ACTIONS`, `MANAGE_QUICK_ACTIONS`, `RENT_DUE` (`dueDate`, `daysLeft`, `cycleDays`), `QUICK_ALERTS` (`month`, `day`, `amount?`, `tag?`), `COMMUNITY_BUZZ`, `HELP_DESK_TICKETS` in `constants.ts` (rent amount from the residence). Every action shows "coming soon" in an `AppDialog`.
+- **Logic**: `useManageResidence(residenceId, navigation)`; mock data `MANAGE_ACTIONS`, `MANAGE_QUICK_ACTIONS`, `RENT_DUE` (`dueDate`, `daysLeft`, `cycleDays`), `QUICK_ALERTS` (`month`, `day`, `amount?`, `tag?`), `COMMUNITY_BUZZ`, `HELP_DESK_TICKETS` in `constants.ts` (rent amount from the residence). The **Maintenance** shortcut opens `Maintenance` (0h), **Scheduling** opens Neyora; every other action shows "coming soon" in an `AppDialog`.
+
+### 0h. Maintenance (`src/features/renter/screens/MaintenanceScreen.tsx`)
+- **Opened by**: the **Maintenance** shortcut on the Manage `ResidenceHeroCard` (route `Maintenance { residenceId }`). Layout follows the "Urban Nest Rooftop Expansion Dashboard" design (Nov 2026) in the app's presets. Light page (`pageTint` + blue / lavender radial glow), no tab bar (pushed page).
+- **Shared pieces added for light renter pages** (reuse them):
+  - `components/AccentSectionHeader`: 4 × 24 `primary` bar + `sectionHeading` navy title + optional right slot (count text, links, arrow buttons).
+  - `components/CircleIconButton`: round white icon button, `outline` (`TILE_BORDER` rim) or `solid` (soft shadow, for photos), default 36.
+  - `CARD_RADIUS` (22, in `components/maintenance/cardStyle.ts`) for every card on the page.
+- **Layout** (components in `components/maintenance/`):
+  - `LightTopBar` "Maintenance" + avatar on the `pageTint` page with a soft blue / lavender radial glow. Dark status bar.
+  - `AnnouncementCarousel` (as in the design image): snapping full-width white cards (350 high): `warningLight` tag pill, `heroTitleCompact` navy title + `primary` second line, `body` text, `Button` `brand` md "Learn More →"; photo on the right 58% melted into the card with CSS linear gradients; navy pill dots bottom right. Data `MAINTENANCE_ANNOUNCEMENTS`.
+  - Other tops were tried and rejected (photo hero + overlapping card, navy band + glass tiles, bento grid, arch, room carousel); the user chose to stay with the design image layout.
+  - `RequestBanner` ("Need a Fix?"): `chipBlue → TILE_BG` card, navy gradient wrench badge with a secondary-blue halo, `cardTitle` + `cardSubtitle`, compact `Button` `brand` "+ Request" (36 high); always one row like the design (badge 40 + 5 halo, padding 12, text max 2 lines).
+  - "Active Tickets" (`TicketCard` per ticket): 56 `ACCENTS` icon tile with a 30 solid icon (`hvac` / `plumbing` / `electrical`, amber tickets use the brighter `warning` colour), uppercase `badge` category pill, `caption` ID, navy `cardTitle`, `cardSubtitle` description, semibold eyebrow meta items (calendar / user / clock), outline chevron `CircleIconButton`. Header right: "2 ITEMS PENDING" eyebrow, count in `primary`.
+  - `ResolvedList`: secondary-blue wash card (done colour, not green), `DONE_BLUE` tick, `sectionTitle` title, navy "View All →", rows with `primary` dot, `bodyBold` title, `caption` time.
+  - "News & Alerts" (`NewsCard`): photo card (196 high) with a navy left-to-right fade, `warningLight` tag, white `sectionHeading` title, `heroSubtitle` text, solid white arrow circle. Two cards per page; the header's prev / next `CircleIconButton`s page through.
+- **Logic**: `useMaintenance(residenceId, navigation)`; mock data `MAINTENANCE_ANNOUNCEMENTS`, `MAINTENANCE_TICKETS`, `RESOLVED_TICKETS`, `MAINTENANCE_NEWS` in `constants.ts`. The hook also owns the news paging (`visibleNews`, `canPrevNews` / `canNextNews`, `prevNews` / `nextNews`), so the screen only draws. Actions show "coming soon" in an `AppDialog`.
+- **Icons** added: solid ticket icons `src/assets/icons/maintenance/{hvac,plumbing,electrical}.png` (`renterIcons.hvac` etc.), drawn by `scripts/icons/draw_solid_icons.ps1` (filled shapes on a 100 grid, rendered 4x and scaled down). `draw_line_icons.ps1` gained an `-Only` switch to redraw just the named line icons.
 
 ### 1. Home Screen (`src/features/home/screens/HomeScreen.tsx`)
 - **Role**: Primary executive operational dashboard.
@@ -820,6 +838,7 @@ Supports two operational modes:
 - **RenterHome ➔ ManageResidence**: tap an Active Lease card ("Manage").
 - **RenterHome ➔ CheckIn**: tap a Move-In Ready card.
 - **ManageResidence ➔ Neyora** (installed SDK: Neyora Home ➔ Neyora Calendar): **Scheduling** shortcut on the frosted residence card. Back returns to ManageResidence.
+- **ManageResidence ➔ Maintenance**: **Maintenance** shortcut on the residence card. Back returns to ManageResidence.
 - **PersonaSelect ➔ Home**: "Continue as PMS".
 - **Home ➔ Calendar**:
   - Tapping **View Calendar** in `ScheduleSection`.

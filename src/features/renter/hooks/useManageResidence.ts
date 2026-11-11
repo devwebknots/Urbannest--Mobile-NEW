@@ -3,7 +3,8 @@
  * (opened from "Manage" on My Residences). Resolves the residence and
  * exposes the (mock) quick actions, alerts, community events and help
  * desk tickets. Features without a page yet show a "coming soon" dialog.
- * Scheduling opens the Neyora module (installed SDK).
+ * Maintenance opens the Maintenance page; Scheduling opens the Neyora
+ * module (installed SDK).
  */
 
 import { useCallback, useMemo } from 'react';
@@ -23,7 +24,7 @@ import type { BuzzEvent, HelpDeskTicket, ManageAction, ManageQuickAction, QuickA
 
 export interface ManageNavigation {
   goBack: () => void;
-  navigate?: (route: 'Neyora') => void;
+  navigate?: (route: 'Neyora' | 'Maintenance', params?: { residenceId: string }) => void;
 }
 
 export function useManageResidence(residenceId?: string, navigation?: ManageNavigation) {
@@ -50,6 +51,15 @@ export function useManageResidence(residenceId?: string, navigation?: ManageNavi
 
   const openAction = useCallback(
     (action: ManageAction) => {
+      if (action.id === 'maintenance') {
+        const params = { residenceId: residence.id };
+        if (navigation?.navigate) {
+          navigation.navigate('Maintenance', params);
+        } else {
+          navigate('Maintenance', params);
+        }
+        return;
+      }
       if (action.id !== 'scheduling') {
         soon(action.label);
         return;
@@ -60,7 +70,7 @@ export function useManageResidence(residenceId?: string, navigation?: ManageNavi
         navigate('Neyora');
       }
     },
-    [navigation, soon],
+    [navigation, residence.id, soon],
   );
   const openAlert = useCallback((alert: QuickAlert) => soon(alert.title), [soon]);
   const openQuickAction = useCallback(

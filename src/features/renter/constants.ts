@@ -15,8 +15,12 @@ import type {
   IssueCategory,
   LeaseStatus,
   ManageAction,
+  MaintenanceAnnouncement,
+  MaintenanceNews,
+  MaintenanceTicket,
   ManageQuickAction,
   NeighborhoodCategory,
+  ResolvedTicket,
   QuickAlert,
   Residence,
   ResidenceFilter,
@@ -533,5 +537,98 @@ export const HELP_DESK_TICKETS: readonly HelpDeskTicket[] = [
     date: 'Jan 26, 2025',
     status: 'Resolved',
     image: renterAssets.providerCountyWastewater,
+  },
+];
+
+/* ---------- Maintenance (mock) ---------- */
+
+export const MAINTENANCE_ANNOUNCEMENTS: readonly MaintenanceAnnouncement[] = [
+  {
+    id: 'rooftop',
+    tag: 'New Amenity',
+    title: 'Rooftop Lounge Expansion',
+    highlight: 'Opening Friday',
+    body: 'Join us for the grand unveiling of our newly renovated sky deck with panoramic views and artisan cocktails.',
+    cta: 'Learn More',
+    image: renterAssets.sterling,
+  },
+  {
+    id: 'fitness',
+    tag: 'Upgrade',
+    title: 'Fitness Studio Refresh',
+    highlight: 'Now Open',
+    body: 'New strength racks, cardio machines and a stretching zone are ready on level two, open 24/7 for residents.',
+    cta: 'Learn More',
+    image: renterAssets.areaCommon,
+  },
+  {
+    id: 'lockers',
+    tag: 'Service',
+    title: 'Smart Package Lockers',
+    highlight: 'In the Lobby',
+    body: 'Collect deliveries any time with a one-time code sent to your phone the moment a parcel arrives.',
+    cta: 'Learn More',
+    image: renterAssets.azure,
+  },
+];
+
+export const MAINTENANCE_TICKETS: readonly MaintenanceTicket[] = [
+  {
+    id: 'RE-4092',
+    category: 'HVAC / Scheduled',
+    title: 'HVAC Filter Replacement',
+    description: 'Routine seasonal maintenance scheduled for Thursday morning between 9:00 AM and 11:00 AM.',
+    icon: 'hvac',
+    accent: 'blue',
+    meta: [
+      { icon: 'calendar', label: 'Oct 24' },
+      { icon: 'user', label: 'James T.' },
+    ],
+  },
+  {
+    id: 'RE-5104',
+    category: 'Plumbing / In Progress',
+    title: 'Leaking Kitchen Faucet',
+    description: 'Technician has ordered replacement parts from the manufacturer. Expected completion: Oct 26.',
+    icon: 'plumbing',
+    accent: 'amber',
+    meta: [{ icon: 'clock', label: 'Pending Parts' }],
+  },
+];
+
+export const RESOLVED_TICKETS: readonly ResolvedTicket[] = [
+  { id: 'RE-3981', title: 'Water leakage in hall', completed: 'Completed 2 days ago' },
+  { id: 'RE-3940', title: 'Smart Lock Re-calibration', completed: 'Completed 4 days ago' },
+  { id: 'RE-3902', title: 'Balcony Door Alignment', completed: 'Completed Oct 15' },
+];
+
+export const MAINTENANCE_NEWS: readonly MaintenanceNews[] = [
+  {
+    id: 'fiber',
+    tag: 'Building Update',
+    title: 'High-Speed Fiber Upgrade Commencing',
+    body: 'We are enhancing our digital infrastructure with dedicated fiber to every unit, ensuring gigabit speeds for all residents.',
+    image: renterAssets.header,
+  },
+  {
+    id: 'scent',
+    tag: 'Lifestyle',
+    title: 'Signature Autumn Scent Series',
+    body: 'Experience our curated seasonal fragrance profile "Midnight Cedar" now greeting you in all common areas and elevators.',
+    image: renterAssets.livingCurated,
+  },
+  {
+    id: 'water',
+    tag: 'Notice',
+    title: 'Water Shut-Off Tuesday Morning',
+    body: 'Water will be off from 10:00 AM to 12:00 PM while the main valve on level three is serviced.',
+    image: renterAssets.utilityWater,
+  },
+  {
+    id: 'garden',
+    tag: 'Community',
+    title: 'Courtyard Garden Planting Day',
+    body: 'Bring the family to plant the new winter beds with our landscaping team. Tools and refreshments provided.',
+    image: renterAssets.areaOutside,
   },
 ];

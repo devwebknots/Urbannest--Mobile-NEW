@@ -10,7 +10,9 @@ param(
   [string]$OutDir = (Join-Path $PSScriptRoot '..\..\src\assets\icons\manage'),
   [int]$Size = 128,
   # Stroke width on the 24-unit grid (Lucide default is 2)
-  [double]$Stroke = 1.8
+  [double]$Stroke = 1.8,
+  # Optional: only draw these icons (e.g. -Only key), leave the rest alone
+  [string[]]$Only = @()
 )
 
 Add-Type -ReferencedAssemblies System.Drawing -TypeDefinition @'
@@ -197,6 +199,7 @@ $icons = [ordered]@{
 New-Item -ItemType Directory -Force $OutDir | Out-Null
 $out = (Resolve-Path $OutDir).Path
 foreach ($name in $icons.Keys) {
+  if ($Only.Count -gt 0 -and $Only -notcontains $name) { continue }
   $file = Join-Path $out "$name.png"
   [SvgLineIcon]::Render($file, [string[]]$icons[$name], $Size, $Stroke)
   Write-Output "wrote $file"

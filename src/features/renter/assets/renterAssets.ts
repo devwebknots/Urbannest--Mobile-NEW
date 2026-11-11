@@ -98,6 +98,10 @@ export const renterIcons = {
   lineCalendar: require('@/assets/icons/manage/calendar.png'),
   lineDumbbell: require('@/assets/icons/manage/dumbbell.png'),
   lineKey: require('@/assets/icons/manage/key.png'),
+  // Solid Maintenance ticket icons, drawn by scripts/icons/draw_solid_icons.ps1
+  hvac: require('@/assets/icons/maintenance/hvac.png'),
+  plumbing: require('@/assets/icons/maintenance/plumbing.png'),
+  electrical: require('@/assets/icons/maintenance/electrical.png'),
 };
 
 /** Width / height of residences_header.jpg */

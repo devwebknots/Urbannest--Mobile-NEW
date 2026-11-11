@@ -243,6 +243,59 @@ export interface BuzzEvent {
 
 export type HelpDeskStatus = 'Pending' | 'In Progress' | 'Resolved';
 
+/* ---------- Maintenance ---------- */
+
+/** Slide in the announcement carousel at the top of the Maintenance page */
+export interface MaintenanceAnnouncement {
+  readonly id: string;
+  /** Gold pill, e.g. "New Amenity" */
+  readonly tag: string;
+  /** Navy part of the headline, e.g. "Rooftop Lounge Expansion" */
+  readonly title: string;
+  /** Blue line under the title, e.g. "Opening Friday" */
+  readonly highlight: string;
+  readonly body: string;
+  readonly cta: string;
+  readonly image: ImageSourcePropType;
+}
+
+/** Solid ticket icons (assets/icons/maintenance), wrench as a general fallback */
+export type MaintenanceTicketIcon = 'hvac' | 'plumbing' | 'electrical' | 'lineWrench';
+
+/** One meta item under an active ticket (date, technician, parts status) */
+export interface MaintenanceTicketMeta {
+  readonly icon: 'calendar' | 'user' | 'clock';
+  readonly label: string;
+}
+
+/** Open maintenance request on the Maintenance page */
+export interface MaintenanceTicket {
+  readonly id: string;
+  /** Pill text, e.g. "HVAC / Scheduled" */
+  readonly category: string;
+  readonly title: string;
+  readonly description: string;
+  readonly icon: MaintenanceTicketIcon;
+  readonly accent: ConciergeAccent;
+  readonly meta: readonly MaintenanceTicketMeta[];
+}
+
+/** Row in "Recently Resolved" */
+export interface ResolvedTicket {
+  readonly id: string;
+  readonly title: string;
+  readonly completed: string;
+}
+
+/** News & Alerts photo card */
+export interface MaintenanceNews {
+  readonly id: string;
+  readonly tag: string;
+  readonly title: string;
+  readonly body: string;
+  readonly image: ImageSourcePropType;
+}
+
 /** Help Desk ticket (a service request with a photo) */
 export interface HelpDeskTicket {
   readonly id: string;

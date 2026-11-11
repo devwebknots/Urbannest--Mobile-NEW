@@ -12,6 +12,7 @@ import { PersonaSelectScreen } from '@/features/persona';
 import {
   CheckInScreen,
   InspectionAreaScreen,
+  MaintenanceScreen,
   ManageResidenceScreen,
   RenterHomeScreen,
   UtilitiesScreen,
@@ -26,7 +27,8 @@ const Stack = createNativeStackNavigator();
 export const RootNavigator: React.FC = () => (
   <NavigationContainer ref={navigationRef}>
     <Stack.Navigator
-      initialRouteName="Splash"
+      // TEMP for testing: opens straight on Maintenance. Change back to "Splash".
+      initialRouteName="Maintenance"
       screenOptions={{ headerShown: false, animation: 'fade' }}
     >
       <Stack.Screen
@@ -64,6 +66,13 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="ManageResidence"
         component={ManageResidenceScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="Maintenance"
+        component={MaintenanceScreen}
+        // TEMP for testing (initial route): the first residence
+        initialParams={{ residenceId: 'obsidian' }}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen
