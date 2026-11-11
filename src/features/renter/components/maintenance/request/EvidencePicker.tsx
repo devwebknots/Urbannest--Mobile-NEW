@@ -1,7 +1,8 @@
 /**
  * EvidencePicker: "Add Evidence" on the request form. Two dashed tiles
  * ("Upload Photos", "Upload Video") side by side; added files show as
- * thumbnails underneath with a remove button (shared IssueMediaThumb).
+ * thumbnails underneath with a remove button (shared IssueMediaThumb);
+ * tap a thumbnail to see the photo full screen or play the video.
  */
 
 import React from 'react';
@@ -18,11 +19,13 @@ interface Props {
   max: number;
   onAdd: (type: 'photo' | 'video') => void;
   onRemove: (index: number) => void;
+  /** Tap a thumbnail: full-screen photo / play the video */
+  onOpen: (media: IssueMedia) => void;
 }
 
 const THUMB = ms(64);
 
-export const EvidencePicker: React.FC<Props> = ({ media, max, onAdd, onRemove }) => (
+export const EvidencePicker: React.FC<Props> = ({ media, max, onAdd, onRemove, onOpen }) => (
   <View>
     <View style={styles.tiles}>
       <Pressable
@@ -50,7 +53,14 @@ export const EvidencePicker: React.FC<Props> = ({ media, max, onAdd, onRemove })
         <View style={styles.thumbs}>
           {media.map((m, i) => (
             <View key={`${m.uri}-${i}`}>
-              <IssueMediaThumb media={m} size={THUMB} />
+              <Pressable
+                onPress={() => onOpen(m)}
+                accessibilityRole="imagebutton"
+                accessibilityLabel={`Open ${m.type} ${i + 1}`}
+                style={({ pressed }) => pressed && styles.pressed}
+              >
+                <IssueMediaThumb media={m} size={THUMB} />
+              </Pressable>
               <Pressable
                 onPress={() => onRemove(i)}
                 hitSlop={6}

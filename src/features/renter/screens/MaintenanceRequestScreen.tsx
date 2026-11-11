@@ -38,6 +38,7 @@ import { FormLabel } from '../components/form/FormLabel';
 import { FormSelect } from '../components/form/FormSelect';
 import { formStyles } from '../components/form/formStyles';
 import { CategorySheet } from '../components/inspection/CategorySheet';
+import { MediaPreview } from '../components/inspection/MediaPreview';
 import { CategoryPicker } from '../components/maintenance/request/CategoryPicker';
 import { EvidencePicker } from '../components/maintenance/request/EvidencePicker';
 import { RequestHero } from '../components/maintenance/request/RequestHero';
@@ -137,7 +138,16 @@ export const MaintenanceRequestScreen: React.FC<Props> = ({ navigation, route })
 
             {/* Describe by voice */}
             <View style={styles.section}>
-              <VoiceNoteCard onPress={vm.recordVoice} />
+              <VoiceNoteCard
+                status={vm.voice.status}
+                elapsedMs={vm.voice.elapsedMs}
+                maxMs={vm.voice.maxMs}
+                note={vm.voice.note}
+                playing={vm.voice.playing}
+                positionMs={vm.voice.positionMs}
+                onPress={vm.voice.press}
+                onDelete={vm.voice.remove}
+              />
             </View>
 
             {/* Detailed description */}
@@ -169,6 +179,7 @@ export const MaintenanceRequestScreen: React.FC<Props> = ({ navigation, route })
                 max={vm.maxMedia}
                 onAdd={vm.addMedia}
                 onRemove={vm.removeMedia}
+                onOpen={vm.openPreview}
               />
             </View>
 
@@ -200,6 +211,7 @@ export const MaintenanceRequestScreen: React.FC<Props> = ({ navigation, route })
         onSelect={vm.selectLocation}
         onClose={vm.closeLocation}
       />
+      <MediaPreview media={vm.preview} onClose={vm.closePreview} />
       <AppDialog {...vm.dialog} />
     </KeyboardAvoidingView>
   );

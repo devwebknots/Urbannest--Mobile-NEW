@@ -268,6 +268,8 @@ export interface MaintenanceCategory {
   readonly id: string;
   readonly label: string;
   readonly icon: MaintenanceCategoryIcon;
+  /** Filled into "Problem" when the category is picked, e.g. "Plumbing issue" */
+  readonly problem: string;
 }
 
 /** One meta item under an active ticket (date, technician, parts status) */

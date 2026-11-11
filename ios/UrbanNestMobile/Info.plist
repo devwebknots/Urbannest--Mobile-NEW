@@ -38,7 +38,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Record sound with videos of issues during your move-in inspection.</string>
+	<string>Record voice notes for maintenance requests and sound with videos of issues.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Attach photos and videos of issues to your move-in inspection.</string>
 	<key>RCTNewArchEnabled</key>

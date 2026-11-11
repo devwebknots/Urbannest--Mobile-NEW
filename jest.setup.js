@@ -12,6 +12,26 @@ jest.mock('react-native-video', () => {
   };
 });
 
+// Native recorder / player: no-op stand-in for tests
+jest.mock('react-native-nitro-sound', () => {
+  const sound = () => ({
+    setSubscriptionDuration: jest.fn(),
+    addRecordBackListener: jest.fn(),
+    removeRecordBackListener: jest.fn(),
+    addPlayBackListener: jest.fn(),
+    removePlayBackListener: jest.fn(),
+    addPlaybackEndListener: jest.fn(),
+    removePlaybackEndListener: jest.fn(),
+    startRecorder: jest.fn(() => Promise.resolve('file:///voice.m4a')),
+    stopRecorder: jest.fn(() => Promise.resolve('file:///voice.m4a')),
+    startPlayer: jest.fn(() => Promise.resolve('')),
+    pausePlayer: jest.fn(() => Promise.resolve('')),
+    resumePlayer: jest.fn(() => Promise.resolve('')),
+    stopPlayer: jest.fn(() => Promise.resolve('')),
+  });
+  return { __esModule: true, default: sound(), createSound: jest.fn(sound) };
+});
+
 jest.mock('react-native-image-picker', () => ({
   launchCamera: jest.fn(() => Promise.resolve({ didCancel: true })),
   launchImageLibrary: jest.fn(() => Promise.resolve({ didCancel: true })),

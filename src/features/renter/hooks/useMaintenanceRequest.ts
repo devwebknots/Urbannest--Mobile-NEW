@@ -1,9 +1,11 @@
 /**
  * useMaintenanceRequest: ViewModel for the "Maintenance Request" form
  * (opened by "+ Request" on the Maintenance page).
- *  - category tile, problem title, location (room of this home, picked
+ *  - category tile (fills the problem title, e.g. "Plumbing issue", unless
+ *    the user typed their own), problem title, location (room of this home, picked
  *    in a bottom sheet), detailed description (max 500), photos / videos
- *  - "Describe by Voice" is not built yet: shows "coming soon"
+ *  - "Describe by Voice": one voice note (useVoiceNote: record up to 2 min,
+ *    play back, delete); photos / videos via the shared useMediaPicker
  *  - Submit is enabled once category, problem and location are set; it
  *    confirms in the app dialog and goes back to the Maintenance page
  *  - leaving with unsaved input asks first
@@ -23,6 +25,7 @@ import {
 } from '../constants';
 import type { IssueMedia } from '../types';
 import { useMediaPicker } from './useMediaPicker';
+import { useVoiceNote } from './useVoiceNote';
 
 export interface MaintenanceRequestNavigation {
   goBack: () => void;
@@ -45,6 +48,8 @@ export function useMaintenanceRequest(
   const [locationOpen, setLocationOpen] = useState(false);
   const [description, setDescription] = useState('');
   const [media, setMedia] = useState<readonly IssueMedia[]>([]);
+  // "Describe by Voice": record / play / delete one voice note
+  const voice = useVoiceNote(showDialog);
 
   // Rooms of this home, e.g. "Kitchen, Suite 402"
   const locations = useMemo(
@@ -58,7 +63,8 @@ export function useMaintenanceRequest(
     problem.trim().length > 0 ||
     Boolean(locationId) ||
     description.trim().length > 0 ||
-    media.length > 0;
+    media.length > 0 ||
+    voice.status !== 'idle';
   const canSubmit = Boolean(categoryId) && problem.trim().length > 0 && Boolean(locationId);
 
   const leave = useCallback(() => {
@@ -85,6 +91,21 @@ export function useMaintenanceRequest(
     });
   }, [dirty, leave, showDialog]);
 
+  // Picking a category fills "Problem" with its title ("Plumbing issue").
+  // Switching category swaps it, but text the user typed is never replaced.
+  const selectCategory = useCallback((id: string) => {
+    setCategoryId(id);
+    const next = MAINTENANCE_CATEGORIES.find(c => c.id === id)?.problem;
+    if (!next) {
+      return;
+    }
+    setProblem(current => {
+      const text = current.trim();
+      const untouched = text === '' || MAINTENANCE_CATEGORIES.some(c => c.problem === text);
+      return untouched ? next : current;
+    });
+  }, []);
+
   const selectLocation = useCallback((id: string) => {
     setLocationId(id);
     setLocationOpen(false);
@@ -104,36 +125,39 @@ export function useMaintenanceRequest(
     setMedia(list => list.filter((_, i) => i !== index));
   }, []);
 
-  const recordVoice = useCallback(
-    () =>
-      showDialog({
-        tone: 'info',
-        title: 'Describe by Voice',
-        message: 'Voice notes are coming soon. Please type the details for now.',
-        actions: [{ label: 'OK', variant: 'brand' }],
-      }),
-    [showDialog],
-  );
+  // Tap a thumbnail: full-screen photo / play the video
+  const [preview, setPreview] = useState<IssueMedia | null>(null);
+  const closePreview = useCallback(() => setPreview(null), []);
 
-  const submit = useCallback(() => {
+  const submit = useCallback(async () => {
     if (!canSubmit) {
       return;
     }
+    // Still recording: keep what was said so far
+    if (voice.status === 'recording') {
+      await voice.stop();
+    }
     const category = MAINTENANCE_CATEGORIES.find(c => c.id === categoryId)?.label ?? '';
+    const extras = [
+      media.length > 0 ? `${media.length} photo${media.length > 1 ? 's / videos' : ' / video'}` : '',
+      voice.note || voice.status === 'recording' ? 'a voice note' : '',
+    ].filter(Boolean);
     showDialog({
       tone: 'info',
       title: 'Request submitted',
-      message: `${problem.trim()} (${category}) in ${locationLabel}. Our team will get back to you shortly.`,
+      message: `${problem.trim()} (${category}) in ${locationLabel}${
+        extras.length ? `, with ${extras.join(' and ')}` : ''
+      }. Our team will get back to you shortly.`,
       actions: [{ label: 'Done', variant: 'brand', onPress: leave }],
     });
-  }, [canSubmit, categoryId, problem, locationLabel, leave, showDialog]);
+  }, [canSubmit, voice, categoryId, media.length, problem, locationLabel, leave, showDialog]);
 
   return {
     profile: RENTER_PROFILE,
     heroImage: MAINTENANCE_REQUEST_HERO,
     categories: MAINTENANCE_CATEGORIES,
     categoryId,
-    selectCategory: setCategoryId,
+    selectCategory,
     problem,
     setProblem,
     locations,
@@ -150,7 +174,10 @@ export function useMaintenanceRequest(
     maxMedia: MAX_ISSUE_MEDIA,
     addMedia,
     removeMedia,
-    recordVoice,
+    preview,
+    openPreview: setPreview,
+    closePreview,
+    voice,
     canSubmit,
     submit,
     back,

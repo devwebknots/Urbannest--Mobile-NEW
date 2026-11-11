@@ -560,11 +560,11 @@ export const MAINTENANCE_BANNER_ASPECT = 1280 / 720;
 
 /** Category tiles on the maintenance request form */
 export const MAINTENANCE_CATEGORIES: readonly MaintenanceCategory[] = [
-  { id: 'plumbing', label: 'Plumbing', icon: 'faucet' },
-  { id: 'electrical', label: 'Electrical', icon: 'bolt' },
-  { id: 'hvac', label: 'HVAC', icon: 'airVent' },
-  { id: 'general', label: 'General', icon: 'wrench' },
-  { id: 'other', label: 'Other', icon: 'ellipsis' },
+  { id: 'plumbing', label: 'Plumbing', icon: 'faucet', problem: 'Plumbing issue' },
+  { id: 'electrical', label: 'Electrical', icon: 'bolt', problem: 'Electrical issue' },
+  { id: 'hvac', label: 'HVAC', icon: 'airVent', problem: 'HVAC issue' },
+  { id: 'general', label: 'General', icon: 'wrench', problem: 'General repair' },
+  { id: 'other', label: 'Other', icon: 'ellipsis', problem: 'Other issue' },
 ];
 
 /** Longest detailed description on the request form */
