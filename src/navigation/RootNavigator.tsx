@@ -31,8 +31,7 @@ const Stack = createNativeStackNavigator();
 export const RootNavigator: React.FC = () => (
   <NavigationContainer ref={navigationRef}>
     <Stack.Navigator
-      // TEMP for testing: opens straight on Maintenance. Change back to "Splash".
-      initialRouteName="Maintenance"
+      initialRouteName="Splash"
       screenOptions={{ headerShown: false, animation: 'fade' }}
     >
       <Stack.Screen
@@ -75,8 +74,6 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="Maintenance"
         component={MaintenanceScreen}
-        // TEMP for testing (initial route): the first residence
-        initialParams={{ residenceId: 'obsidian' }}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen

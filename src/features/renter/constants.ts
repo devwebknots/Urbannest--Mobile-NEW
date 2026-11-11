@@ -895,7 +895,6 @@ const MARCUS: Technician = {
 function completedDetails(args: {
   description: string;
   location?: string;
-  photo?: ImageSourcePropType;
   tech: Technician;
   day: string;
   /** Times of: received, assigned, repair started, completed */
@@ -913,7 +912,6 @@ function completedDetails(args: {
     completed: true,
     description: args.description,
     location: args.location,
-    photo: args.photo,
     assignee: tech,
     timeline: [
       {
@@ -1003,7 +1001,6 @@ const RESOLVED_TICKET_DETAILS: Readonly<Record<string, MaintenanceTicketDetails>
     description:
       'Water leakage reported in the hall near the elevator. The source was sealed and verified with no further leakage.',
     location: '3rd Floor',
-    photo: renterAssets.ticketHallLeak,
     tech: JOHN,
     day: 'Oct 8',
     times: ['10:24 AM', '10:36 AM', '01:15 PM', '04:45 PM'],

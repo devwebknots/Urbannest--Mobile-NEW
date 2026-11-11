@@ -360,8 +360,6 @@ export interface MaintenanceTicketDetails {
   readonly reported?: string;
   /** Where in the building, e.g. "3rd Floor"; defaults to the home's unit */
   readonly location?: string;
-  /** Photo of the area, faded into the right of the summary card */
-  readonly photo?: ImageSourcePropType;
   /** Technician; the initials show when there is no photo */
   readonly assignee: {
     readonly name: string;
