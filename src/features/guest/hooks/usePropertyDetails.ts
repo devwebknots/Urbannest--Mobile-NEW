@@ -3,7 +3,8 @@
  * page. Any guest listing can be opened (Rentals Near You or Featured);
  * the page shows its photo, price and stats with the design's shared
  * details (costs, features, rating).
- * Apply / Book a Tour need an account, so they offer Log In / Sign Up.
+ * Apply Now opens the rental application; Book a Tour needs an account,
+ * so it offers Log In / Sign Up.
  */
 
 import { useCallback, useMemo, useState } from 'react';
@@ -23,7 +24,10 @@ import type { PropertyDetails, PropertySummary } from '../types';
 
 export interface PropertyDetailsNavigation {
   goBack: () => void;
-  navigate?: (route: 'PersonaSelect') => void;
+  navigate?: {
+    (route: 'PersonaSelect'): void;
+    (route: 'RentalApplication', params: { propertyId: string }): void;
+  };
   /** Opens another listing on top (Similar Deals) */
   push?: (route: 'PropertyDetails', params: { propertyId: string }) => void;
 }
@@ -166,14 +170,14 @@ export function usePropertyDetails(propertyId?: string, navigation?: PropertyDet
     [goToSignIn, showDialog],
   );
 
-  const apply = useCallback(
-    () =>
-      needAccount(
-        `Apply for ${property.name}`,
-        'Log in or create an account to send your rental application.',
-      ),
-    [needAccount, property.name],
-  );
+  // Apply Now opens the rental application for this listing
+  const apply = useCallback(() => {
+    if (navigation?.navigate) {
+      navigation.navigate('RentalApplication', { propertyId: property.id });
+    } else {
+      navigate('RentalApplication', { propertyId: property.id });
+    }
+  }, [navigation, property.id]);
 
   const bookTour = useCallback(
     () =>

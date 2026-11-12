@@ -420,6 +420,14 @@ export const typographyPresets: Record<string, TextStyle> = {
     lineHeight: scaleFont(20),
     color: colors.navy,
   },
+  // Small label above a form field ("Legal First Name *" on the rental application)
+  fieldLabel: {
+    fontFamily: typography.fontFamily.body.semiBold,
+    fontSize: scaleFont(12),
+    lineHeight: scaleFont(16),
+    color: colors.textPrimary,
+    fontWeight: typography.fontWeight.semibold,
+  },
   eyebrow: {
     fontFamily: typography.fontFamily.body.medium,
     fontSize: scaleFont(11),

@@ -12,17 +12,26 @@ import type { PropertyIconName } from '../../types';
 import { PropertyIcon } from './PropertyIcon';
 
 interface Props {
-  icon: PropertyIconName;
+  icon?: PropertyIconName;
+  /** Any other icon (e.g. from another feature's set), drawn in the circle instead */
+  iconElement?: React.ReactNode;
   title: string;
   right?: React.ReactNode;
   /** Icon circle fill (default chipBlue; white on a chipBlue strip) */
   badgeColor?: string;
 }
 
-export const PropertySectionTitle: React.FC<Props> = ({ icon, title, right, badgeColor }) => (
+export const PropertySectionTitle: React.FC<Props> = ({
+  icon,
+  iconElement,
+  title,
+  right,
+  badgeColor,
+}) => (
   <View style={styles.row}>
     <View style={[styles.badge, badgeColor ? { backgroundColor: badgeColor } : null]}>
-      <PropertyIcon name={icon} size={ms(18)} color={colors.primary} />
+      {iconElement ??
+        (icon ? <PropertyIcon name={icon} size={ms(18)} color={colors.primary} /> : null)}
     </View>
     <Text style={styles.title} accessibilityRole="header" numberOfLines={1}>
       {title}

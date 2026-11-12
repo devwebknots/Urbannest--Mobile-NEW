@@ -1,0 +1,30 @@
+/**
+ * Rental application art and icons.
+ * header_building.png: the building from the top-right of the "Rental
+ * Application" design (cropped, 524 x 430), left and bottom edges faded to
+ * transparent so it melts into the page tint.
+ */
+export const applicationAssets = {
+  headerBuilding: require('@/assets/images/application/header_building.png'),
+};
+
+/** Width / height of header_building.png */
+export const HEADER_BUILDING_ASPECT = 524 / 430;
+
+/**
+ * Line icons (Lucide, ISC licence; white PNGs tinted in the app) at the
+ * renter-set weight: scripts/icons/draw_line_icons.ps1
+ * -OutDir src/assets/icons/application -Stroke 2.2 -Only user,users,mail,pencil,plus,circle_check
+ * House / calendar reuse the property details set.
+ */
+export const applicationIcons = {
+  user: require('@/assets/icons/application/user.png'),
+  users: require('@/assets/icons/application/users.png'),
+  mail: require('@/assets/icons/application/mail.png'),
+  pencil: require('@/assets/icons/application/pencil.png'),
+  plus: require('@/assets/icons/application/plus.png'),
+  circleCheck: require('@/assets/icons/application/circle_check.png'),
+  house: require('@/assets/icons/property/house.png'),
+  calendar: require('@/assets/icons/property/calendar_days.png'),
+  document: require('@/assets/icons/property/note.png'),
+};

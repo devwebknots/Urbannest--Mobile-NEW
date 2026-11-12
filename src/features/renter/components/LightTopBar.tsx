@@ -20,6 +20,8 @@ interface Props {
   onBack: () => void;
   onProfilePress?: () => void;
   backLabel?: string;
+  /** Title next to the back button instead of centered (e.g. "Rental Application") */
+  titleAlign?: 'center' | 'left';
 }
 
 export const LightTopBar: React.FC<Props> = ({
@@ -28,6 +30,7 @@ export const LightTopBar: React.FC<Props> = ({
   onBack,
   onProfilePress,
   backLabel = 'Back',
+  titleAlign = 'center',
 }) => (
   <View style={styles.bar}>
     <Pressable
@@ -40,7 +43,7 @@ export const LightTopBar: React.FC<Props> = ({
       <ChevronLeftIcon size={ms(18)} color={colors.navy} />
     </Pressable>
     {/* Same flex slot with or without a title, so the avatar stays right */}
-    <Text style={styles.title} numberOfLines={1}>
+    <Text style={[styles.title, titleAlign === 'left' && styles.titleLeft]} numberOfLines={1}>
       {title ?? ''}
     </Text>
     {initials && onProfilePress ? (
@@ -76,6 +79,10 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.md,
     textAlign: 'center',
     color: colors.navy,
+  },
+  titleLeft: {
+    marginLeft: spacing.lg,
+    textAlign: 'left',
   },
 });
 

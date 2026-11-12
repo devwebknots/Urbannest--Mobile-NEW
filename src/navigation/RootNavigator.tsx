@@ -6,6 +6,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NeyoraModule } from '@neyora/maintenance-sdk';
+import { RentalApplicationScreen } from '@/features/application';
 import { GuestHomeScreen, PropertyDetailsScreen } from '@/features/guest';
 import { HomeScreen } from '@/features/home';
 import { PersonaSelectScreen } from '@/features/persona';
@@ -52,6 +53,11 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="PropertyDetails"
         component={PropertyDetailsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="RentalApplication"
+        component={RentalApplicationScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen

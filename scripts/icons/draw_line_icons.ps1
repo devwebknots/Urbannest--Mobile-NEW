@@ -360,6 +360,40 @@ $icons = [ordered]@{
     'path:m21 3-9 9',
     'path:M15 3h6v6'
   )
+  # ---- Rental application (draw into icons/application at -Stroke 2.2):
+  #      -Only user,users,mail,pencil,plus,circle_check
+  # lucide: user
+  'user' = @(
+    'path:M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2',
+    'circle:12,7,4'
+  )
+  # lucide: users
+  'users' = @(
+    'path:M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2',
+    'circle:9,7,4',
+    'path:M22 21v-2a4 4 0 0 0-3-3.87',
+    'path:M16 3.13a4 4 0 0 1 0 7.75'
+  )
+  # lucide: mail
+  'mail' = @(
+    'path:m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7',
+    'path:M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z'
+  )
+  # lucide: pencil
+  'pencil' = @(
+    'path:M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z',
+    'path:m15 5 4 4'
+  )
+  # lucide: plus
+  'plus' = @(
+    'path:M5 12h14',
+    'path:M12 5v14'
+  )
+  # lucide: circle-check
+  'circle_check' = @(
+    'circle:12,12,10',
+    'path:m9 12 2 2 4-4'
+  )
 }
 
 New-Item -ItemType Directory -Force $OutDir | Out-Null

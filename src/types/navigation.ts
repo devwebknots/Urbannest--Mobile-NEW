@@ -19,6 +19,8 @@ export type RootStackParamList = {
   GuestHome: undefined;
   /** A listing's full details, opened from the guest home or Similar Deals */
   PropertyDetails: { propertyId: string };
+  /** Rental application (step 1: Applicant & Household), opened by Apply Now */
+  RentalApplication: { propertyId: string };
   PersonaSelect: undefined;
   RenterHome: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */
