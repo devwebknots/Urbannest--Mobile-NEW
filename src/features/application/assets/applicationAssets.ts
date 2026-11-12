@@ -33,6 +33,7 @@ export const applicationIcons = {
   car: require('@/assets/icons/application/car.png'),
   package: require('@/assets/icons/application/package.png'),
   upload: require('@/assets/icons/application/upload.png'),
+  send: require('@/assets/icons/application/send.png'),
   coins: require('@/assets/icons/property/database.png'),
   house: require('@/assets/icons/property/house.png'),
   calendar: require('@/assets/icons/property/calendar_days.png'),

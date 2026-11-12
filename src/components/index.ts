@@ -23,3 +23,6 @@ export { default as ProfileAvatar } from './ProfileAvatar';
 export * from './ProfileAvatar';
 
 export * from './icons';
+
+export { default as SuccessCheck } from './SuccessCheck';
+export * from './SuccessCheck';

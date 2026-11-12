@@ -8,7 +8,8 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { useAppDialog } from '@/components/AppDialog';
-import { goBack } from '@/navigation/navigationRef';
+import { StackActions } from '@react-navigation/native';
+import { goBack, navigationRef } from '@/navigation/navigationRef';
 import { GUEST_LISTINGS } from '@/features/guest/hooks/usePropertyDetails';
 import { isValidEmail } from '@/utils/validators';
 import {
@@ -35,6 +36,10 @@ import { useHistoryStep } from './useHistoryStep';
 
 export interface RentalApplicationNavigation {
   goBack: () => void;
+  replace?: (
+    route: 'ApplicationSubmitted',
+    params: { propertyId: string; applicationId: string; submittedAt: number },
+  ) => void;
 }
 
 export type ApplicationPicker = 'country' | 'state' | 'occupants' | null;
@@ -266,20 +271,22 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
     return false;
   }, [currentStep, form, showDialog]);
 
+  /**
+   * Sent: open the "Application Submitted!" page in place of this one, so
+   * back goes to the property. Mock ID until the API returns one.
+   */
   const submit = useCallback(() => {
-    showDialog({
-      tone: 'success',
-      title: 'Application Submitted',
-      message: `Your application for ${property.name} has been sent. We'll let you know as soon as the landlord replies.`,
-      details: [
-        { label: 'Applicant', value: `${form.firstName} ${form.lastName}`.trim() },
-        { label: 'Move-in', value: form.moveInDate },
-        { label: 'Occupants', value: form.occupants },
-      ],
-      dismissible: false,
-      actions: [{ label: 'Done', variant: 'brand', onPress: leave }],
-    });
-  }, [form, leave, property.name, showDialog]);
+    const params = {
+      propertyId: property.id,
+      applicationId: `UN-RA-${10000 + Math.floor(Math.random() * 90000)}`,
+      submittedAt: Date.now(),
+    };
+    if (navigation?.replace) {
+      navigation.replace('ApplicationSubmitted', params);
+    } else if (navigationRef.isReady()) {
+      navigationRef.dispatch(StackActions.replace('ApplicationSubmitted', params));
+    }
+  }, [navigation, property.id]);
 
   /** Footer button: next step, or submit on the last one */
   const continueToNext = useCallback(() => {

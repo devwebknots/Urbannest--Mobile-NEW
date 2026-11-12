@@ -21,6 +21,8 @@ export type RootStackParamList = {
   PropertyDetails: { propertyId: string };
   /** Rental application (step 1: Applicant & Household), opened by Apply Now */
   RentalApplication: { propertyId: string };
+  /** Confirmation + next steps after the application is sent (replaces RentalApplication) */
+  ApplicationSubmitted: { propertyId: string; applicationId: string; submittedAt: number };
   PersonaSelect: undefined;
   RenterHome: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */
