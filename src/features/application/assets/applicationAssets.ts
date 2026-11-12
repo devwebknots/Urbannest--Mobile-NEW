@@ -24,6 +24,7 @@ export const applicationIcons = {
   pencil: require('@/assets/icons/application/pencil.png'),
   plus: require('@/assets/icons/application/plus.png'),
   circleCheck: require('@/assets/icons/application/circle_check.png'),
+  briefcase: require('@/assets/icons/application/briefcase.png'),
   house: require('@/assets/icons/property/house.png'),
   calendar: require('@/assets/icons/property/calendar_days.png'),
   document: require('@/assets/icons/property/note.png'),

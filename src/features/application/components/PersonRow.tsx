@@ -10,30 +10,42 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { TILE_BG, TILE_BORDER } from '@/features/renter/components/checkin/CheckInChecklist';
 import { moderateScale as ms } from '@/utils/responsive';
+import type { ApplicationIconName } from '../types';
 import { ApplicationIcon } from './ApplicationIcon';
 
 interface Props {
   name: string;
   detail: string;
-  /** Show the first letter instead of the person icon */
+  /** Show the first letter instead of the icon */
   initial?: boolean;
+  /** Avatar icon (default: person); e.g. house for a residence row */
+  icon?: ApplicationIconName;
+  /** Lines for the detail text (default 1) */
+  detailLines?: number;
   right?: React.ReactNode;
 }
 
-export const PersonRow: React.FC<Props> = ({ name, detail, initial, right }) => (
+export const PersonRow: React.FC<Props> = ({
+  name,
+  detail,
+  initial,
+  icon = 'user',
+  detailLines = 1,
+  right,
+}) => (
   <View style={styles.row}>
     <View style={[styles.avatar, initial && styles.avatarInitial]}>
       {initial ? (
         <Text style={styles.initial}>{name.trim().charAt(0).toUpperCase()}</Text>
       ) : (
-        <ApplicationIcon name="user" size={ms(20)} color={colors.navy} />
+        <ApplicationIcon name={icon} size={ms(20)} color={colors.navy} />
       )}
     </View>
     <View style={styles.text}>
       <Text style={styles.name} numberOfLines={1}>
         {name}
       </Text>
-      <Text style={styles.detail} numberOfLines={1}>
+      <Text style={styles.detail} numberOfLines={detailLines}>
         {detail}
       </Text>
     </View>

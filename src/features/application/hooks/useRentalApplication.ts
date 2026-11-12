@@ -28,35 +28,14 @@ import type {
   Dependent,
   PersonSheetState,
 } from '../types';
+import { formatDateInput, isValidDate } from '../utils';
+import { useHistoryStep } from './useHistoryStep';
 
 export interface RentalApplicationNavigation {
   goBack: () => void;
 }
 
 export type ApplicationPicker = 'country' | 'state' | 'occupants' | null;
-
-/** "30112026" or "30/11/2026" -> "30/11/2026" while typing */
-export const formatDateInput = (text: string) => {
-  const digits = text.replace(/\D/g, '').slice(0, 8);
-  if (digits.length <= 2) {
-    return digits;
-  }
-  if (digits.length <= 4) {
-    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-  }
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-};
-
-/** Real calendar date in DD/MM/YYYY */
-export const isValidDate = (value: string) => {
-  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
-  if (!m) {
-    return false;
-  }
-  const [day, month, year] = [Number(m[1]), Number(m[2]), Number(m[3])];
-  const d = new Date(year, month - 1, day);
-  return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
-};
 
 const REQUIRED_MESSAGE = 'Required';
 
@@ -221,10 +200,14 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
     }
   }, [navigation]);
 
+  // Step 2 (Rental & Financial History)
+  const history = useHistoryStep(showDialog);
+
   const dirty =
     JSON.stringify(form) !== JSON.stringify(APPLICATION_PREFILL) ||
     JSON.stringify(coApplicants) !== JSON.stringify(APPLICATION_CO_APPLICANTS) ||
-    JSON.stringify(dependents) !== JSON.stringify(APPLICATION_DEPENDENTS);
+    JSON.stringify(dependents) !== JSON.stringify(APPLICATION_DEPENDENTS) ||
+    history.hasData;
 
   // Which step is open (0 = Applicant & Household)
   const [currentStep, setCurrentStep] = useState(0);
@@ -291,36 +274,66 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
     if (currentStep === 0 && !checkHousehold()) {
       return;
     }
+    if (currentStep === 1 && !history.check()) {
+      return;
+    }
     if (currentStep < lastStep) {
       setCurrentStep(currentStep + 1);
     } else {
       submit();
     }
-  }, [checkHousehold, currentStep, lastStep, submit]);
+  }, [checkHousehold, currentStep, history, lastStep, submit]);
 
   /**
    * Tapping a step in the stepper: earlier steps open straight away; later
-   * ones need step 1 complete first (steps 2–4 have no fields yet).
+   * ones need every step before them complete (steps 1 and 2 have fields).
    */
   const goToStep = useCallback(
     (index: number) => {
       if (index === currentStep) {
         return;
       }
-      if (index > currentStep && currentStep === 0 && !checkHousehold()) {
-        return;
+      for (let s = currentStep; s < index; s++) {
+        if (s === 0 && !checkHousehold()) {
+          return;
+        }
+        if (s === 1) {
+          if (currentStep === 1) {
+            if (!history.check()) {
+              return;
+            }
+          } else if (!history.isComplete) {
+            setCurrentStep(1);
+            showDialog({
+              tone: 'info',
+              title: 'Complete your history first',
+              message: 'Add your residence and employment details to unlock the next steps.',
+              actions: [{ label: 'OK', variant: 'brand' }],
+            });
+            return;
+          }
+        }
       }
       setCurrentStep(index);
     },
-    [checkHousehold, currentStep],
+    [checkHousehold, currentStep, history, showDialog],
   );
+
+  const continueLabel =
+    currentStep === 0
+      ? `Continue to Stage ${currentStep + 2}`
+      : currentStep === lastStep
+        ? 'Submit Application'
+        : 'Save & Continue';
 
   return {
     property,
     steps: APPLICATION_STEPS,
     currentStep,
     isLastStep: currentStep === lastStep,
+    continueLabel,
     goToStep,
+    history,
     form,
     setField,
     errors,

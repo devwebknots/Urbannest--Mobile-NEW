@@ -33,14 +33,17 @@ const ICON = ms(18);
 export const LabeledField: React.FC<{
   label: string;
   required?: boolean;
+  /** Light note after the label, e.g. "(blank if current)" */
+  hint?: string;
   error?: string;
   style?: StyleProp<ViewStyle>;
   children: React.ReactNode;
-}> = ({ label, required, error, style, children }) => (
+}> = ({ label, required, hint, error, style, children }) => (
   <View style={style}>
-    <Text style={styles.label}>
+    <Text style={styles.label} numberOfLines={1}>
       {label}
       {required ? <Text style={styles.star}> *</Text> : null}
+      {hint ? <Text style={styles.hint}> {hint}</Text> : null}
     </Text>
     {children}
     {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -57,6 +60,8 @@ interface FieldInputProps {
   placeholder?: string;
   leftIcon?: ApplicationIconName;
   rightIcon?: ApplicationIconName;
+  /** Text before the value, e.g. "$" */
+  prefix?: string;
   invalid?: boolean;
   keyboardType?: KeyboardTypeOptions;
   autoCapitalize?: TextInputProps['autoCapitalize'];
@@ -68,12 +73,14 @@ interface FieldInputProps {
 export const FieldInput: React.FC<FieldInputProps> = ({
   leftIcon,
   rightIcon,
+  prefix,
   invalid,
   placeholder,
   ...input
 }) => (
   <View style={[formStyles.field, styles.box, invalid && styles.invalid]}>
     {leftIcon ? <ApplicationIcon name={leftIcon} size={ICON} color={colors.navy} /> : null}
+    {prefix ? <Text style={[formStyles.input, styles.prefix]}>{prefix}</Text> : null}
     <TextInput
       {...input}
       placeholder={placeholder}
@@ -125,6 +132,14 @@ const styles = StyleSheet.create({
   },
   star: {
     color: colors.error,
+  },
+  hint: {
+    ...typographyPresets.caption,
+    color: colors.textSecondary,
+  },
+  prefix: {
+    marginRight: -spacing.xs,
+    color: colors.textSecondary,
   },
   error: {
     ...typographyPresets.caption,

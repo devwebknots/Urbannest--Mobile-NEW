@@ -62,20 +62,59 @@ test('rental application step 1 shows the form, household and continue', async (
     tree.root.findByProps({ accessibilityLabel: 'Continue to Stage 2' }).props.onPress();
   });
   let now = JSON.stringify(tree.toJSON());
+  for (const text of [
+    'Rental & Financial History',
+    'Rental History',
+    'How did you hold this residence?',
+    'Add Residence',
+    'Employment & Income',
+    'Save & Continue',
+  ]) {
+    expect(now).toContain(text);
+  }
+
+  // Step 2: an empty page can't move on
+  const press = async (label: string) =>
+    ReactTestRenderer.act(() => {
+      tree.root.findByProps({ accessibilityLabel: label }).props.onPress();
+    });
+  const type = async (label: string, text: string) =>
+    ReactTestRenderer.act(() => {
+      tree.root.findByProps({ accessibilityLabel: label }).props.onChangeText(text);
+    });
+  await press('Save & Continue');
+  expect(JSON.stringify(tree.toJSON())).toContain('Required');
+
+  // Fill a residence (pickers via their sheets) and add it
+  await press('How did you hold this residence');
+  await press('Rented');
+  await type('Residence street address 1', '12 Oak Street');
+  await type('Residence city', 'Austin');
+  await press('Residence state');
+  await press('TX');
+  await type('Residence ZIP code', '73301');
+  await type('Residence start date', '01022021');
+  await type('Monthly rent', '1850');
+  await press('Add Residence');
+  now = JSON.stringify(tree.toJSON());
+  expect(now).toContain('12 Oak Street');
+  expect(now).toContain('$1,850/mo');
+  expect(now).toContain('Add Another Residence');
+
+  // Employment: a student only needs status + income
+  await press('Employment status');
+  await press('Student');
+  await type('Annual income', '12000');
+  await press('Save & Continue');
+  now = JSON.stringify(tree.toJSON());
   expect(now).toContain('This step is coming soon');
-  expect(now).toContain('Continue to Stage 3');
 
   // Tapping step 4 jumps there; the button becomes Submit
-  await ReactTestRenderer.act(() => {
-    tree.root.findByProps({ accessibilityLabel: 'Step 4, Submission' }).props.onPress();
-  });
+  await press('Step 4, Submission');
   expect(JSON.stringify(tree.toJSON())).toContain('Submit Application');
 
-  await ReactTestRenderer.act(() => {
-    tree.root.findByProps({ accessibilityLabel: 'Previous step' }).props.onPress();
-  });
-  now = JSON.stringify(tree.toJSON());
-  expect(now).toContain('Continue to Stage 4');
+  await press('Previous step');
+  expect(JSON.stringify(tree.toJSON())).toContain('Save & Continue');
 
   await ReactTestRenderer.act(() => {
     tree.unmount();

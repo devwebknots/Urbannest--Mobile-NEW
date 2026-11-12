@@ -7,6 +7,9 @@
 import type {
   ApplicantForm,
   ApplicationStep,
+  ChoiceOption,
+  EmploymentForm,
+  ResidenceForm,
   CoApplicant,
   Dependent,
   PhoneCountry,
@@ -16,24 +19,28 @@ export const APPLICATION_STEPS: readonly ApplicationStep[] = [
   {
     id: 'household',
     label: 'Applicant & Household',
+    title: 'Applicant & Household',
     subtitle: 'Provide your personal, household, and move-in details to continue.',
     icon: 'user',
   },
   {
     id: 'history',
     label: 'History',
-    subtitle: 'Tell us where you have lived and worked over the last few years.',
+    title: 'Rental & Financial History',
+    subtitle: 'Document your past residences and your current income.',
     icon: 'house',
   },
   {
     id: 'documents',
     label: 'Documents',
+    title: 'Documents',
     subtitle: 'Upload your ID, proof of income and any other supporting documents.',
     icon: 'document',
   },
   {
     id: 'submit',
     label: 'Submission',
+    title: 'Submission',
     subtitle: 'Review your details and send your application to the landlord.',
     icon: 'circleCheck',
   },
@@ -93,3 +100,50 @@ export const APPLICATION_DEPENDENTS: readonly Dependent[] = [
   { id: 'd1', name: 'Nan', relationship: 'Spouse / Partner' },
   { id: 'd2', name: 'Dinkan', relationship: 'Child' },
 ];
+
+/* ---- Step 2: Rental & Financial History ---- */
+
+/** "How did you hold this residence?" */
+export const RESIDENCE_HOLD_TYPES: readonly ChoiceOption[] = [
+  { id: 'rented', label: 'Rented' },
+  { id: 'owned', label: 'Owned' },
+  { id: 'family', label: 'Lived with family / friends' },
+  { id: 'company', label: 'Company / student housing' },
+  { id: 'other', label: 'Other' },
+];
+
+export const EMPLOYMENT_STATUSES: readonly ChoiceOption[] = [
+  { id: 'fullTime', label: 'Employed full-time' },
+  { id: 'partTime', label: 'Employed part-time' },
+  { id: 'self', label: 'Self-employed' },
+  { id: 'student', label: 'Student' },
+  { id: 'retired', label: 'Retired' },
+  { id: 'unemployed', label: 'Not employed' },
+];
+
+/** Statuses that ask for employer, job title and dates */
+export const EMPLOYED_STATUS_IDS: readonly string[] = ['fullTime', 'partTime', 'self'];
+
+export const EMPTY_RESIDENCE: ResidenceForm = {
+  holdType: '',
+  street1: '',
+  street2: '',
+  city: '',
+  stateId: '',
+  zip: '',
+  landlordName: '',
+  landlordContact: '',
+  startDate: '',
+  endDate: '',
+  rent: '',
+  reason: '',
+};
+
+export const EMPTY_EMPLOYMENT: EmploymentForm = {
+  status: '',
+  income: '',
+  employer: '',
+  jobTitle: '',
+  startDate: '',
+  endDate: '',
+};

@@ -389,6 +389,11 @@ $icons = [ordered]@{
     'path:M5 12h14',
     'path:M12 5v14'
   )
+  # lucide: briefcase (rental application step 2, Employment & Income)
+  'briefcase' = @(
+    'path:M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16',
+    'path:M4 6h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z'
+  )
   # lucide: circle-check
   'circle_check' = @(
     'circle:12,12,10',

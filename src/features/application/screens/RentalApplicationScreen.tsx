@@ -49,6 +49,7 @@ import {
 import { ApplicationSection } from '../components/ApplicationSection';
 import { ApplicationStepper } from '../components/ApplicationStepper';
 import { EditButton, InviteSentPill, PersonRow } from '../components/PersonRow';
+import { HistoryStep } from '../components/HistoryStep';
 import { PersonSheet } from '../components/PersonSheet';
 import { StepPlaceholder } from '../components/StepPlaceholder';
 import { StepTransition } from '../components/StepTransition';
@@ -123,7 +124,7 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
               minimumFontScale={0.8}
               accessibilityRole="header"
             >
-              {step.label}
+              {step.title}
             </Text>
             <Text style={styles.subtitle}>{step.subtitle}</Text>
           </View>
@@ -139,13 +140,16 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
 
         <StepTransition step={vm.currentStep}>
         {vm.currentStep > 0 ? (
-          <StepPlaceholder step={step} />
+          vm.currentStep === 1 ? (
+            <HistoryStep vm={vm.history} />
+          ) : (
+            <StepPlaceholder step={step} />
+          )
         ) : (
         <View style={styles.sections}>
           {/* Primary applicant */}
           <Reveal delay={60}>
             <ApplicationSection
-              icon="user"
               title="Primary Applicant Identity"
               subtitle="Your personal and contact details."
             >
@@ -223,7 +227,7 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
 
           {/* Residential address */}
           <Reveal delay={120}>
-            <ApplicationSection icon="house" title="Residential Address">
+            <ApplicationSection title="Residential Address">
               <LabeledField label="Street Address 1" required error={errors.street1}>
                 <FieldInput
                   value={form.street1}
@@ -280,7 +284,7 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
 
           {/* Move-in */}
           <Reveal delay={180}>
-            <ApplicationSection icon="calendar" title="Move-In Details">
+            <ApplicationSection title="Move-In Details">
               <FieldRow>
                 <LabeledField label="Desired Move-In Date" required error={errors.moveInDate} style={styles.half}>
                   <FieldInput
@@ -309,9 +313,8 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
           {/* Co-applicants */}
           <Reveal delay={240}>
             <ApplicationSection
-              icon="users"
               title="Co-Applicants"
-              subtitle="Add a co-applicant so they can complete their part of the application independently."
+              subtitle="Invite others to fill in their own part."
             >
               {vm.coApplicants.map(c => (
                 <PersonRow key={c.id} name={c.name} detail={c.email} initial right={<InviteSentPill />} />
@@ -329,9 +332,8 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
           {/* Dependents */}
           <Reveal delay={300}>
             <ApplicationSection
-              icon="users"
               title="Dependents"
-              subtitle="Add any family members who will live with you (e.g., children or other dependents)."
+              subtitle="Family members who will live with you."
             >
               {vm.dependents.map(d => (
                 <PersonRow
@@ -358,7 +360,7 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
       {/* Fixed action; the page fades out under it */}
       <View style={[styles.footer, { paddingBottom: footerPadBottom }]}>
         <Button
-          title={vm.isLastStep ? 'Submit Application' : `Continue to Stage ${vm.currentStep + 2}`}
+          title={vm.continueLabel}
           variant="brand"
           onPress={vm.continueToNext}
           rightIcon={<ArrowRightIcon size={ms(16)} color={colors.white} />}
