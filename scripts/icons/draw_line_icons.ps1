@@ -436,6 +436,20 @@ $icons = [ordered]@{
     'path:M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z',
     'path:m21.854 2.147-10.94 10.939'
   )
+  # lucide: locate-fixed ("Use current location"; icons/application, -Stroke 2.2)
+  'locate' = @(
+    'path:M2 12h3',
+    'path:M19 12h3',
+    'path:M12 2v3',
+    'path:M12 19v3',
+    'circle:12,12,7',
+    'circle:12,12,3'
+  )
+  # lucide: map-pin (address suggestions)
+  'map_pin' = @(
+    'path:M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0',
+    'circle:12,10,3'
+  )
   # lucide: circle-check
   'circle_check' = @(
     'circle:12,12,10',

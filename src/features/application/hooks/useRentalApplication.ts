@@ -29,7 +29,8 @@ import type {
   Dependent,
   PersonSheetState,
 } from '../types';
-import { formatDateInput, isValidDate } from '../utils';
+import { formatDateInput, isValidDate, withAddress } from '../utils';
+import { useAddressLookup } from './useAddressLookup';
 import { useDocumentsStep } from './useDocumentsStep';
 import { useReviewStep } from './useReviewStep';
 import { useHistoryStep } from './useHistoryStep';
@@ -121,6 +122,15 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
   const errors = useMemo(() => (showErrors ? validate(form) : {}), [form, showErrors]);
 
   const country = PHONE_COUNTRIES.find(c => c.id === form.countryId) ?? PHONE_COUNTRIES[0];
+
+  // Residential Address: free address suggestions + "Use current location"
+  const homeLookup = useAddressLookup(
+    (address, from) =>
+      setForm(prev =>
+        withAddress(from === 'street2' ? { ...prev, street2: '' } : prev, address, US_STATES),
+      ),
+    showDialog,
+  );
 
   const pick = useCallback(
     (id: string) => {
@@ -408,6 +418,7 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
     review,
     editStep,
     applicantSummary,
+    homeLookup,
     form,
     setField,
     errors,

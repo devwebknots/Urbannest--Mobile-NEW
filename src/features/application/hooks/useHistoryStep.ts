@@ -28,7 +28,15 @@ import type {
   ResidenceField,
   ResidenceForm,
 } from '../types';
-import { formatDateInput, formatMoneyInput, monthYear, moneyValue, parseDate } from '../utils';
+import {
+  formatDateInput,
+  formatMoneyInput,
+  monthYear,
+  moneyValue,
+  parseDate,
+  withAddress,
+} from '../utils';
+import { useAddressLookup } from './useAddressLookup';
 
 export type HistoryPicker = 'holdType' | 'state' | 'status' | null;
 
@@ -135,6 +143,15 @@ export function useHistoryStep(showDialog: (config: AppDialogConfig) => void) {
   const [showEmploymentErrors, setShowEmploymentErrors] = useState(false);
 
   const [picker, setPicker] = useState<HistoryPicker>(null);
+
+  // Residence address: free address suggestions + "Use current location"
+  const residenceLookup = useAddressLookup(
+    (address, from) =>
+      setResidence(prev =>
+        withAddress(from === 'street2' ? { ...prev, street2: '' } : prev, address, US_STATES),
+      ),
+    showDialog,
+  );
 
   const setResidenceField = useCallback((key: ResidenceField, value: string) => {
     const v = DATE_FIELDS.includes(key)
@@ -331,6 +348,7 @@ export function useHistoryStep(showDialog: (config: AppDialogConfig) => void) {
 
   return {
     isComplete,
+    residenceLookup,
     hasData,
     residences,
     residence,

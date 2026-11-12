@@ -10,7 +10,6 @@ import React from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -61,7 +60,8 @@ export const FormSheet: React.FC<Props> = ({
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close" />
       <KeyboardAvoidingView
         style={styles.avoid}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        // padding on both: the modal draws edge to edge on Android too
+        behavior="padding"
         pointerEvents="box-none"
       >
         <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>

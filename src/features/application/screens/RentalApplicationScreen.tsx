@@ -29,6 +29,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useKeyboard } from '@/hooks/useKeyboard';
 import { AppDialog } from '@/components/AppDialog';
 import { Button } from '@/components/Button';
 import { colors, spacing, typographyPresets } from '@/config/theme';
@@ -39,6 +40,7 @@ import { FormSelect } from '@/features/renter/components/form/FormSelect';
 import { CategorySheet } from '@/features/renter/components/inspection/CategorySheet';
 import { moderateScale as ms } from '@/utils/responsive';
 import { HEADER_BUILDING_ASPECT, applicationAssets } from '../assets/applicationAssets';
+import { AddressSuggestions, CurrentLocationButton } from '../components/AddressLookupParts';
 import { ApplicationIcon } from '../components/ApplicationIcon';
 import {
   FieldInput,
@@ -82,19 +84,36 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   }, [vm.currentStep]);
 
+  // While typing, the fixed button steps aside (like most apps) so the
+  // keyboard and the field being edited get the space
+  const { isKeyboardVisible } = useKeyboard();
+
   return (
+    /*
+     * Keyboard: iOS insets the scroll view and keeps the focused field in
+     * view (automaticallyAdjustKeyboardInsets). Android draws edge to edge,
+     * where the window may not resize, so a padding KeyboardAvoidingView
+     * lifts the page; Android's ScrollView then scrolls the focused field
+     * into view. (If the window does resize, the avoiding view adds nothing.)
+     */
     <KeyboardAvoidingView
       style={styles.root}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
+      enabled={Platform.OS === 'android'}
+      // Extra lift so the focused field sits clearly above the keyboard,
+      // not touching its top edge
+      keyboardVerticalOffset={KEYBOARD_GAP}
     >
       <StatusBar barStyle="dark-content" />
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+        automaticallyAdjustKeyboardInsets
         contentContainerStyle={{
           paddingTop: insets.top + spacing.sm,
-          paddingBottom: footerH + spacing.xl,
+          paddingBottom: isKeyboardVisible ? spacing.xl : footerH + spacing.xl,
         }}
       >
         {/* Soft blue glow + the design's building, top right */}
@@ -239,25 +258,59 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
           {/* Residential address */}
           <Reveal delay={120}>
             <ApplicationSection title="Residential Address">
-              <LabeledField label="Street Address 1" required error={errors.street1}>
+              <LabeledField
+                label="Street Address 1"
+                required
+                error={errors.street1}
+                action={
+                  <CurrentLocationButton
+                    onPress={vm.homeLookup.useCurrentLocation}
+                    loading={vm.homeLookup.locating}
+                  />
+                }
+              >
                 <FieldInput
                   value={form.street1}
-                  onChangeText={t => setField('street1', t)}
+                  onChangeText={t => {
+                    setField('street1', t);
+                    vm.homeLookup.type(t, 'street1');
+                  }}
+                  onFocus={() => vm.homeLookup.type(form.street1, 'street1')}
+                  onBlur={vm.homeLookup.close}
                   invalid={!!errors.street1}
                   autoComplete="address-line1"
+                  autoCorrect={false}
                   maxLength={80}
                   accessibilityLabel="Street address 1"
                 />
+                {vm.homeLookup.field === 'street1' ? (
+                  <AddressSuggestions
+                    suggestions={vm.homeLookup.suggestions}
+                    onSelect={vm.homeLookup.select}
+                  />
+                ) : null}
               </LabeledField>
               <LabeledField label="Street Address 2">
                 <FieldInput
                   value={form.street2}
-                  onChangeText={t => setField('street2', t)}
+                  onChangeText={t => {
+                    setField('street2', t);
+                    vm.homeLookup.type(t, 'street2');
+                  }}
+                  onFocus={() => vm.homeLookup.type(form.street2, 'street2')}
+                  onBlur={vm.homeLookup.close}
                   placeholder="Apt, suite, unit (optional)"
                   autoComplete="address-line2"
+                  autoCorrect={false}
                   maxLength={80}
                   accessibilityLabel="Street address 2"
                 />
+                {vm.homeLookup.field === 'street2' ? (
+                  <AddressSuggestions
+                    suggestions={vm.homeLookup.suggestions}
+                    onSelect={vm.homeLookup.select}
+                  />
+                ) : null}
               </LabeledField>
               <FieldRow>
                 <LabeledField label="City" required error={errors.city} style={styles.city}>
@@ -368,15 +421,17 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
         </StepTransition>
       </ScrollView>
 
-      {/* Fixed action; the page fades out under it */}
-      <View style={[styles.footer, { paddingBottom: footerPadBottom }]}>
-        <Button
-          title={vm.continueLabel}
-          variant="brand"
-          onPress={vm.continueToNext}
-          rightIcon={<ArrowRightIcon size={ms(16)} color={colors.white} />}
-        />
-      </View>
+      {/* Fixed action; the page fades out under it. Hidden while typing. */}
+      {isKeyboardVisible ? null : (
+        <View style={[styles.footer, { paddingBottom: footerPadBottom }]}>
+          <Button
+            title={vm.continueLabel}
+            variant="brand"
+            onPress={vm.continueToNext}
+            rightIcon={<ArrowRightIcon size={ms(16)} color={colors.white} />}
+          />
+        </View>
+      )}
 
       <CategorySheet
         visible={vm.picker !== null}
@@ -404,6 +459,9 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
 
 // colors.headerGradientEnd (#518EF9) as rgb, for the glow
 const BLUE = '81,142,249';
+
+/** Space kept between the focused field and the keyboard (Android) */
+const KEYBOARD_GAP = spacing.xxxl;
 
 const styles = StyleSheet.create({
   root: {

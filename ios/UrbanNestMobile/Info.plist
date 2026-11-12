@@ -36,7 +36,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Take photos and videos of issues during your move-in inspection.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string>Fill in your address from your current location on the rental application.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Record voice notes for maintenance requests and sound with videos of issues.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

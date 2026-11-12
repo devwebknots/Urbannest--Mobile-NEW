@@ -48,3 +48,32 @@ export const monthYear = (value: string) => {
     ? `${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()]} ${d.getFullYear()}`
     : value;
 };
+
+interface AddressFields {
+  street1: string;
+  street2: string;
+  city: string;
+  stateId: string;
+  zip: string;
+}
+
+/**
+ * Puts a looked-up address into a form's address fields. Keeps what the
+ * user had for anything the lookup didn't give (or that doesn't fit the
+ * form: the state must be a US state, the ZIP five digits).
+ */
+export function withAddress<T extends AddressFields>(
+  prev: T,
+  a: { street1: string; street2: string; city: string; stateCode: string; zip: string },
+  validStates: readonly { id: string }[],
+): T {
+  const zip = a.zip.slice(0, 5);
+  return {
+    ...prev,
+    street1: a.street1 || prev.street1,
+    street2: a.street2 || prev.street2,
+    city: a.city || prev.city,
+    stateId: validStates.some(s => s.id === a.stateCode) ? a.stateCode : prev.stateId,
+    zip: /^\d{5}$/.test(zip) ? zip : prev.zip,
+  };
+}

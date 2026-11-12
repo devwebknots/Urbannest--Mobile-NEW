@@ -36,3 +36,13 @@ jest.mock('react-native-image-picker', () => ({
   launchCamera: jest.fn(() => Promise.resolve({ didCancel: true })),
   launchImageLibrary: jest.fn(() => Promise.resolve({ didCancel: true })),
 }));
+
+// Location (native module) for the rental application "Use current location"
+jest.mock('@react-native-community/geolocation', () => ({
+  __esModule: true,
+  default: {
+    getCurrentPosition: jest.fn(),
+    setRNConfiguration: jest.fn(),
+    requestAuthorization: jest.fn(),
+  },
+}));

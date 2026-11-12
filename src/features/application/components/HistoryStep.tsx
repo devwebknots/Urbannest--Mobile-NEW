@@ -21,6 +21,7 @@ import { CategorySheet } from '@/features/renter/components/inspection/CategoryS
 import { moderateScale as ms } from '@/utils/responsive';
 import { HistoryStepModel, residenceSummary } from '../hooks/useHistoryStep';
 import { FieldInput, FieldRow, LabeledField } from './ApplicationFields';
+import { AddressSuggestions, CurrentLocationButton } from './AddressLookupParts';
 import { ApplicationIcon } from './ApplicationIcon';
 import { ApplicationSection } from './ApplicationSection';
 import { EditButton, PersonRow } from './PersonRow';
@@ -62,13 +63,25 @@ export const HistoryStep: React.FC<{ vm: HistoryStepModel }> = ({ vm }) => {
                 accessibilityLabel="How did you hold this residence"
               />
             </LabeledField>
+            <View style={styles.locateRow}>
+              <CurrentLocationButton
+                onPress={vm.residenceLookup.useCurrentLocation}
+                loading={vm.residenceLookup.locating}
+              />
+            </View>
             <FieldRow>
               <LabeledField label="Street Address 1" required error={re.street1} style={styles.flex}>
                 <FieldInput
                   value={r.street1}
-                  onChangeText={t => vm.setResidenceField('street1', t)}
+                  onChangeText={t => {
+                    vm.setResidenceField('street1', t);
+                    vm.residenceLookup.type(t, 'street1');
+                  }}
+                  onFocus={() => vm.residenceLookup.type(r.street1, 'street1')}
+                  onBlur={vm.residenceLookup.close}
                   invalid={!!re.street1}
                   autoComplete="address-line1"
+                  autoCorrect={false}
                   maxLength={80}
                   accessibilityLabel="Residence street address 1"
                 />
@@ -76,14 +89,27 @@ export const HistoryStep: React.FC<{ vm: HistoryStepModel }> = ({ vm }) => {
               <LabeledField label="Street Address 2" style={styles.flex}>
                 <FieldInput
                   value={r.street2}
-                  onChangeText={t => vm.setResidenceField('street2', t)}
+                  onChangeText={t => {
+                    vm.setResidenceField('street2', t);
+                    vm.residenceLookup.type(t, 'street2');
+                  }}
+                  onFocus={() => vm.residenceLookup.type(r.street2, 'street2')}
+                  onBlur={vm.residenceLookup.close}
                   placeholder="Apt, suite, unit"
                   autoComplete="address-line2"
+                  autoCorrect={false}
                   maxLength={80}
                   accessibilityLabel="Residence street address 2"
                 />
               </LabeledField>
             </FieldRow>
+            {/* Address suggestions, full width under the street row */}
+            {vm.residenceLookup.suggestions.length > 0 ? (
+              <AddressSuggestions
+                suggestions={vm.residenceLookup.suggestions}
+                onSelect={vm.residenceLookup.select}
+              />
+            ) : null}
             <FieldRow>
               <LabeledField label="City" required error={re.city} style={styles.city}>
                 <FieldInput
@@ -332,6 +358,11 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
+  },
+  // "Use current location" sits right-aligned just above the street row
+  locateRow: {
+    alignItems: 'flex-end',
+    marginBottom: -spacing.sm,
   },
   city: {
     flex: 1.15,

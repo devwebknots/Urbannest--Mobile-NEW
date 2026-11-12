@@ -36,15 +36,20 @@ export const LabeledField: React.FC<{
   /** Light note after the label, e.g. "(blank if current)" */
   hint?: string;
   error?: string;
+  /** Small action at the right of the label, e.g. "Use current location" */
+  action?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   children: React.ReactNode;
-}> = ({ label, required, hint, error, style, children }) => (
+}> = ({ label, required, hint, error, action, style, children }) => (
   <View style={style}>
-    <Text style={styles.label} numberOfLines={1}>
-      {label}
-      {required ? <Text style={styles.star}> *</Text> : null}
-      {hint ? <Text style={styles.hint}> {hint}</Text> : null}
-    </Text>
+    <View style={styles.labelRow}>
+      <Text style={[styles.label, styles.labelText]} numberOfLines={1}>
+        {label}
+        {required ? <Text style={styles.star}> *</Text> : null}
+        {hint ? <Text style={styles.hint}> {hint}</Text> : null}
+      </Text>
+      {action ? <View style={styles.labelAction}>{action}</View> : null}
+    </View>
     {children}
     {error ? <Text style={styles.error}>{error}</Text> : null}
   </View>
@@ -68,6 +73,10 @@ interface FieldInputProps {
   autoComplete?: TextInputProps['autoComplete'];
   maxLength?: number;
   accessibilityLabel: string;
+  onFocus?: TextInputProps['onFocus'];
+  onBlur?: TextInputProps['onBlur'];
+  autoCorrect?: boolean;
+  returnKeyType?: TextInputProps['returnKeyType'];
 }
 
 export const FieldInput: React.FC<FieldInputProps> = ({
@@ -129,6 +138,17 @@ const styles = StyleSheet.create({
   label: {
     ...typographyPresets.fieldLabel,
     marginBottom: spacing.sm,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  labelText: {
+    flexShrink: 1,
+  },
+  labelAction: {
+    marginLeft: 'auto',
+    paddingLeft: spacing.md,
   },
   star: {
     color: colors.error,

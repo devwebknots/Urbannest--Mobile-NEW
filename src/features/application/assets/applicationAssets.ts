@@ -34,6 +34,8 @@ export const applicationIcons = {
   package: require('@/assets/icons/application/package.png'),
   upload: require('@/assets/icons/application/upload.png'),
   send: require('@/assets/icons/application/send.png'),
+  locate: require('@/assets/icons/application/locate.png'),
+  mapPin: require('@/assets/icons/application/map_pin.png'),
   coins: require('@/assets/icons/property/database.png'),
   house: require('@/assets/icons/property/house.png'),
   calendar: require('@/assets/icons/property/calendar_days.png'),
