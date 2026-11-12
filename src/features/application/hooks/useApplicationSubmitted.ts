@@ -2,7 +2,7 @@
  * useApplicationSubmitted: the "Application Submitted!" page after a rental
  * application is sent: the application ID, the "What Happens Next?"
  * steps (submitted done, review and decision pending), "Track Application
- * Status" (tracking page coming next) and "Back to Home".
+ * Status" (opens the Application Status list) and "Back to Home".
  */
 
 import { useCallback, useMemo } from 'react';
@@ -12,7 +12,13 @@ import type { TicketTimelineStep } from '@/features/renter/types';
 
 export interface ApplicationSubmittedNavigation {
   goBack: () => void;
-  navigate?: (route: 'GuestHome') => void;
+  navigate?: {
+    (route: 'GuestHome'): void;
+    (
+      route: 'ApplicationStatus',
+      params: { propertyId?: string; applicationId: string; submittedAt: number },
+    ): void;
+  };
 }
 
 /** "Today, 9:41 AM" / "Nov 12, 9:41 AM" */
@@ -26,11 +32,10 @@ export const submittedLabel = (time: number, now = Date.now()) => {
 };
 
 export function useApplicationSubmitted(
-  params: { applicationId?: string; submittedAt?: number } | undefined,
+  params: { propertyId?: string; applicationId?: string; submittedAt?: number } | undefined,
   navigation?: ApplicationSubmittedNavigation,
 ) {
   const dialog = useAppDialog();
-  const showDialog = dialog.show;
   const applicationId = params?.applicationId ?? 'UN-RA-10456';
   const submittedAt = params?.submittedAt ?? Date.now();
 
@@ -77,17 +82,19 @@ export function useApplicationSubmitted(
     }
   }, [navigation]);
 
-  const track = useCallback(
-    () =>
-      showDialog({
-        tone: 'info',
-        title: 'Track Application Status',
-        reference: applicationId,
-        message: 'Live status tracking is coming soon. We will notify you at every step.',
-        actions: [{ label: 'OK', variant: 'brand' }],
-      }),
-    [applicationId, showDialog],
-  );
+  /** "Track Application Status": the status list, this application on top */
+  const track = useCallback(() => {
+    const status = {
+      propertyId: params?.propertyId,
+      applicationId,
+      submittedAt,
+    };
+    if (navigation?.navigate) {
+      navigation.navigate('ApplicationStatus', status);
+    } else {
+      navigate('ApplicationStatus', status);
+    }
+  }, [applicationId, navigation, params?.propertyId, submittedAt]);
 
   return { applicationId, steps, back, home, track, dialog: dialog.props };
 }

@@ -8,6 +8,10 @@ import type {
   ApplicantForm,
   ApplicationDocument,
   ApplicationStep,
+  ApplicationFilterId,
+  ApplicationIconName,
+  ApplicationRecord,
+  ApplicationStatusId,
   ConsentItem,
   Pet,
   Vehicle,
@@ -18,6 +22,7 @@ import type {
   Dependent,
   PhoneCountry,
 } from './types';
+import { renterAssets } from '@/features/renter/assets/renterAssets';
 import { applicationAssets } from './assets/applicationAssets';
 
 export const APPLICATION_STEPS: readonly ApplicationStep[] = [
@@ -245,4 +250,49 @@ export const APPLICATION_CONSENTS: readonly ConsentItem[] = [
     text: 'I agree to receive application-related communications electronically.',
     required: false,
   },
+];
+
+/* ---- Application Status page ---- */
+
+/**
+ * Status look (app status colours, as on Maintenance tickets: blue = in
+ * progress, green = good, amber = waiting, red = problem, grey = draft)
+ */
+export const APPLICATION_STATUS_META: Record<
+  ApplicationStatusId,
+  { label: string; icon: ApplicationIconName; accent: 'grey' | 'blue' | 'green' | 'amber' | 'red'; filter: ApplicationFilterId }
+> = {
+  submitted: { label: 'Submitted', icon: 'send', accent: 'blue', filter: 'progress' },
+  draft: { label: 'Draft', icon: 'document', accent: 'grey', filter: 'draft' },
+  lease: { label: 'Lease Generation\nIn Progress', icon: 'refresh', accent: 'green', filter: 'progress' },
+  verification: { label: 'Verification\nIn Progress', icon: 'refresh', accent: 'blue', filter: 'progress' },
+  approved: { label: 'Approved', icon: 'circleCheck', accent: 'green', filter: 'approved' },
+  waiting: { label: 'Waiting List', icon: 'clock', accent: 'amber', filter: 'waiting' },
+  rejected: { label: 'Rejected', icon: 'circleX', accent: 'red', filter: 'rejected' },
+  incomplete: { label: 'Incomplete', icon: 'circleAlert', accent: 'red', filter: 'incomplete' },
+};
+
+export const APPLICATION_FILTERS: readonly {
+  id: ApplicationFilterId;
+  label: string;
+  icon?: ApplicationIconName;
+}[] = [
+  { id: 'all', label: 'All' },
+  { id: 'draft', label: 'Draft', icon: 'document' },
+  { id: 'progress', label: 'In Progress', icon: 'refresh' },
+  { id: 'approved', label: 'Approved', icon: 'circleCheck' },
+  { id: 'waiting', label: 'Waiting List', icon: 'clock' },
+  { id: 'rejected', label: 'Rejected', icon: 'circleX' },
+  { id: 'incomplete', label: 'Incomplete', icon: 'circleAlert' },
+];
+
+/** The design's sample applications (mock until the API lists them) */
+export const APPLICATION_RECORDS: readonly ApplicationRecord[] = [
+  { id: 'AHC12895', propertyName: 'Maple Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'draft', image: renterAssets.sterling, propertyId: 'r1' },
+  { id: 'AHC12896', propertyName: 'High Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'lease', image: renterAssets.obsidian },
+  { id: 'ABC123456', propertyName: 'Green View', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '01/05/2025', status: 'approved', image: renterAssets.azure },
+  { id: 'AVF14568', propertyName: 'Grace Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/20/2024', status: 'verification', image: renterAssets.marble },
+  { id: 'AGF25486', propertyName: 'Green View', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/20/2024', status: 'waiting', image: renterAssets.azure },
+  { id: 'AHC12897', propertyName: 'Maple Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'rejected', image: renterAssets.sterling },
+  { id: 'AHC12898', propertyName: 'Green View', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'incomplete', image: renterAssets.azure },
 ];

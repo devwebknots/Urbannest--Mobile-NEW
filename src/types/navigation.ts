@@ -23,6 +23,10 @@ export type RootStackParamList = {
   RentalApplication: { propertyId: string };
   /** Confirmation + next steps after the application is sent (replaces RentalApplication) */
   ApplicationSubmitted: { propertyId: string; applicationId: string; submittedAt: number };
+  /** All the user's applications with their status ("Track Application Status") */
+  ApplicationStatus:
+    | { propertyId?: string; applicationId?: string; submittedAt?: number }
+    | undefined;
   PersonaSelect: undefined;
   RenterHome: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */

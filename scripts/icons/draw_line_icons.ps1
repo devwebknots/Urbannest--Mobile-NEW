@@ -450,6 +450,36 @@ $icons = [ordered]@{
     'path:M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0',
     'circle:12,10,3'
   )
+  # ---- Application Status page (icons/application, -Stroke 2.2):
+  #      -Only refresh_cw,clock,circle_x,circle_alert,funnel
+  # lucide: refresh-cw
+  'refresh_cw' = @(
+    'path:M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8',
+    'path:M21 3v5h-5',
+    'path:M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16',
+    'path:M8 16H3v5'
+  )
+  # lucide: clock
+  'clock' = @(
+    'circle:12,12,10',
+    'path:M12 6v6l4 2'
+  )
+  # lucide: circle-x
+  'circle_x' = @(
+    'circle:12,12,10',
+    'path:m15 9-6 6',
+    'path:m9 9 6 6'
+  )
+  # lucide: circle-alert
+  'circle_alert' = @(
+    'circle:12,12,10',
+    'path:M12 8v4',
+    'path:M12 16h.01'
+  )
+  # lucide: funnel
+  'funnel' = @(
+    'path:M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z'
+  )
   # lucide: circle-check
   'circle_check' = @(
     'circle:12,12,10',

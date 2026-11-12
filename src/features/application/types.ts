@@ -140,6 +140,40 @@ export interface ConsentItem {
   readonly required: boolean;
 }
 
+/** Application Status page */
+export type ApplicationStatusId =
+  | 'submitted'
+  | 'draft'
+  | 'lease'
+  | 'verification'
+  | 'approved'
+  | 'waiting'
+  | 'rejected'
+  | 'incomplete';
+
+/** Filter chips: several statuses can share one ("In Progress") */
+export type ApplicationFilterId =
+  | 'all'
+  | 'draft'
+  | 'progress'
+  | 'approved'
+  | 'waiting'
+  | 'rejected'
+  | 'incomplete';
+
+export interface ApplicationRecord {
+  readonly id: string;
+  readonly propertyName: string;
+  /** "Unit A 13.A • Room A1, A3" */
+  readonly unit: string;
+  /** MM/DD/YYYY */
+  readonly appliedOn: string;
+  readonly status: ApplicationStatusId;
+  readonly image: number;
+  /** Listing to reopen (drafts) */
+  readonly propertyId?: string;
+}
+
 export interface ChoiceOption {
   readonly id: string;
   readonly label: string;

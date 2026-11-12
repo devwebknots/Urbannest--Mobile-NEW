@@ -22,6 +22,8 @@ interface Props {
   backLabel?: string;
   /** Title next to the back button instead of centered (e.g. "Rental Application") */
   titleAlign?: 'center' | 'left';
+  /** Buttons on the right (e.g. filter, more); replaces the avatar */
+  right?: React.ReactNode;
 }
 
 export const LightTopBar: React.FC<Props> = ({
@@ -31,6 +33,7 @@ export const LightTopBar: React.FC<Props> = ({
   onProfilePress,
   backLabel = 'Back',
   titleAlign = 'center',
+  right,
 }) => (
   <View style={styles.bar}>
     <Pressable
@@ -46,7 +49,9 @@ export const LightTopBar: React.FC<Props> = ({
     <Text style={[styles.title, titleAlign === 'left' && styles.titleLeft]} numberOfLines={1}>
       {title ?? ''}
     </Text>
-    {initials && onProfilePress ? (
+    {right ? (
+      <View style={styles.right}>{right}</View>
+    ) : initials && onProfilePress ? (
       <ProfileAvatar initials={initials} onPress={onProfilePress} />
     ) : null}
   </View>
@@ -83,6 +88,11 @@ const styles = StyleSheet.create({
   titleLeft: {
     marginLeft: spacing.lg,
     textAlign: 'left',
+  },
+  right: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
 });
 
