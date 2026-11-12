@@ -129,8 +129,21 @@ test('rental application step 1 shows the form, household and continue', async (
   // Required documents are uploaded, so step 3 moves on to step 4
   await press('Continue to Review');
   now = JSON.stringify(tree.toJSON());
-  expect(now).toContain('This step is coming soon');
-  expect(now).toContain('Submit Application');
+  for (const text of [
+    'Review, Consent & Submit',
+    'Full Legal Name',
+    'John Adam Doe',
+    'Background Screening',
+    'Net Due Today',
+    'Truth & Accuracy Attestation',
+    'Submit Official Application',
+  ]) {
+    expect(now).toContain(text);
+  }
+
+  // Submitting needs the required consents + a matching signature
+  await press('Submit Official Application');
+  expect(JSON.stringify(tree.toJSON())).toContain('Almost there');
 
   await press('Previous step');
   expect(JSON.stringify(tree.toJSON())).toContain('Continue to Review');

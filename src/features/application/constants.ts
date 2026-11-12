@@ -8,6 +8,7 @@ import type {
   ApplicantForm,
   ApplicationDocument,
   ApplicationStep,
+  ConsentItem,
   Pet,
   Vehicle,
   ChoiceOption,
@@ -44,8 +45,8 @@ export const APPLICATION_STEPS: readonly ApplicationStep[] = [
   {
     id: 'submit',
     label: 'Submission',
-    title: 'Submission',
-    subtitle: 'Review your details and send your application to the landlord.',
+    title: 'Review, Consent & Submit',
+    subtitle: 'Carefully review your information, then provide consent to submit.',
     icon: 'circleCheck',
   },
 ];
@@ -202,4 +203,46 @@ export const APPLICATION_VEHICLES: readonly Vehicle[] = [
 export const STORAGE_OPTIONS: readonly ChoiceOption[] = [
   { id: 'yes', label: 'Yes' },
   { id: 'no', label: 'No' },
+];
+
+/* ---- Step 4: Review, Consent & Submit ---- */
+
+/** Screening summary (the design's sample values) */
+export const SCREENING_SUMMARY = {
+  vendors: 'Experian, TransUnion, National Registry',
+  scope: 'Credit, background & rental history',
+  tier: 'Tier 1 Rating (Sample)',
+};
+
+/** Application fee lines; negative = credit */
+export const APPLICATION_FEES: readonly { label: string; amount: number }[] = [
+  { label: 'Institutional Underwriting & Screening', amount: 150 },
+  { label: 'Corporate Partner Subsidy', amount: -150 },
+];
+
+export const APPLICATION_CONSENTS: readonly ConsentItem[] = [
+  {
+    id: 'truth',
+    title: 'Truth & Accuracy Attestation',
+    text: 'I declare that all statements, disclosures, and uploaded documents provided in this application are true, accurate, and complete.',
+    required: true,
+  },
+  {
+    id: 'screening',
+    title: 'Background & Credit Screening Authorization',
+    text: 'I authorize the applicable landlord/property manager to conduct background and credit screening as permitted by law.',
+    required: true,
+  },
+  {
+    id: 'privacy',
+    title: 'Privacy & Data Processing Consent',
+    text: 'I consent to UrbanNest processing my personal information for the purpose of this rental application.',
+    required: true,
+  },
+  {
+    id: 'electronic',
+    title: 'Electronic Communication Consent',
+    text: 'I agree to receive application-related communications electronically.',
+    required: false,
+  },
 ];

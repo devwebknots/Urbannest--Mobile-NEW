@@ -132,6 +132,14 @@ export type LifestyleSheetState =
   | { kind: 'vehicle'; editId?: string }
   | null;
 
+/** Step 4: one consent checkbox */
+export interface ConsentItem {
+  readonly id: string;
+  readonly title: string;
+  readonly text: string;
+  readonly required: boolean;
+}
+
 export interface ChoiceOption {
   readonly id: string;
   readonly label: string;

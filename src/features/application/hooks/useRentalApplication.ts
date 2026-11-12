@@ -30,6 +30,7 @@ import type {
 } from '../types';
 import { formatDateInput, isValidDate } from '../utils';
 import { useDocumentsStep } from './useDocumentsStep';
+import { useReviewStep } from './useReviewStep';
 import { useHistoryStep } from './useHistoryStep';
 
 export interface RentalApplicationNavigation {
@@ -211,6 +212,8 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
   const history = useHistoryStep(showDialog);
   // Step 3 (Property Requirements & Documents)
   const documents = useDocumentsStep(showDialog);
+  // Step 4 (Review, Consent & Submit)
+  const review = useReviewStep(showDialog);
 
   const dirty =
     JSON.stringify(form) !== JSON.stringify(APPLICATION_PREFILL) ||
@@ -291,10 +294,40 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
     }
     if (currentStep < lastStep) {
       setCurrentStep(currentStep + 1);
-    } else {
+    } else if (review.check(form.firstName, form.middleName, form.lastName)) {
       submit();
     }
-  }, [checkHousehold, currentStep, documents, history, lastStep, submit]);
+  }, [checkHousehold, currentStep, documents, form, history, lastStep, review, submit]);
+
+  /** "Edit" on the review step: straight back to an earlier step */
+  const editStep = useCallback((index: number) => setCurrentStep(index), []);
+
+  // Step 4 summary of step 1
+  const fullName = [form.firstName, form.middleName, form.lastName]
+    .map(s => s.trim())
+    .filter(Boolean)
+    .join(' ');
+  const applicantSummary = [
+    { label: 'Full Legal Name', value: fullName || '—' },
+    { label: 'Date of Birth', value: form.dateOfBirth || '—' },
+    { label: 'Email', value: form.email || '—' },
+    { label: 'Phone', value: form.phone ? `${country.dialCode} ${form.phone}` : '—' },
+    {
+      label: 'Current Address',
+      value:
+        [
+          [form.street1, form.street2].map(s => s.trim()).filter(Boolean).join(', '),
+          [form.city.trim(), [form.stateId, form.zip.trim()].filter(Boolean).join(' ')]
+            .filter(Boolean)
+            .join(', '),
+        ]
+          .filter(Boolean)
+          .join(' · ') || '—',
+    },
+    { label: 'Desired Move-In Date', value: form.moveInDate || '—' },
+    { label: 'Co-Applicants', value: coApplicants.map(c => c.name).join(', ') || 'None' },
+    { label: 'Dependents', value: dependents.map(d => d.name).join(', ') || 'None' },
+  ];
 
   /**
    * Tapping a step in the stepper: earlier steps open straight away; later
@@ -351,7 +384,7 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
     currentStep === 0
       ? `Continue to Stage ${currentStep + 2}`
       : currentStep === lastStep
-        ? 'Submit Application'
+        ? 'Submit Official Application'
         : currentStep === lastStep - 1
           ? 'Continue to Review'
           : 'Save & Continue';
@@ -365,6 +398,9 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
     goToStep,
     history,
     documents,
+    review,
+    editStep,
+    applicantSummary,
     form,
     setField,
     errors,

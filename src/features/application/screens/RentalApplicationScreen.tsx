@@ -52,7 +52,7 @@ import { EditButton, InviteSentPill, PersonRow } from '../components/PersonRow';
 import { DocumentsStep } from '../components/DocumentsStep';
 import { HistoryStep } from '../components/HistoryStep';
 import { PersonSheet } from '../components/PersonSheet';
-import { StepPlaceholder } from '../components/StepPlaceholder';
+import { ReviewStep } from '../components/ReviewStep';
 import { StepTransition } from '../components/StepTransition';
 import {
   RentalApplicationNavigation,
@@ -147,7 +147,13 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
             vm.currentStep === 2 ? (
               <DocumentsStep vm={vm.documents} />
             ) : (
-              <StepPlaceholder step={step} />
+              <ReviewStep
+                vm={vm.review}
+                applicant={vm.applicantSummary}
+                legalName={{ first: form.firstName, middle: form.middleName, last: form.lastName }}
+                onEditApplicant={() => vm.editStep(0)}
+                onEditScreening={() => vm.editStep(1)}
+              />
             )
           )
         ) : (
