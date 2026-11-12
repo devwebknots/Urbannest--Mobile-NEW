@@ -29,6 +29,7 @@ import type {
   PersonSheetState,
 } from '../types';
 import { formatDateInput, isValidDate } from '../utils';
+import { useDocumentsStep } from './useDocumentsStep';
 import { useHistoryStep } from './useHistoryStep';
 
 export interface RentalApplicationNavigation {
@@ -36,6 +37,12 @@ export interface RentalApplicationNavigation {
 }
 
 export type ApplicationPicker = 'country' | 'state' | 'occupants' | null;
+
+/**
+ * TEMPORARY (preview): skip step 2's checks so step 3 can be reached
+ * without filling in History. Set back to false before release.
+ */
+const SKIP_HISTORY_CHECK = true;
 
 const REQUIRED_MESSAGE = 'Required';
 
@@ -202,6 +209,8 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
 
   // Step 2 (Rental & Financial History)
   const history = useHistoryStep(showDialog);
+  // Step 3 (Property Requirements & Documents)
+  const documents = useDocumentsStep(showDialog);
 
   const dirty =
     JSON.stringify(form) !== JSON.stringify(APPLICATION_PREFILL) ||
@@ -274,7 +283,10 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
     if (currentStep === 0 && !checkHousehold()) {
       return;
     }
-    if (currentStep === 1 && !history.check()) {
+    if (currentStep === 1 && !SKIP_HISTORY_CHECK && !history.check()) {
+      return;
+    }
+    if (currentStep === 2 && !documents.check()) {
       return;
     }
     if (currentStep < lastStep) {
@@ -282,7 +294,7 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
     } else {
       submit();
     }
-  }, [checkHousehold, currentStep, history, lastStep, submit]);
+  }, [checkHousehold, currentStep, documents, history, lastStep, submit]);
 
   /**
    * Tapping a step in the stepper: earlier steps open straight away; later
@@ -299,10 +311,10 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
         }
         if (s === 1) {
           if (currentStep === 1) {
-            if (!history.check()) {
+            if (!SKIP_HISTORY_CHECK && !history.check()) {
               return;
             }
-          } else if (!history.isComplete) {
+          } else if (!SKIP_HISTORY_CHECK && !history.isComplete) {
             setCurrentStep(1);
             showDialog({
               tone: 'info',
@@ -313,10 +325,26 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
             return;
           }
         }
+        if (s === 2) {
+          if (currentStep === 2) {
+            if (!documents.check()) {
+              return;
+            }
+          } else if (!documents.isComplete) {
+            setCurrentStep(2);
+            showDialog({
+              tone: 'info',
+              title: 'Add your documents first',
+              message: 'Upload the required documents and answer the lifestyle questions to continue.',
+              actions: [{ label: 'OK', variant: 'brand' }],
+            });
+            return;
+          }
+        }
       }
       setCurrentStep(index);
     },
-    [checkHousehold, currentStep, history, showDialog],
+    [checkHousehold, currentStep, documents, history, showDialog],
   );
 
   const continueLabel =
@@ -324,7 +352,9 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
       ? `Continue to Stage ${currentStep + 2}`
       : currentStep === lastStep
         ? 'Submit Application'
-        : 'Save & Continue';
+        : currentStep === lastStep - 1
+          ? 'Continue to Review'
+          : 'Save & Continue';
 
   return {
     property,
@@ -334,6 +364,7 @@ export function useRentalApplication(propertyId?: string, navigation?: RentalApp
     continueLabel,
     goToStep,
     history,
+    documents,
     form,
     setField,
     errors,

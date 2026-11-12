@@ -6,6 +6,9 @@
  */
 export const applicationAssets = {
   headerBuilding: require('@/assets/images/application/header_building.png'),
+  // Step 3 pet photo, cropped from the "Property Requirements & Documents"
+  // design (318 x 246)
+  petLabrador: require('@/assets/images/application/pet_labrador.jpg'),
 };
 
 /** Width / height of header_building.png */
@@ -25,6 +28,12 @@ export const applicationIcons = {
   plus: require('@/assets/icons/application/plus.png'),
   circleCheck: require('@/assets/icons/application/circle_check.png'),
   briefcase: require('@/assets/icons/application/briefcase.png'),
+  idCard: require('@/assets/icons/application/id_card.png'),
+  paw: require('@/assets/icons/application/paw.png'),
+  car: require('@/assets/icons/application/car.png'),
+  package: require('@/assets/icons/application/package.png'),
+  upload: require('@/assets/icons/application/upload.png'),
+  coins: require('@/assets/icons/property/database.png'),
   house: require('@/assets/icons/property/house.png'),
   calendar: require('@/assets/icons/property/calendar_days.png'),
   document: require('@/assets/icons/property/note.png'),

@@ -394,6 +394,43 @@ $icons = [ordered]@{
     'path:M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16',
     'path:M4 6h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z'
   )
+  # ---- Rental application step 3 (icons/application, -Stroke 2.2):
+  #      -Only id_card,paw,car,package,upload
+  # lucide: id-card
+  'id_card' = @(
+    'path:M16 10h2',
+    'path:M16 14h2',
+    'path:M6.17 15a3 3 0 0 1 5.66 0',
+    'circle:9,11,2',
+    'path:M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z'
+  )
+  # lucide: paw-print
+  'paw' = @(
+    'circle:11,4,2',
+    'circle:18,8,2',
+    'circle:20,16,2',
+    'path:M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z'
+  )
+  # lucide: car
+  'car' = @(
+    'path:M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2',
+    'circle:7,17,2',
+    'path:M9 17h6',
+    'circle:17,17,2'
+  )
+  # lucide: package
+  'package' = @(
+    'path:M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z',
+    'path:M12 22V12',
+    'path:m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7',
+    'path:m7.5 4.27 9 5.15'
+  )
+  # lucide: upload
+  'upload' = @(
+    'path:M12 3v12',
+    'path:m17 8-5-5-5 5',
+    'path:M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'
+  )
   # lucide: circle-check
   'circle_check' = @(
     'circle:12,12,10',

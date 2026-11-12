@@ -15,6 +15,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { colors, spacing } from '@/config/theme';
+import { TILE_BORDER } from '@/features/renter/components/checkin/CheckInChecklist';
 import { FormSelect } from '@/features/renter/components/form/FormSelect';
 import { CategorySheet } from '@/features/renter/components/inspection/CategorySheet';
 import { moderateScale as ms } from '@/utils/responsive';
@@ -193,14 +194,24 @@ export const HistoryStep: React.FC<{ vm: HistoryStepModel }> = ({ vm }) => {
             </FieldRow>
 
             <View style={styles.actions}>
-              <Button
-                title={vm.editing ? 'Save Residence' : 'Add Residence'}
-                variant="brand"
-                size="md"
-                onPress={vm.saveResidence}
-                style={styles.addButton}
-              />
-              <Button title="Cancel" variant="link" onPress={vm.cancelResidence} />
+              <View style={styles.actionSlot}>
+                <Button
+                  title={vm.editing ? 'Save Residence' : 'Add Residence'}
+                  variant="soft"
+                  size="md"
+                  onPress={vm.saveResidence}
+                  style={styles.actionButton}
+                />
+              </View>
+              <View style={styles.actionSlot}>
+                <Button
+                  title="Cancel"
+                  variant="light"
+                  size="md"
+                  onPress={vm.cancelResidence}
+                  style={[styles.actionButton, styles.cancelButton]}
+                />
+              </View>
             </View>
           </>
         ) : (
@@ -325,14 +336,24 @@ const styles = StyleSheet.create({
   city: {
     flex: 1.15,
   },
+  // Secondary actions side by side: soft "Add Residence" + white "Cancel"
   actions: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xl,
+    gap: spacing.md,
     marginTop: spacing.xs,
   },
-  addButton: {
-    minWidth: ms(150),
+  // Two equal halves; each button fills its half
+  actionSlot: {
+    flex: 1,
+  },
+  actionButton: {
+    width: '100%',
+    paddingHorizontal: spacing.md,
+  },
+  // White button on the light page: pale blue rim so its edge shows
+  cancelButton: {
+    borderWidth: 1,
+    borderColor: TILE_BORDER,
   },
 });
 

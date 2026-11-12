@@ -6,7 +6,10 @@
 
 import type {
   ApplicantForm,
+  ApplicationDocument,
   ApplicationStep,
+  Pet,
+  Vehicle,
   ChoiceOption,
   EmploymentForm,
   ResidenceForm,
@@ -14,6 +17,7 @@ import type {
   Dependent,
   PhoneCountry,
 } from './types';
+import { applicationAssets } from './assets/applicationAssets';
 
 export const APPLICATION_STEPS: readonly ApplicationStep[] = [
   {
@@ -33,8 +37,8 @@ export const APPLICATION_STEPS: readonly ApplicationStep[] = [
   {
     id: 'documents',
     label: 'Documents',
-    title: 'Documents',
-    subtitle: 'Upload your ID, proof of income and any other supporting documents.',
+    title: 'Property Requirements & Documents',
+    subtitle: 'Upload your documents and tell us about pets, vehicles and storage.',
     icon: 'document',
   },
   {
@@ -147,3 +151,55 @@ export const EMPTY_EMPLOYMENT: EmploymentForm = {
   startDate: '',
   endDate: '',
 };
+
+/* ---- Step 3: Property Requirements & Documents ---- */
+
+/** Document slots; the design's first two come already uploaded */
+export const APPLICATION_DOCUMENTS: readonly ApplicationDocument[] = [
+  {
+    id: 'id',
+    title: 'Government-Issued Identification',
+    hint: "Driver's License, Passport, or State ID",
+    icon: 'idCard',
+    required: true,
+    fileName: 'ID_Proof.pdf',
+  },
+  {
+    id: 'income',
+    title: 'Proof of Income',
+    hint: 'Pay stub, bank statement, etc.',
+    icon: 'coins',
+    required: true,
+    fileName: 'Paystub_Aug.pdf',
+  },
+  {
+    id: 'employment',
+    title: 'Employment Verification',
+    hint: 'Upload employment letter or verification.',
+    icon: 'briefcase',
+    required: false,
+  },
+  {
+    id: 'other',
+    title: 'Other Requested Document',
+    hint: 'Any additional document.',
+    icon: 'document',
+    required: false,
+  },
+];
+
+export const PET_TYPES: readonly string[] = ['Dog', 'Cat', 'Bird', 'Other'];
+
+/** The design's pet and vehicle */
+export const APPLICATION_PETS: readonly Pet[] = [
+  { id: 'pet1', type: 'Dog', breed: 'Labrador', weight: '30', photo: applicationAssets.petLabrador },
+];
+
+export const APPLICATION_VEHICLES: readonly Vehicle[] = [
+  { id: 'car1', model: 'Toyota Camry', plate: 'MO-1234' },
+];
+
+export const STORAGE_OPTIONS: readonly ChoiceOption[] = [
+  { id: 'yes', label: 'Yes' },
+  { id: 'no', label: 'No' },
+];

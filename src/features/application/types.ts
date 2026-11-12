@@ -98,6 +98,40 @@ export interface EmploymentForm {
 
 export type EmploymentField = keyof EmploymentForm;
 
+/** Step 3: one document slot ("Government-Issued Identification") */
+export interface ApplicationDocument {
+  readonly id: string;
+  readonly title: string;
+  readonly hint: string;
+  readonly icon: ApplicationIconName;
+  readonly required: boolean;
+  /** Uploaded file, if any */
+  readonly fileName?: string;
+  readonly uri?: string;
+}
+
+export interface Pet {
+  readonly id: string;
+  readonly type: string;
+  readonly breed: string;
+  /** kg, as typed */
+  readonly weight: string;
+  /** Local photo (require id or uri) */
+  readonly photo?: number | { uri: string };
+}
+
+export interface Vehicle {
+  readonly id: string;
+  readonly model: string;
+  readonly plate: string;
+}
+
+/** What the step 3 add / edit sheet is doing */
+export type LifestyleSheetState =
+  | { kind: 'pet'; editId?: string }
+  | { kind: 'vehicle'; editId?: string }
+  | null;
+
 export interface ChoiceOption {
   readonly id: string;
   readonly label: string;

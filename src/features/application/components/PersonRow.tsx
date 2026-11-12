@@ -6,7 +6,14 @@
  */
 
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  ImageSourcePropType,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
 import { TILE_BG, TILE_BORDER } from '@/features/renter/components/checkin/CheckInChecklist';
 import { moderateScale as ms } from '@/utils/responsive';
@@ -22,6 +29,8 @@ interface Props {
   icon?: ApplicationIconName;
   /** Lines for the detail text (default 1) */
   detailLines?: number;
+  /** Photo in the avatar instead of an icon (e.g. a pet) */
+  photo?: ImageSourcePropType;
   right?: React.ReactNode;
 }
 
@@ -31,11 +40,14 @@ export const PersonRow: React.FC<Props> = ({
   initial,
   icon = 'user',
   detailLines = 1,
+  photo,
   right,
 }) => (
   <View style={styles.row}>
     <View style={[styles.avatar, initial && styles.avatarInitial]}>
-      {initial ? (
+      {photo ? (
+        <Image source={photo} style={styles.photo} resizeMode="cover" />
+      ) : initial ? (
         <Text style={styles.initial}>{name.trim().charAt(0).toUpperCase()}</Text>
       ) : (
         <ApplicationIcon name={icon} size={ms(20)} color={colors.navy} />
@@ -101,6 +113,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.tileBlue,
     borderWidth: 2,
     borderColor: colors.white,
+  },
+  photo: {
+    width: AVATAR - 4,
+    height: AVATAR - 4,
+    borderRadius: (AVATAR - 4) / 2,
   },
   avatarInitial: {
     backgroundColor: colors.chipBlue,

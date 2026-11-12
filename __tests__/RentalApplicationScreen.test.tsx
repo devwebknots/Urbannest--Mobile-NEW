@@ -107,14 +107,33 @@ test('rental application step 1 shows the form, household and continue', async (
   await type('Annual income', '12000');
   await press('Save & Continue');
   now = JSON.stringify(tree.toJSON());
-  expect(now).toContain('This step is coming soon');
+  for (const text of [
+    'Property Requirements & Documents',
+    'Verification & Documents',
+    'Government-Issued Identification',
+    'ID_Proof.pdf',
+    '2 of 4 uploaded',
+    'Lifestyle & Logistics',
+    'Dog – Labrador',
+    'Toyota Camry',
+    'Storage Allocation',
+    'Continue to Review',
+  ]) {
+    expect(now).toContain(text);
+  }
 
-  // Tapping step 4 jumps there; the button becomes Submit
-  await press('Step 4, Submission');
-  expect(JSON.stringify(tree.toJSON())).toContain('Submit Application');
+  // Answering No to pets hides the pet list
+  await press('Pets: No');
+  expect(JSON.stringify(tree.toJSON())).not.toContain('Dog – Labrador');
+
+  // Required documents are uploaded, so step 3 moves on to step 4
+  await press('Continue to Review');
+  now = JSON.stringify(tree.toJSON());
+  expect(now).toContain('This step is coming soon');
+  expect(now).toContain('Submit Application');
 
   await press('Previous step');
-  expect(JSON.stringify(tree.toJSON())).toContain('Save & Continue');
+  expect(JSON.stringify(tree.toJSON())).toContain('Continue to Review');
 
   await ReactTestRenderer.act(() => {
     tree.unmount();

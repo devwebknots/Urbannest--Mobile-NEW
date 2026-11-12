@@ -49,6 +49,7 @@ import {
 import { ApplicationSection } from '../components/ApplicationSection';
 import { ApplicationStepper } from '../components/ApplicationStepper';
 import { EditButton, InviteSentPill, PersonRow } from '../components/PersonRow';
+import { DocumentsStep } from '../components/DocumentsStep';
 import { HistoryStep } from '../components/HistoryStep';
 import { PersonSheet } from '../components/PersonSheet';
 import { StepPlaceholder } from '../components/StepPlaceholder';
@@ -143,7 +144,11 @@ export const RentalApplicationScreen: React.FC<Props> = ({ navigation, route }) 
           vm.currentStep === 1 ? (
             <HistoryStep vm={vm.history} />
           ) : (
-            <StepPlaceholder step={step} />
+            vm.currentStep === 2 ? (
+              <DocumentsStep vm={vm.documents} />
+            ) : (
+              <StepPlaceholder step={step} />
+            )
           )
         ) : (
         <View style={styles.sections}>
