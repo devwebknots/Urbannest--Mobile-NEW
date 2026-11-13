@@ -18,29 +18,10 @@ import {
   APPLICATION_PETS,
   PHONE_COUNTRIES,
 } from '../constants';
-import type { ApplicationRecord } from '../types';
+import type { ApplicationRecord, DocumentPaperModel } from '../types';
 
 export interface SubmittedApplicationNavigation {
   goBack: () => void;
-}
-
-/** One row of the paper's sections table */
-export interface DocSectionRow {
-  readonly id: string;
-  readonly section: string;
-  readonly title: string;
-  readonly lines: readonly string[];
-  /** Checked boxes in the last column */
-  readonly checks: readonly string[];
-}
-
-export interface LeaseDocument {
-  readonly heading: string;
-  readonly applicant: { name: string; address: string; phone: string; email: string };
-  readonly property: string;
-  readonly sections: readonly DocSectionRow[];
-  readonly declaration: string;
-  readonly footer: readonly string[];
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -64,7 +45,7 @@ export function useSubmittedApplication(
   const submittedOn = longDate(record.appliedOn);
   const fileName = 'Lease_Application.pdf';
 
-  const document = useMemo<LeaseDocument>(() => {
+  const document = useMemo<DocumentPaperModel>(() => {
     const a = APPLICATION_PREFILL;
     const dial = PHONE_COUNTRIES.find(c => c.id === a.countryId)?.dialCode ?? '';
     const name = [a.firstName, a.middleName, a.lastName].filter(Boolean).join(' ');
@@ -75,8 +56,19 @@ export function useSubmittedApplication(
 
     return {
       heading: 'Standard Application for Lease',
-      applicant: { name, address, phone: `${dial} ${a.phone}`.trim(), email: a.email },
-      property,
+      intro: 'This application was completed and submitted electronically by the applicant.',
+      notes: [
+        'Information is as provided by the applicant at the time of submission.',
+        'Changes after submission must be requested through the leasing office.',
+      ],
+      certify: 'This is to certify that the applicant, named below, has applied as described below.',
+      party: { title: 'Applicant: Name & Address', name, address },
+      contacts: [
+        { label: 'Telephone Number', value: `${dial} ${a.phone}`.trim() },
+        { label: 'Email', value: a.email },
+      ],
+      subject: { title: 'Property and unit to which this application applies:', value: property },
+      columns: ['Section', 'Details', 'Provided'],
       sections: [
         {
           id: 's1',
@@ -110,7 +102,8 @@ export function useSubmittedApplication(
           checks: ['Consents'],
         },
       ],
-      declaration: APPLICATION_CONSENTS.map(c => c.text).join(' '),
+      closingTitle: 'DECLARATION / CONSENTS:',
+      closing: APPLICATION_CONSENTS.map(c => c.text).join(' '),
       footer: [
         record.propertyName.toUpperCase(),
         'LEASING OFFICE',

@@ -16,7 +16,7 @@ import {
   APPLICATION_PROGRESS,
   OFFER_ACCEPTED_PROGRESS,
 } from '../constants';
-import { offerStore, useOfferStore } from '../store/offerStore';
+import { journeyStore, useJourneyStore } from '../store/journeyStore';
 import type { ApplicationRecord, JourneyState, JourneyStep } from '../types';
 
 export interface ApplicationDetailsNavigation {
@@ -26,6 +26,7 @@ export interface ApplicationDetailsNavigation {
     (route: 'RentalApplication', params: { propertyId: string }): void;
     (route: 'SubmittedApplication', params: { record: ApplicationRecord }): void;
     (route: 'OfferAcceptance', params: { record: ApplicationRecord; accepted?: boolean }): void;
+    (route: 'LeaseReview', params: { record: ApplicationRecord; confirmed?: boolean }): void;
   };
 }
 
@@ -66,14 +67,17 @@ export function useApplicationDetails(
 ) {
   const dialog = useAppDialog();
   const showDialog = dialog.show;
-  // Re-render when an offer is accepted on the Offer Acceptance page
-  useOfferStore();
+  // Re-render when the renter finishes a step (offer accepted, lease confirmed)
+  useJourneyStore();
   const base = APPLICATION_PROGRESS[record.status];
-  // Offer accepted while Offer Acceptance was current: move on to Lease Review
-  const progress =
-    offerStore.isAccepted(record.id) && base.step < OFFER_ACCEPTED_PROGRESS.step
+  // Lease confirmed -> Lease Agreement (the "lease" status' progress);
+  // offer accepted -> Lease Review. Never moves an application backwards.
+  const reached = journeyStore.isDone(record.id, 'review')
+    ? APPLICATION_PROGRESS.lease
+    : journeyStore.isDone(record.id, 'offer')
       ? OFFER_ACCEPTED_PROGRESS
       : base;
+  const progress = reached.step > base.step ? reached : base;
   const appliedOn = longDate(record.appliedOn);
 
   const facts = useMemo(
@@ -164,6 +168,16 @@ export function useApplicationDetails(
           navigation.navigate('OfferAcceptance', params);
         } else {
           navigate('OfferAcceptance', params);
+        }
+        return;
+      }
+      // Lease Review: once the lease is out (current) or confirmed (done)
+      if (row.id === 'review' && row.state !== 'upcoming') {
+        const params = { record, confirmed: row.state === 'done' };
+        if (navigation?.navigate) {
+          navigation.navigate('LeaseReview', params);
+        } else {
+          navigate('LeaseReview', params);
         }
         return;
       }

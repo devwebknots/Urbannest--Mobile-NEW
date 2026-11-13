@@ -68,6 +68,8 @@ export const applicationIcons = {
   share: require('@/assets/icons/property/share.png'),
   // Offer Acceptance
   building: require('@/assets/icons/property/building.png'),
+  // Lease Review (same script, -Stroke 2.2)
+  fileSignature: require('@/assets/icons/application/file_signature.png'),
   key: require('@/assets/icons/manage/key.png'),
   wallet: require('@/assets/icons/property/wallet.png'),
   layers: require('@/assets/icons/property/layers.png'),

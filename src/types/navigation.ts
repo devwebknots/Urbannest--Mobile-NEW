@@ -37,6 +37,12 @@ export type RootStackParamList = {
     /** Step already done: show "Offer Accepted", no buttons */
     accepted?: boolean;
   };
+  /** The generated lease (confirm / dispute), opened from the Lease Review step */
+  LeaseReview: {
+    record: import('@/features/application/types').ApplicationRecord;
+    /** Step already done: show "Lease Confirmed", no buttons */
+    confirmed?: boolean;
+  };
   PersonaSelect: undefined;
   RenterHome: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */

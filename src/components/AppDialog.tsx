@@ -16,7 +16,9 @@
  * plays it back quickly. No motion in tests.
  * Action variants: brand (main), soft (other choice), danger (destructive,
  * e.g. "Remove"), link (quiet, e.g. "Cancel"). Every action closes the
- * dialog first; its onPress runs right after the close animation.
+ * dialog first; its onPress runs right after the close animation. An
+ * action with `next: true` instead runs onPress at once so it can show the
+ * following dialog (confirm -> success) in the same open pop-up.
  * Backdrop tap / Android back close it like "Cancel", unless
  * `dismissible: false` (success dialogs use it so "Done" is pressed).
  *
@@ -52,6 +54,13 @@ export interface AppDialogAction {
   readonly label: string;
   readonly variant?: 'brand' | 'soft' | 'danger' | 'link';
   readonly onPress?: () => void;
+  /**
+   * onPress shows the next dialog (e.g. confirm -> success): run it right
+   * away and swap the card in place instead of closing first. Closing and
+   * reopening the native Modal back to back can leave an invisible modal
+   * over the screen (app looks frozen).
+   */
+  readonly next?: boolean;
 }
 
 /** One summary row in a success dialog, e.g. Category: Plumbing */
@@ -96,15 +105,20 @@ export const AppDialog: React.FC<Props> = ({ config, onClose }) => {
   // Keeps the last config on screen while the close animation plays
   const [shown, setShown] = useState<AppDialogConfig | null>(config);
   const progress = useRef(new Animated.Value(config ? 1 : 0)).current;
+  // A dialog is on screen: a new config swaps the card in place
+  const open = useRef(config !== null);
 
   useEffect(() => {
     if (config) {
       setShown(config);
+      const swapping = open.current;
+      open.current = true;
       if (NO_MOTION) {
         progress.setValue(1);
         return;
       }
-      progress.setValue(0);
+      // Swap: keep the backdrop, give the new card a small pop
+      progress.setValue(swapping ? 0.85 : 0);
       Animated.spring(progress, {
         toValue: 1,
         damping: 18,
@@ -113,6 +127,7 @@ export const AppDialog: React.FC<Props> = ({ config, onClose }) => {
         useNativeDriver: true,
       }).start();
     } else {
+      open.current = false;
       if (NO_MOTION) {
         setShown(null);
         return;
@@ -127,6 +142,10 @@ export const AppDialog: React.FC<Props> = ({ config, onClose }) => {
   }, [config, progress]);
 
   const run = (action: AppDialogAction) => {
+    if (action.next && action.onPress) {
+      action.onPress();
+      return;
+    }
     onClose();
     if (action.onPress) {
       setTimeout(action.onPress, AFTER_CLOSE_MS);

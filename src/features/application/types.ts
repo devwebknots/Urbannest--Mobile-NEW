@@ -207,6 +207,52 @@ export interface ApplicationProgress {
   readonly statusDetail: string;
 }
 
+/** One row of a document paper's table */
+export interface DocSectionRow {
+  readonly id: string;
+  readonly section: string;
+  readonly title: string;
+  readonly lines: readonly string[];
+  /** Ticked boxes in the last column */
+  readonly checks: readonly string[];
+}
+
+/**
+ * A document drawn as a sheet of paper (Submitted Application, Lease
+ * Review): every text on the paper comes from here
+ */
+export interface DocumentPaperModel {
+  readonly heading: string;
+  /** Bold line under the heading */
+  readonly intro: string;
+  /** "Note:" lines */
+  readonly notes: readonly string[];
+  /** Line above the parties box */
+  readonly certify: string;
+  /** Left cell of the parties box */
+  readonly party: { title: string; name: string; address: string };
+  /** Right cell of the parties box (Telephone, Email…) */
+  readonly contacts: readonly { label: string; value: string }[];
+  /** Full-width row under the parties */
+  readonly subject: { title: string; value: string };
+  /** Table head: section, details, ticks */
+  readonly columns: readonly [string, string, string];
+  readonly sections: readonly DocSectionRow[];
+  readonly closingTitle: string;
+  readonly closing: string;
+  /** Centered bold lines at the bottom */
+  readonly footer: readonly string[];
+}
+
+/** Lease Review: the lease the owner generated after the offer was accepted */
+export interface LeaseTerms {
+  readonly landlord: string;
+  readonly landlordAddress: string;
+  readonly landlordPhone: string;
+  readonly landlordEmail: string;
+  readonly fileSize: string;
+}
+
 /** Offer Acceptance: the owner's lease offer for an approved application */
 export interface LeaseOffer {
   /** Street address under the property name */

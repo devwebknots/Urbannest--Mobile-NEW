@@ -11,7 +11,7 @@ import { useCallback, useMemo } from 'react';
 import { useAppDialog } from '@/components/AppDialog';
 import { goBack } from '@/navigation/navigationRef';
 import { APPLICATION_OFFER } from '../constants';
-import { offerStore } from '../store/offerStore';
+import { journeyStore } from '../store/journeyStore';
 import type { ApplicationIconName, ApplicationRecord } from '../types';
 
 export interface OfferAcceptanceNavigation {
@@ -91,9 +91,11 @@ export function useOfferAcceptance(
           {
             label: 'Accept Offer',
             variant: 'brand',
+            // Swap to the success card in place (no close + reopen)
+            next: true,
             onPress: () => {
               // Application Details moves its journey on to Lease Review
-              offerStore.accept(record.id);
+              journeyStore.complete(record.id, 'offer');
               showDialog({
                 tone: 'success',
                 title: 'Offer Accepted',

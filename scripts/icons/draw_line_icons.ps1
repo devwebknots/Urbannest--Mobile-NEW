@@ -539,6 +539,12 @@ $icons = [ordered]@{
     'path:M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4',
     'path:m7 10 5 5 5-5'
   )
+  # lucide file (page + folded corner) with a signature stroke: Lease Review
+  'file_signature' = @(
+    'path:M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z',
+    'path:M14 2v4a2 2 0 0 0 2 2h4',
+    'path:M8 17c.8-1.6 1.6-2.4 2.2-2.2.7.3-.3 2.2.4 2.4.6.2 1.2-1 1.9-1.1.5 0 .7.7 1.5.9H16'
+  )
   # (share reuses property/share.png)
   # lucide: scan (four corners: full screen)
   'expand' = @(

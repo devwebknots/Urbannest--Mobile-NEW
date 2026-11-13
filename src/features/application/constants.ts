@@ -15,6 +15,7 @@ import type {
   ApplicationStatusId,
   JourneyStep,
   LeaseOffer,
+  LeaseTerms,
   ConsentItem,
   Pet,
   Vehicle,
@@ -387,4 +388,15 @@ export const APPLICATION_OFFER: LeaseOffer = {
   rent: 1500,
   securityDeposit: 500,
   oneTimePayment: 500,
+};
+
+/* ---- Lease Review page ---- */
+
+/** Sample lease details (owner side), until leases come from the API */
+export const APPLICATION_LEASE: LeaseTerms = {
+  landlord: 'UrbanNest Property Management',
+  landlordAddress: '701 Treeside Ct, Aspen Grove, CO 81611',
+  landlordPhone: '+1 970 555 0142',
+  landlordEmail: 'leasing@urbannest.com',
+  fileSize: 'PDF • 1.2 MB',
 };

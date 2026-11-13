@@ -5,9 +5,11 @@
  *    a line under it.
  *  - FileBar: red PDF tile, file name + "PDF • 1.2 MB", round soft-blue
  *    download / share buttons and a bare full-screen icon.
- *  - LeaseDocumentPaper: the document drawn as a white sheet of paper:
- *    centered title, note, applicant box, sections table with check boxes,
- *    declaration paragraph and the centered footer. Body font, small sizes.
+ *  - LeaseDocumentPaper: a document drawn as a white sheet of paper:
+ *    centered title, note, parties box, sections table with check boxes,
+ *    closing paragraph and the centered footer. Body font, small sizes.
+ *    All its text comes from a DocumentPaperModel (also used by Lease
+ *    Review).
  */
 
 import React from 'react';
@@ -15,8 +17,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { borderRadius, colors, shadows, spacing, typography, typographyPresets } from '@/config/theme';
 import { TILE_BORDER } from '@/features/renter/components/checkin/CheckInChecklist';
 import { moderateScale as ms, scaleFont } from '@/utils/responsive';
-import type { LeaseDocument } from '../hooks/useSubmittedApplication';
-import type { ApplicationIconName } from '../types';
+import type { ApplicationIconName, DocumentPaperModel } from '../types';
 import { ApplicationIcon } from './ApplicationIcon';
 
 /* ---------- Heading ---------- */
@@ -63,8 +64,10 @@ export const FileBar: React.FC<{
   onDownload: () => void;
   onShare: () => void;
   onExpand: () => void;
-}> = ({ name, meta, onDownload, onShare, onExpand }) => (
-  <View style={styles.fileBar}>
+  /** Hairline under the bar (on when the paper follows in the same card) */
+  divider?: boolean;
+}> = ({ name, meta, onDownload, onShare, onExpand, divider = true }) => (
+  <View style={[styles.fileBar, divider && styles.fileBarDivider]}>
     <View style={styles.pdfTile}>
       <ApplicationIcon name="fileText" size={ms(22)} color={colors.error} />
     </View>
@@ -90,53 +93,55 @@ const Box: React.FC<{ checked: boolean; label: string }> = ({ checked, label }) 
   </View>
 );
 
-export const LeaseDocumentPaper: React.FC<{ doc: LeaseDocument }> = ({ doc }) => (
-  <View style={styles.paper} accessible accessibilityLabel={`${doc.heading}, ${doc.applicant.name}`}>
+/** Any document as a sheet of paper; all its text comes from `doc` */
+export const LeaseDocumentPaper: React.FC<{ doc: DocumentPaperModel }> = ({ doc }) => (
+  <View style={styles.paper} accessible accessibilityLabel={`${doc.heading}, ${doc.party.name}`}>
     <Text style={styles.docTitle}>{doc.heading.toUpperCase()}</Text>
 
-    <Text style={[styles.docBold, styles.docGap]}>
-      This application was completed and submitted electronically by the applicant.
-    </Text>
-    <Text style={[styles.docBold, styles.docGapSm]}>Note:</Text>
-    <Text style={styles.docText}>
-      1. Information is as provided by the applicant at the time of submission.
-    </Text>
-    <Text style={styles.docText}>
-      2. Changes after submission must be requested through the leasing office.
-    </Text>
+    <Text style={[styles.docBold, styles.docGap]}>{doc.intro}</Text>
+    {doc.notes.length > 0 ? (
+      <>
+        <Text style={[styles.docBold, styles.docGapSm]}>Note:</Text>
+        {doc.notes.map((n, i) => (
+          <Text key={n} style={styles.docText}>
+            {`${i + 1}. ${n}`}
+          </Text>
+        ))}
+      </>
+    ) : null}
     <View style={styles.docRule} />
 
-    <Text style={styles.docText}>
-      This is to certify that the applicant, named below, has applied as described below.
-    </Text>
+    <Text style={styles.docText}>{doc.certify}</Text>
 
-    {/* Applicant box: name & address | phone & email, then the property */}
+    {/* Parties box: name & address | contacts, then the subject row */}
     <View style={[styles.grid, styles.docGapSm]}>
       <View style={styles.gridRow}>
         <View style={[styles.cell, styles.cellWide]}>
-          <Text style={styles.docBold}>Applicant: Name & Address</Text>
-          <Text style={styles.docText}>{doc.applicant.name}</Text>
-          <Text style={styles.docText}>{doc.applicant.address}</Text>
+          <Text style={styles.docBold}>{doc.party.title}</Text>
+          <Text style={styles.docText}>{doc.party.name}</Text>
+          <Text style={styles.docText}>{doc.party.address}</Text>
         </View>
         <View style={[styles.cell, styles.cellLast]}>
-          <Text style={styles.docBold}>Telephone Number:</Text>
-          <Text style={styles.docText}>{doc.applicant.phone}</Text>
-          <Text style={[styles.docBold, styles.docGapXs]}>Email:</Text>
-          <Text style={styles.docText}>{doc.applicant.email}</Text>
+          {doc.contacts.map((c, i) => (
+            <React.Fragment key={c.label}>
+              <Text style={[styles.docBold, i > 0 && styles.docGapXs]}>{`${c.label}:`}</Text>
+              <Text style={styles.docText}>{c.value}</Text>
+            </React.Fragment>
+          ))}
         </View>
       </View>
       <View style={[styles.cell, styles.cellTop, styles.cellLast]}>
-        <Text style={styles.docBold}>Property and unit to which this application applies:</Text>
-        <Text style={styles.docText}>{doc.property}</Text>
+        <Text style={styles.docBold}>{doc.subject.title}</Text>
+        <Text style={styles.docText}>{doc.subject.value}</Text>
       </View>
     </View>
 
     {/* Sections table */}
     <View style={[styles.grid, styles.docGap]}>
       <View style={[styles.gridRow, styles.tableHead]}>
-        <Text style={[styles.th, styles.colSection]}>Section</Text>
-        <Text style={[styles.th, styles.colDetails]}>Details</Text>
-        <Text style={[styles.th, styles.colChecks, styles.cellLast]}>Provided</Text>
+        <Text style={[styles.th, styles.colSection]}>{doc.columns[0]}</Text>
+        <Text style={[styles.th, styles.colDetails]}>{doc.columns[1]}</Text>
+        <Text style={[styles.th, styles.colChecks, styles.cellLast]}>{doc.columns[2]}</Text>
       </View>
       {doc.sections.map(s => (
         <View key={s.id} style={[styles.gridRow, styles.cellTop]}>
@@ -160,8 +165,8 @@ export const LeaseDocumentPaper: React.FC<{ doc: LeaseDocument }> = ({ doc }) =>
       ))}
     </View>
 
-    <Text style={[styles.docBold, styles.docGap]}>DECLARATION / CONSENTS:</Text>
-    <Text style={styles.docSmall}>{doc.declaration}</Text>
+    <Text style={[styles.docBold, styles.docGap]}>{doc.closingTitle}</Text>
+    <Text style={styles.docSmall}>{doc.closing}</Text>
 
     <View style={styles.docFooter}>
       {doc.footer.map(l => (
@@ -217,6 +222,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
+  },
+  fileBarDivider: {
     borderBottomWidth: 1,
     borderBottomColor: TILE_BORDER,
   },

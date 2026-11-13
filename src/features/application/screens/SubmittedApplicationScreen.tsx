@@ -11,22 +11,12 @@
  */
 
 import React from 'react';
-import {
-  Modal,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppDialog } from '@/components/AppDialog';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for the hidden Close button
 import { Button } from '@/components/Button';
-import { CloseIcon } from '@/components/icons';
-import { borderRadius, colors, shadows, spacing, typographyPresets } from '@/config/theme';
-import { CircleIconButton } from '@/features/renter/components/CircleIconButton';
+import { borderRadius, colors, shadows, spacing } from '@/config/theme';
 import { LightTopBar } from '@/features/renter/components/LightTopBar';
 import { Reveal } from '@/features/renter/components/Reveal';
 import { moderateScale as ms } from '@/utils/responsive';
@@ -35,6 +25,7 @@ import {
   FileBar,
   LeaseDocumentPaper,
 } from '../components/SubmittedApplicationParts';
+import { DocumentFullScreen } from '../components/DocumentFullScreen';
 import {
   SubmittedApplicationNavigation,
   useSubmittedApplication,
@@ -106,35 +97,12 @@ export const SubmittedApplicationScreen: React.FC<Props> = ({ navigation, route 
       </View> */}
 
       {/* Full screen: the paper alone */}
-      <Modal
+      <DocumentFullScreen
         visible={vm.fullScreen}
-        animationType="fade"
-        onRequestClose={vm.closeFullScreen}
-        statusBarTranslucent
-      >
-        <View style={[styles.full, { paddingTop: insets.top + spacing.sm }]}>
-          <View style={styles.fullBar}>
-            <Text style={styles.fullTitle} numberOfLines={1}>
-              {vm.fileName}
-            </Text>
-            <CircleIconButton
-              size={ms(40)}
-              accessibilityLabel="Close full screen"
-              onPress={vm.closeFullScreen}
-              icon={<CloseIcon size={ms(16)} color={colors.navy} />}
-            />
-          </View>
-          <ScrollView
-            maximumZoomScale={3}
-            minimumZoomScale={1}
-            centerContent
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={[styles.fullContent, { paddingBottom: bottom + spacing.lg }]}
-          >
-            <LeaseDocumentPaper doc={vm.document} />
-          </ScrollView>
-        </View>
-      </Modal>
+        title={vm.fileName}
+        doc={vm.document}
+        onClose={vm.closeFullScreen}
+      />
 
       <AppDialog {...vm.dialog} />
     </View>
@@ -186,26 +154,6 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     paddingHorizontal: spacing.screenHorizontal,
     backgroundImage: `linear-gradient(180deg, rgba(${TINT},0) 0%, rgba(${TINT},0.96) 30%, rgba(${TINT},1) 100%)`,
-  },
-  // Full screen
-  full: {
-    flex: 1,
-    backgroundColor: colors.pageTint,
-  },
-  fullBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingHorizontal: spacing.screenHorizontal,
-    paddingBottom: spacing.md,
-  },
-  fullTitle: {
-    ...typographyPresets.cardTitle,
-    flex: 1,
-    color: colors.navy,
-  },
-  fullContent: {
-    paddingHorizontal: spacing.md,
   },
 });
 

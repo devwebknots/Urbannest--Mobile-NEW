@@ -32,7 +32,7 @@ import {
   PaymentRows,
 } from '../components/OfferAcceptanceParts';
 import { OfferAcceptanceNavigation, useOfferAcceptance } from '../hooks/useOfferAcceptance';
-import { offerStore, useOfferStore } from '../store/offerStore';
+import { journeyStore, useJourneyStore } from '../store/journeyStore';
 import type { ApplicationRecord } from '../types';
 
 interface Props {
@@ -45,8 +45,8 @@ export const OfferAcceptanceScreen: React.FC<Props> = ({ navigation, route }) =>
   const { width } = useWindowDimensions();
   const { record } = route.params;
   // Re-render once accepted (hides the buttons behind the success dialog)
-  useOfferStore();
-  const accepted = route.params.accepted === true || offerStore.isAccepted(record.id);
+  useJourneyStore();
+  const accepted = route.params.accepted === true || journeyStore.isDone(record.id, 'offer');
   const vm = useOfferAcceptance(record, navigation);
   const bottom = Math.max(insets.bottom, spacing.md) + spacing.sm;
 
