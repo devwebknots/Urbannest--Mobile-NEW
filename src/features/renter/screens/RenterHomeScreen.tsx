@@ -2,7 +2,7 @@
  * RenterHomeScreen: "My Residences" — the renter's landing page after
  * choosing the Renter persona. Navy header art with a faded house photo,
  * All / Active / Past segmented filter, residence cards and a floating
- * tab bar.
+ * tab bar. The Tracking tab swaps the body for the Application Status page.
  */
 
 import React from 'react';
@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, spacing, typographyPresets } from '@/config/theme';
+import { ApplicationStatusScreen } from '@/features/application/screens/ApplicationStatusScreen';
 import { RENTER_HEADER_ASPECT, renterAssets } from '../assets/renterAssets';
 import { RenterHeader } from '../components/RenterHeader';
 import {
@@ -46,16 +47,24 @@ export const RenterHomeScreen: React.FC<Props> = ({ navigation }) => {
   // Header art keeps its ratio; it fades into pageTint at the bottom,
   // so the page continues seamlessly below it.
   const headerArtHeight = Math.round(width / RENTER_HEADER_ASPECT);
+  const tabBarClearance =
+    RENTER_TAB_BAR_HEIGHT + renterTabBarBottomGap(insets.bottom) + spacing.xxl;
+  // The capsule may sit on a "coming soon" tab; the body stays on the last page
+  const showTracking = tabs.page === 'tracking';
 
   return (
     <View style={styles.root}>
+      {showTracking ? (
+        <ApplicationStatusScreen
+          onBack={() => tabs.onTabChange('residences')}
+          bottomInset={tabBarClearance}
+        />
+      ) : (
+      <>
       <StatusBar barStyle="light-content" />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom:
-            RENTER_TAB_BAR_HEIGHT + renterTabBarBottomGap(insets.bottom) + spacing.xxl,
-        }}
+        contentContainerStyle={{ paddingBottom: tabBarClearance }}
       >
         <Image
           source={renterAssets.header}
@@ -95,6 +104,8 @@ export const RenterHomeScreen: React.FC<Props> = ({ navigation }) => {
           ) : null}
         </View>
       </ScrollView>
+      </>
+      )}
 
       <RenterTabBar
         active={tabs.tab}

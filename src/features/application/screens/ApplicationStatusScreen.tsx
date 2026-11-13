@@ -7,7 +7,8 @@
  *  - side-scrolling status filter chips with counts
  *  - application cards (photo, name, unit, status pill, applied date, ID);
  *    tap = details dialog (drafts: "Continue Application")
- * No tab bar (pushed page).
+ * Pushed page: no tab bar. Also the renter home's Tracking tab, which
+ * passes `onBack` (to Homes) and `bottomInset` (room for its tab bar).
  */
 
 import React from 'react';
@@ -32,9 +33,18 @@ import {
 interface Props {
   navigation?: ApplicationStatusNavigation;
   route?: { params?: { propertyId?: string; applicationId?: string; submittedAt?: number } };
+  /** Tab use: replaces the stack "back" */
+  onBack?: () => void;
+  /** Tab use: bottom padding that clears the floating tab bar */
+  bottomInset?: number;
 }
 
-export const ApplicationStatusScreen: React.FC<Props> = ({ navigation, route }) => {
+export const ApplicationStatusScreen: React.FC<Props> = ({
+  navigation,
+  route,
+  onBack,
+  bottomInset,
+}) => {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const vm = useApplicationStatus(route?.params, navigation);
@@ -46,7 +56,7 @@ export const ApplicationStatusScreen: React.FC<Props> = ({ navigation, route }) 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: insets.top + spacing.sm,
-          paddingBottom: Math.max(insets.bottom, spacing.md) + spacing.xl,
+          paddingBottom: bottomInset ?? Math.max(insets.bottom, spacing.md) + spacing.xl,
         }}
       >
         {/* Soft blue glow behind the top of the page */}
@@ -55,7 +65,7 @@ export const ApplicationStatusScreen: React.FC<Props> = ({ navigation, route }) 
         <LightTopBar
           title="Rental Application"
           titleAlign="left"
-          onBack={vm.back}
+          onBack={onBack ?? vm.back}
           backLabel="Back"
           right={
             <>
