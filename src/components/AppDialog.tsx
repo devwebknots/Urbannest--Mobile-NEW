@@ -6,6 +6,8 @@
  *
  * Centered white card over a navy-dimmed page: round icon (tone), title,
  * message, then full-width action buttons stacked top to bottom.
+ * Optional `header`: full-width content on top of the card (e.g. the
+ * check-in prompt's logo + property photo).
  * Tones:
  *  - warning: amber triangle
  *  - info:    icon only if one is given
@@ -61,6 +63,8 @@ export interface AppDialogAction {
    * over the screen (app looks frozen).
    */
   readonly next?: boolean;
+  /** Icon after the label (brand / soft buttons), e.g. an arrow */
+  readonly rightIcon?: React.ReactNode;
 }
 
 /** One summary row in a success dialog, e.g. Category: Plumbing */
@@ -75,6 +79,8 @@ export interface AppDialogConfig {
   readonly tone?: AppDialogTone;
   /** Custom icon (overrides the tone's icon) */
   readonly icon?: React.ReactNode;
+  /** Full-width content above the icon (e.g. logo + property photo) */
+  readonly header?: React.ReactNode;
   /** Small chip under the title, e.g. "Request #RE-5201" */
   readonly reference?: string;
   /** Summary rows in a pale box under the message */
@@ -205,6 +211,8 @@ export const AppDialog: React.FC<Props> = ({ config, onClose }) => {
             ]}
             accessibilityViewIsModal
           >
+            {dialog.header ? <View style={styles.header}>{dialog.header}</View> : null}
+
             {/* Success: animated badge; warning: triangle; info: icon if given */}
             {toneKey === 'success' && !dialog.icon ? (
               <View style={styles.badge}>
@@ -277,6 +285,7 @@ export const AppDialog: React.FC<Props> = ({ config, onClose }) => {
                     title={action.label}
                     variant={action.variant ?? 'brand'}
                     size="md"
+                    rightIcon={action.rightIcon}
                     onPress={() => run(action)}
                   />
                 ),
@@ -325,6 +334,10 @@ const styles = StyleSheet.create({
     borderRadius: ms(26),
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  header: {
+    alignSelf: 'stretch',
+    marginBottom: spacing.md,
   },
   badge: {
     // The badge leaves room for its rings; pull the title up a little

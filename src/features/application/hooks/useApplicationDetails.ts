@@ -7,15 +7,21 @@
  * drafts can be continued from ⋮.
  */
 
-import { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useAppDialog } from '@/components/AppDialog';
+import { colors } from '@/config/theme';
+import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
 import { goBack, navigate } from '@/navigation/navigationRef';
 import { renterAssets } from '@/features/renter/assets/renterAssets';
+import { moderateScale as ms } from '@/utils/responsive';
+import { CheckInPromptHeader } from '../components/CheckInPromptHeader';
 import {
   AGREEMENT_READY_PROGRESS,
   APPLICATION_JOURNEY,
   APPLICATION_PROGRESS,
+  DEMO_CHECK_IN_RESIDENCE_ID,
   DEMO_OWNER_AGREEMENT_MS,
+  LEASE_SIGNED_PROGRESS,
   OFFER_ACCEPTED_PROGRESS,
   PAYMENT_DONE_PROGRESS,
 } from '../constants';
@@ -31,6 +37,8 @@ export interface ApplicationDetailsNavigation {
     (route: 'OfferAcceptance', params: { record: ApplicationRecord; accepted?: boolean }): void;
     (route: 'LeaseReview', params: { record: ApplicationRecord; confirmed?: boolean }): void;
     (route: 'LeasePayment', params: { record: ApplicationRecord; paid?: boolean }): void;
+    (route: 'CheckIn', params: { residenceId: string }): void;
+    (route: 'RenterHome'): void;
   };
 }
 
@@ -76,16 +84,22 @@ export function useApplicationDetails(
   const base = APPLICATION_PROGRESS[record.status];
   // Lease confirmed -> Lease Agreement (the "lease" status' progress);
   // offer accepted -> Lease Review. Never moves an application backwards.
-  // Paid -> Lease Signing; owner generated the agreement -> Payment
-  const reached = journeyStore.isDone(record.id, 'payment')
-    ? PAYMENT_DONE_PROGRESS
-    : journeyStore.isDone(record.id, 'agreement')
-      ? AGREEMENT_READY_PROGRESS
-      : journeyStore.isDone(record.id, 'review')
-        ? APPLICATION_PROGRESS.lease
-        : journeyStore.isDone(record.id, 'offer')
-          ? OFFER_ACCEPTED_PROGRESS
-          : base;
+  // Furthest finished step wins: signed -> Move-in; paid -> Lease Signing;
+  // agreement generated -> Payment; lease confirmed -> Lease Agreement;
+  // offer accepted -> Lease Review
+  const done = (step: Parameters<typeof journeyStore.isDone>[1]) =>
+    journeyStore.isDone(record.id, step);
+  const reached = done('signing')
+    ? LEASE_SIGNED_PROGRESS
+    : done('payment')
+      ? PAYMENT_DONE_PROGRESS
+      : done('agreement')
+        ? AGREEMENT_READY_PROGRESS
+        : done('review')
+          ? APPLICATION_PROGRESS.lease
+          : done('offer')
+            ? OFFER_ACCEPTED_PROGRESS
+            : base;
   const progress = reached.step > base.step ? reached : base;
   const agreementCurrent = APPLICATION_JOURNEY[progress.step]?.id === 'agreement';
 
@@ -176,6 +190,26 @@ export function useApplicationDetails(
     [navigation],
   );
 
+  // Check-in prompt's "Yes, Proceed to Check-In" (demo residence for now)
+  const openCheckIn = useCallback(() => {
+    const params = { residenceId: DEMO_CHECK_IN_RESIDENCE_ID };
+    if (navigation?.navigate) {
+      navigation.navigate('CheckIn', params);
+    } else {
+      navigate('CheckIn', params);
+    }
+  }, [navigation]);
+
+  // Check-in prompt's "No, Not Now": the renter home with its bottom tabs
+  // (pops back to it when it's already in the stack, e.g. from the Status tab)
+  const openRenterHome = useCallback(() => {
+    if (navigation?.navigate) {
+      navigation.navigate('RenterHome');
+    } else {
+      navigate('RenterHome');
+    }
+  }, [navigation]);
+
   const openStep = useCallback(
     (row: JourneyRow) => {
       // Built step pages: Application Submitted -> the submitted document
@@ -217,6 +251,41 @@ export function useApplicationDetails(
         }
         return;
       }
+      // Move-in Details: the Check-In page itself
+      if (row.id === 'movein' && row.state !== 'upcoming') {
+        openCheckIn();
+        return;
+      }
+      // Lease Signing: will open a third-party e-sign page. For now tapping
+      // it counts as signed and shows the check-in prompt
+      if (row.id === 'signing' && row.state !== 'upcoming') {
+        journeyStore.complete(record.id, 'signing');
+        showDialog({
+          tone: 'success',
+          header: React.createElement(CheckInPromptHeader, {
+            name: record.propertyName,
+            unit: record.address,
+            image: record.image,
+          }),
+          title: 'Check-In Process Initiated',
+          message:
+            'Your rental application has been fully completed. You can now proceed with the check-in process.',
+          actions: [
+            {
+              label: 'Yes, Proceed to Check-In',
+              variant: 'brand',
+              rightIcon: React.createElement(ArrowRightIcon, {
+                size: ms(16),
+                color: colors.white,
+              }),
+              onPress: openCheckIn,
+            },
+            // Not now: back to the renter home (with its bottom tabs)
+            { label: 'No, Not Now', variant: 'link', onPress: openRenterHome },
+          ],
+        });
+        return;
+      }
       showDialog({
         tone: 'info',
         title: row.title,
@@ -225,7 +294,7 @@ export function useApplicationDetails(
         actions: [{ label: 'OK', variant: 'brand' }],
       });
     },
-    [navigation, progress.message, record, showDialog],
+    [navigation, openCheckIn, openRenterHome, progress.message, record, showDialog],
   );
 
   const more = useCallback(() => {

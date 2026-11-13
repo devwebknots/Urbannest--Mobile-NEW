@@ -316,7 +316,7 @@ export const APPLICATION_JOURNEY: readonly JourneyStep[] = [
   { id: 'agreement', title: 'Lease Agreement', detail: 'Final lease agreement will be shared.', icon: 'fileText', doneDetail: 'Lease agreement generated.' },
   { id: 'payment', title: 'Payment', detail: 'Complete the required payments.', icon: 'wallet', userAction: true, viewable: true, doneDetail: 'Payments completed.' },
   { id: 'signing', title: 'Lease Signing', detail: 'Sign the lease digitally.', icon: 'signature', userAction: true, viewable: true, doneDetail: 'Lease signed digitally.' },
-  { id: 'movein', title: 'Move-in Details', detail: 'Get your move-in date and instructions.', icon: 'key', viewable: true, doneDetail: 'Move-in details shared.' },
+  { id: 'movein', title: 'Move-in Details', detail: 'Get your move-in date and instructions.', icon: 'key', userAction: true, viewable: true, doneDetail: 'Move-in details shared.' },
 ];
 
 /** After the renter accepts the offer: current step moves to Lease Review */
@@ -342,6 +342,20 @@ export const PAYMENT_DONE_PROGRESS: ApplicationProgress = {
   message: 'Your payment was received. Sign your lease digitally to continue.',
   statusDetail: 'Approved.',
 };
+
+/** After the lease is signed: current step moves to Move-in Details */
+export const LEASE_SIGNED_PROGRESS: ApplicationProgress = {
+  step: 7,
+  title: 'Ready for Check-In',
+  message: 'Your lease is signed. Start the check-in process to get your move-in details.',
+  statusDetail: 'Approved.',
+};
+
+/**
+ * Demo only: residence the check-in prompt opens (applications aren't
+ * linked to residences yet)
+ */
+export const DEMO_CHECK_IN_RESIDENCE_ID = 'obsidian';
 
 /** Payment Summary: tax on the lease payment (sample rate) */
 export const LEASE_PAYMENT_TAX_RATE = 0.1;
