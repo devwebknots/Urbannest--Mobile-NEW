@@ -7,13 +7,15 @@
  * drafts can be continued from ⋮.
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useAppDialog } from '@/components/AppDialog';
 import { goBack, navigate } from '@/navigation/navigationRef';
 import { renterAssets } from '@/features/renter/assets/renterAssets';
 import {
+  AGREEMENT_READY_PROGRESS,
   APPLICATION_JOURNEY,
   APPLICATION_PROGRESS,
+  DEMO_OWNER_AGREEMENT_MS,
   OFFER_ACCEPTED_PROGRESS,
 } from '../constants';
 import { journeyStore, useJourneyStore } from '../store/journeyStore';
@@ -72,12 +74,29 @@ export function useApplicationDetails(
   const base = APPLICATION_PROGRESS[record.status];
   // Lease confirmed -> Lease Agreement (the "lease" status' progress);
   // offer accepted -> Lease Review. Never moves an application backwards.
-  const reached = journeyStore.isDone(record.id, 'review')
-    ? APPLICATION_PROGRESS.lease
-    : journeyStore.isDone(record.id, 'offer')
-      ? OFFER_ACCEPTED_PROGRESS
-      : base;
+  // Owner generated the agreement -> Payment
+  const reached = journeyStore.isDone(record.id, 'agreement')
+    ? AGREEMENT_READY_PROGRESS
+    : journeyStore.isDone(record.id, 'review')
+      ? APPLICATION_PROGRESS.lease
+      : journeyStore.isDone(record.id, 'offer')
+        ? OFFER_ACCEPTED_PROGRESS
+        : base;
   const progress = reached.step > base.step ? reached : base;
+  const agreementCurrent = APPLICATION_JOURNEY[progress.step]?.id === 'agreement';
+
+  // Demo only (no owner side yet): while Lease Agreement is current it shows
+  // the loader, then the owner "generates" it and the journey moves to Payment
+  useEffect(() => {
+    if (!agreementCurrent) {
+      return undefined;
+    }
+    const timer = setTimeout(
+      () => journeyStore.complete(record.id, 'agreement'),
+      DEMO_OWNER_AGREEMENT_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [agreementCurrent, record.id]);
   const appliedOn = longDate(record.appliedOn);
 
   const facts = useMemo(
@@ -117,6 +136,9 @@ export function useApplicationDetails(
           detail = 'Not submitted yet.';
         } else if (step.id === 'status') {
           detail = progress.statusDetail;
+        } else if (state === 'done' && step.doneDetail) {
+          // e.g. "Final lease agreement will be shared." -> "Lease agreement generated."
+          detail = step.doneDetail;
         }
         // Only the submission has a known date for now
         const date = state === 'done' && step.id === 'submitted' ? appliedOn : undefined;

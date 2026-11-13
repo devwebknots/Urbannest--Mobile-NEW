@@ -192,6 +192,8 @@ export interface JourneyStep {
   readonly userAction?: boolean;
   /** Done card shows "View" (not for the review-only Application Status) */
   readonly viewable?: boolean;
+  /** Line once the step is done (e.g. "Lease agreement generated."); else `detail` */
+  readonly doneDetail?: string;
 }
 
 export type JourneyState = 'done' | 'current' | 'upcoming';

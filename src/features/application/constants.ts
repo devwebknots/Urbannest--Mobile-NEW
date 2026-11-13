@@ -311,12 +311,12 @@ export const APPLICATION_RECORDS: readonly ApplicationRecord[] = [
 export const APPLICATION_JOURNEY: readonly JourneyStep[] = [
   { id: 'submitted', title: 'Application Submitted', detail: 'Successfully received.', icon: 'circleCheck', viewable: true },
   { id: 'status', title: 'Application Status', detail: 'Reviewing your documents.', icon: 'fileSearch' },
-  { id: 'offer', title: 'Offer Acceptance', detail: 'Accept the rental offer to proceed.', icon: 'handshake', userAction: true, viewable: true },
-  { id: 'review', title: 'Lease Review', detail: 'Review the lease terms and details.', icon: 'eye', userAction: true, viewable: true },
-  { id: 'agreement', title: 'Lease Agreement', detail: 'Final lease agreement will be shared.', icon: 'fileText', viewable: true },
-  { id: 'payment', title: 'Payment', detail: 'Complete the required payments.', icon: 'wallet', userAction: true, viewable: true },
-  { id: 'signing', title: 'Lease Signing', detail: 'Sign the lease digitally.', icon: 'signature', userAction: true, viewable: true },
-  { id: 'movein', title: 'Move-in Details', detail: 'Get your move-in date and instructions.', icon: 'key', viewable: true },
+  { id: 'offer', title: 'Offer Acceptance', detail: 'Accept the rental offer to proceed.', icon: 'handshake', userAction: true, viewable: true, doneDetail: 'Rental offer accepted.' },
+  { id: 'review', title: 'Lease Review', detail: 'Review the lease terms and details.', icon: 'eye', userAction: true, viewable: true, doneDetail: 'Lease terms confirmed.' },
+  { id: 'agreement', title: 'Lease Agreement', detail: 'Final lease agreement will be shared.', icon: 'fileText', doneDetail: 'Lease agreement generated.' },
+  { id: 'payment', title: 'Payment', detail: 'Complete the required payments.', icon: 'wallet', userAction: true, viewable: true, doneDetail: 'Payments completed.' },
+  { id: 'signing', title: 'Lease Signing', detail: 'Sign the lease digitally.', icon: 'signature', userAction: true, viewable: true, doneDetail: 'Lease signed digitally.' },
+  { id: 'movein', title: 'Move-in Details', detail: 'Get your move-in date and instructions.', icon: 'key', viewable: true, doneDetail: 'Move-in details shared.' },
 ];
 
 /** After the renter accepts the offer: current step moves to Lease Review */
@@ -326,6 +326,20 @@ export const OFFER_ACCEPTED_PROGRESS: ApplicationProgress = {
   message: 'You accepted the rental offer. Review the lease terms and details to continue.',
   statusDetail: 'Approved.',
 };
+
+/** After the owner generates the lease agreement: current step moves to Payment */
+export const AGREEMENT_READY_PROGRESS: ApplicationProgress = {
+  step: 5,
+  title: 'Complete Your Payment',
+  message: 'Your lease agreement is ready. Complete the required payments to continue.',
+  statusDetail: 'Approved.',
+};
+
+/**
+ * Demo only: the owner "generates" the lease agreement this long after
+ * Lease Agreement becomes the current step (no owner side / API yet)
+ */
+export const DEMO_OWNER_AGREEMENT_MS = 4000;
 
 const REVIEWING: ApplicationProgress = {
   step: 1,
