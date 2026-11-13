@@ -485,6 +485,53 @@ $icons = [ordered]@{
     'circle:12,12,10',
     'path:m9 12 2 2 4-4'
   )
+  # Application Details (application set, -Stroke 2.2)
+  # lucide: eye
+  'eye' = @(
+    'path:M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0',
+    'circle:12,12,3'
+  )
+  # lucide: handshake
+  'handshake' = @(
+    'path:m11 17 2 2a1 1 0 1 0 3-3',
+    'path:m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4',
+    'path:m21 3 1 11h-2',
+    'path:M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3',
+    'path:M3 4h8'
+  )
+  # lucide: bed-double
+  'bed_double' = @(
+    'path:M2 20v-8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8',
+    'path:M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4',
+    'path:M12 4v6',
+    'path:M2 18h20'
+  )
+  # lucide: graduation-cap
+  'graduation_cap' = @(
+    'path:M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z',
+    'path:M22 10v6',
+    'path:M6 12.5V16a6 3 0 0 0 12 0v-3.5'
+  )
+  # lucide: file-search
+  'file_search' = @(
+    'path:M14 2v4a2 2 0 0 0 2 2h4',
+    'path:M4.268 21a2 2 0 0 0 1.727 1H18a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3',
+    'path:m9 18-1.5-1.5',
+    'circle:5,14,3'
+  )
+  # lucide: file-text
+  'file_text' = @(
+    'path:M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z',
+    'path:M14 2v4a2 2 0 0 0 2 2h4',
+    'path:M10 9H8',
+    'path:M16 13H8',
+    'path:M16 17H8'
+  )
+  # lucide: signature
+  'signature' = @(
+    'path:m21 17-2.156-1.868A.5.5 0 0 0 18 15.5v.5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1c0-2.545-3.991-3.97-8.5-4a1 1 0 0 0 0 5c4.153 0 4.745-11.295 5.708-13.5a2.5 2.5 0 1 1 3.31 3.284',
+    'path:M3 21h18'
+  )
 }
 
 New-Item -ItemType Directory -Force $OutDir | Out-Null

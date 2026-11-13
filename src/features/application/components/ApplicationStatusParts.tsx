@@ -11,7 +11,16 @@
  */
 
 import React from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { ChevronRightIcon } from '@/components/icons';
 import { borderRadius, colors, shadows, spacing, typographyPresets } from '@/config/theme';
 import { TILE_BORDER } from '@/features/renter/components/checkin/CheckInChecklist';
@@ -33,11 +42,15 @@ const ACCENT = {
   red: { bg: colors.errorLight, fg: colors.error },
 } as const;
 
-export const StatusPill: React.FC<{ status: ApplicationStatusId }> = ({ status }) => {
+export const StatusPill: React.FC<{
+  status: ApplicationStatusId;
+  /** e.g. drop the top margin when the pill sits beside a title */
+  style?: StyleProp<ViewStyle>;
+}> = ({ status, style }) => {
   const meta = APPLICATION_STATUS_META[status];
   const tone = ACCENT[meta.accent];
   return (
-    <View style={[styles.pill, { backgroundColor: tone.bg }]}>
+    <View style={[styles.pill, { backgroundColor: tone.bg }, style]}>
       <ApplicationIcon name={meta.icon} size={ms(13)} color={tone.fg} />
       <Text style={[styles.pillText, { color: tone.fg }]} numberOfLines={1}>
         {meta.label.replace('\n', ' ')}

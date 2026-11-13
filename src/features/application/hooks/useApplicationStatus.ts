@@ -2,8 +2,7 @@
  * useApplicationStatus: the Application Status page ("Track Application
  * Status" after submitting). Lists the user's applications (the design's
  * samples, plus the one just sent at the top), filter chips with counts,
- * sort (filter button), and a details dialog per application (drafts can
- * be continued).
+ * sort (filter button). Tapping an application opens Application Details.
  */
 
 import { useCallback, useMemo, useState } from 'react';
@@ -22,7 +21,7 @@ export interface ApplicationStatusNavigation {
   goBack: () => void;
   navigate?: {
     (route: 'GuestHome'): void;
-    (route: 'RentalApplication', params: { propertyId: string }): void;
+    (route: 'ApplicationDetails', params: { record: ApplicationRecord }): void;
   };
 }
 
@@ -71,6 +70,7 @@ export function useApplicationStatus(
         appliedOn: toMdY(params.submittedAt ?? Date.now()),
         status: 'submitted',
         image: typeof listing.image === 'number' ? listing.image : renterAssets.sterling,
+        category: 'Single Family',
       },
       ...APPLICATION_RECORDS,
     ];
@@ -123,42 +123,16 @@ export function useApplicationStatus(
     }
   }, [navigation]);
 
-  const continueDraft = useCallback(
-    (propertyId: string) => {
+  /** Card tap: the Application Details page (drafts continue from its ⋮) */
+  const open = useCallback(
+    (record: ApplicationRecord) => {
       if (navigation?.navigate) {
-        navigation.navigate('RentalApplication', { propertyId });
+        navigation.navigate('ApplicationDetails', { record });
       } else {
-        navigate('RentalApplication', { propertyId });
+        navigate('ApplicationDetails', { record });
       }
     },
     [navigation],
-  );
-
-  const open = useCallback(
-    (record: ApplicationRecord) => {
-      const meta = APPLICATION_STATUS_META[record.status];
-      const isDraft = record.status === 'draft' && record.propertyId;
-      showDialog({
-        tone: 'info',
-        title: record.propertyName,
-        reference: `Application ${record.id}`,
-        details: [
-          { label: 'Status', value: meta.label.replace('\n', ' ') },
-          { label: 'Applied on', value: record.appliedOn },
-          { label: 'Unit', value: record.unit },
-        ],
-        actions: isDraft
-          ? [
-              {
-                label: 'Continue Application',
-                onPress: () => continueDraft(record.propertyId as string),
-              },
-              { label: 'Close', variant: 'link' },
-            ]
-          : [{ label: 'OK', variant: 'brand' }],
-      });
-    },
-    [continueDraft, showDialog],
   );
 
   const more = useCallback(

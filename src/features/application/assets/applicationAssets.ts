@@ -9,7 +9,13 @@ export const applicationAssets = {
   // Step 3 pet photo, cropped from the "Property Requirements & Documents"
   // design (318 x 246)
   petLabrador: require('@/assets/images/application/pet_labrador.jpg'),
+  // "Current Status" document illustration, cropped from the "Application
+  // Details" design (230 x 215), edges feathered to transparent
+  statusDocuments: require('@/assets/images/application/status_documents.png'),
 };
+
+/** Width / height of status_documents.png */
+export const STATUS_DOCUMENTS_ASPECT = 230 / 215;
 
 /** Width / height of header_building.png */
 export const HEADER_BUILDING_ASPECT = 524 / 430;
@@ -41,6 +47,16 @@ export const applicationIcons = {
   circleX: require('@/assets/icons/application/circle_x.png'),
   circleAlert: require('@/assets/icons/application/circle_alert.png'),
   funnel: require('@/assets/icons/application/funnel.png'),
+  // Application Details (same script, -Stroke 2.2)
+  eye: require('@/assets/icons/application/eye.png'),
+  handshake: require('@/assets/icons/application/handshake.png'),
+  bed: require('@/assets/icons/application/bed_double.png'),
+  graduationCap: require('@/assets/icons/application/graduation_cap.png'),
+  fileSearch: require('@/assets/icons/application/file_search.png'),
+  fileText: require('@/assets/icons/application/file_text.png'),
+  signature: require('@/assets/icons/application/signature.png'),
+  key: require('@/assets/icons/manage/key.png'),
+  wallet: require('@/assets/icons/property/wallet.png'),
   layers: require('@/assets/icons/property/layers.png'),
   coins: require('@/assets/icons/property/database.png'),
   house: require('@/assets/icons/property/house.png'),

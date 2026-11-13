@@ -27,6 +27,8 @@ export type RootStackParamList = {
   ApplicationStatus:
     | { propertyId?: string; applicationId?: string; submittedAt?: number }
     | undefined;
+  /** One application's details + journey, opened from an Application Status card */
+  ApplicationDetails: { record: import('@/features/application/types').ApplicationRecord };
   PersonaSelect: undefined;
   RenterHome: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */

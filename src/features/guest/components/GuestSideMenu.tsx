@@ -27,6 +27,7 @@ import { useStatusBarInsets } from '@/hooks/useStatusBarInsets';
 import {
   BookmarkIcon,
   ChevronRightIcon,
+  ClockIcon,
   CloseIcon,
   HomeIcon,
   KeyIcon,
@@ -53,6 +54,7 @@ export type GuestMenuKey =
   | 'rent'
   | 'buy'
   | 'featured'
+  | 'applications'
   | 'guides'
   | 'cities'
   | 'help'
@@ -103,6 +105,11 @@ const GROUPS: { title: string; items: MenuItem[] }[] = [
         key: 'featured',
         label: 'Featured Homes',
         icon: c => <StarGlyph size={ICON} color={c} />,
+      },
+      {
+        key: 'applications',
+        label: 'Application Status',
+        icon: c => <ClockIcon size={ICON} color={c} />,
       },
     ],
   },

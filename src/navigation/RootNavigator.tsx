@@ -7,6 +7,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NeyoraModule } from '@neyora/maintenance-sdk';
 import {
+  ApplicationDetailsScreen,
   ApplicationStatusScreen,
   ApplicationSubmittedScreen,
   RentalApplicationScreen,
@@ -72,6 +73,11 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="ApplicationStatus"
         component={ApplicationStatusScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="ApplicationDetails"
+        component={ApplicationDetailsScreen as React.ComponentType}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen

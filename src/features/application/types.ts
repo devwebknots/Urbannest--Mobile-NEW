@@ -172,6 +172,35 @@ export interface ApplicationRecord {
   readonly image: number;
   /** Listing to reopen (drafts) */
   readonly propertyId?: string;
+  /** Details page: line under the name, e.g. "Unit 402-B" */
+  readonly address?: string;
+  /** Details page: photo tag, e.g. "Single Family" */
+  readonly category?: string;
+  /** Details page: "A 13.A" (else read from `unit`) */
+  readonly unitNo?: string;
+  /** Details page: "A1, A3" (else read from `unit`) */
+  readonly rooms?: string;
+}
+
+/** Application Details: one step of the "Application Journey" */
+export interface JourneyStep {
+  readonly id: string;
+  readonly title: string;
+  readonly detail: string;
+  readonly icon: ApplicationIconName;
+}
+
+export type JourneyState = 'done' | 'current' | 'upcoming';
+
+/** Application Details: where an application is, by status */
+export interface ApplicationProgress {
+  /** Index of the current journey step */
+  readonly step: number;
+  /** "Current Status" card */
+  readonly title: string;
+  readonly message: string;
+  /** Subtitle of the "Application Status" journey step */
+  readonly statusDetail: string;
 }
 
 export interface ChoiceOption {

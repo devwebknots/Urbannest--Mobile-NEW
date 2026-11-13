@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components/Button';
 import { colors, spacing } from '@/config/theme';
+import { navigate } from '@/navigation/navigationRef';
 import { moderateScale as ms } from '@/utils/responsive';
 import { CategoryRow } from '../components/CategoryRow';
 import { CitiesSection } from '../components/CitiesSection';
@@ -92,6 +93,9 @@ export const GuestHomeScreen: React.FC<Props> = ({ navigation }) => {
       case 'guides':
       case 'cities':
         scrollToY(sectionY.current[key]);
+        break;
+      case 'applications':
+        navigate('ApplicationStatus');
         break;
       default:
         // help / about / terms: screens not built yet

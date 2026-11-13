@@ -10,8 +10,10 @@ import type {
   ApplicationStep,
   ApplicationFilterId,
   ApplicationIconName,
+  ApplicationProgress,
   ApplicationRecord,
   ApplicationStatusId,
+  JourneyStep,
   ConsentItem,
   Pet,
   Vehicle,
@@ -288,11 +290,74 @@ export const APPLICATION_FILTERS: readonly {
 
 /** The design's sample applications (mock until the API lists them) */
 export const APPLICATION_RECORDS: readonly ApplicationRecord[] = [
-  { id: 'AHC12895', propertyName: 'Maple Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'draft', image: renterAssets.sterling, propertyId: 'r1' },
-  { id: 'AHC12896', propertyName: 'High Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'lease', image: renterAssets.obsidian },
-  { id: 'ABC123456', propertyName: 'Green View', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '01/05/2025', status: 'approved', image: renterAssets.azure },
-  { id: 'AVF14568', propertyName: 'Grace Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/20/2024', status: 'verification', image: renterAssets.marble },
-  { id: 'AGF25486', propertyName: 'Green View', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/20/2024', status: 'waiting', image: renterAssets.azure },
-  { id: 'AHC12897', propertyName: 'Maple Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'rejected', image: renterAssets.sterling },
-  { id: 'AHC12898', propertyName: 'Green View', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'incomplete', image: renterAssets.azure },
+  { id: 'AHC12895', propertyName: 'Maple Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'draft', image: renterAssets.sterling, propertyId: 'r1', address: 'Unit 402-B', category: 'Single Family' },
+  { id: 'AHC12896', propertyName: 'High Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'lease', image: renterAssets.obsidian, address: 'Unit 402-B', category: 'Single Family' },
+  { id: 'ABC123456', propertyName: 'Green View', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '01/05/2025', status: 'approved', image: renterAssets.azure, address: 'Unit 402-B', category: 'Single Family' },
+  { id: 'AVF14568', propertyName: 'Grace Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/20/2024', status: 'verification', image: renterAssets.marble, address: 'Unit 402-B', category: 'Single Family' },
+  { id: 'AGF25486', propertyName: 'Green View', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/20/2024', status: 'waiting', image: renterAssets.azure, address: 'Unit 402-B', category: 'Single Family' },
+  { id: 'AHC12897', propertyName: 'Maple Tower', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'rejected', image: renterAssets.sterling, address: 'Unit 402-B', category: 'Single Family' },
+  { id: 'AHC12898', propertyName: 'Green View', unit: 'Unit A 13.A • Room A1, A3', appliedOn: '12/16/2024', status: 'incomplete', image: renterAssets.azure, address: 'Unit 402-B', category: 'Single Family' },
 ];
+
+/* ---- Application Details page ---- */
+
+/** "Application Journey" (the design's steps; {date} = applied date) */
+export const APPLICATION_JOURNEY: readonly JourneyStep[] = [
+  { id: 'submitted', title: 'Application Submitted', detail: 'Successfully received on {date}.', icon: 'circleCheck' },
+  { id: 'status', title: 'Application Status', detail: 'Reviewing your documents.', icon: 'fileSearch' },
+  { id: 'offer', title: 'Offer Acceptance', detail: 'Accept the rental offer to proceed.', icon: 'handshake' },
+  { id: 'review', title: 'Lease Review', detail: 'Review the lease terms and details.', icon: 'eye' },
+  { id: 'agreement', title: 'Lease Agreement', detail: 'Final lease agreement will be shared.', icon: 'fileText' },
+  { id: 'payment', title: 'Payment', detail: 'Complete the required payments.', icon: 'wallet' },
+  { id: 'signing', title: 'Lease Signing', detail: 'Sign the lease digitally.', icon: 'signature' },
+  { id: 'movein', title: 'Move-in Details', detail: 'Get your move-in date and instructions.', icon: 'key' },
+];
+
+const REVIEWING: ApplicationProgress = {
+  step: 1,
+  title: 'Reviewing Your Documents',
+  message: "We're verifying the documents you submitted. You'll be notified once this step is complete.",
+  statusDetail: 'Reviewing your documents.',
+};
+
+/** Current step + "Current Status" card per application status */
+export const APPLICATION_PROGRESS: Record<ApplicationStatusId, ApplicationProgress> = {
+  draft: {
+    step: 0,
+    title: 'Finish Your Application',
+    message: 'Your application is saved as a draft. Complete the remaining steps and submit it.',
+    statusDetail: 'Starts once you submit.',
+  },
+  submitted: REVIEWING,
+  verification: REVIEWING,
+  incomplete: {
+    step: 1,
+    title: 'Documents Needed',
+    message: 'Some details or documents are missing. Update your application so the review can continue.',
+    statusDetail: 'Action needed: missing documents.',
+  },
+  waiting: {
+    step: 1,
+    title: "You're on the Waiting List",
+    message: "There's no unit free right now. We'll let you know as soon as one opens up.",
+    statusDetail: 'On the waiting list.',
+  },
+  rejected: {
+    step: 1,
+    title: 'Application Not Approved',
+    message: "This application wasn't approved. You can browse other homes and apply again.",
+    statusDetail: 'Not approved.',
+  },
+  approved: {
+    step: 2,
+    title: 'Your Offer Is Ready',
+    message: 'Your application was approved. Accept the rental offer to proceed.',
+    statusDetail: 'Approved.',
+  },
+  lease: {
+    step: 4,
+    title: 'Preparing Your Lease',
+    message: "Your lease agreement is being generated. We'll share it with you shortly.",
+    statusDetail: 'Approved.',
+  },
+};
