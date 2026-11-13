@@ -24,6 +24,8 @@ export interface ApplicationDetailsNavigation {
 
 export interface JourneyRow extends JourneyStep {
   readonly state: JourneyState;
+  /** Done steps: when it happened ("Oct 24, 2023") */
+  readonly date?: string;
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -98,7 +100,9 @@ export function useApplicationDetails(
         } else if (step.id === 'status') {
           detail = progress.statusDetail;
         }
-        return { ...step, detail, state };
+        // Only the submission has a known date for now
+        const date = state === 'done' && step.id === 'submitted' ? appliedOn : undefined;
+        return { ...step, detail, state, date };
       }),
     [appliedOn, progress, record.status],
   );

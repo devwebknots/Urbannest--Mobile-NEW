@@ -7,6 +7,7 @@
  *  - ApplicationSummaryCard: swipeable photo + name, status pill, facts
  *  - CurrentStatusCard for the application's status
  *  - "Application Journey" (`sectionHeading` + line) and the eight steps
+ *    on a timeline rail
  *  - "Close" (brand button) pinned to the bottom
  */
 
@@ -14,6 +15,7 @@ import React from 'react';
 import { ScrollView, StatusBar, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppDialog } from '@/components/AppDialog';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for the hidden Close button
 import { Button } from '@/components/Button';
 import { MoreVerticalIcon } from '@/components/icons';
 import { colors, spacing, typographyPresets } from '@/config/theme';
@@ -37,7 +39,8 @@ interface Props {
   route: { params: { record: ApplicationRecord } };
 }
 
-/** Button height + its padding above */
+/** Button height + its padding above (for the hidden Close footer) */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for the hidden Close button
 const FOOTER = ms(48) + spacing.lg;
 
 export const ApplicationDetailsScreen: React.FC<Props> = ({ navigation, route }) => {
@@ -53,7 +56,8 @@ export const ApplicationDetailsScreen: React.FC<Props> = ({ navigation, route })
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: insets.top + spacing.sm,
-          paddingBottom: FOOTER + bottom + spacing.xl,
+          // Close footer hidden: FOOTER + bottom + spacing.xl while it shows
+          paddingBottom: bottom + spacing.xl,
         }}
       >
         {/* Soft blue glow behind the top of the page (as on Application Status) */}
@@ -94,21 +98,29 @@ export const ApplicationDetailsScreen: React.FC<Props> = ({ navigation, route })
           <Text style={styles.heading} accessibilityRole="header">
             Application Journey
           </Text>
-          <Text style={styles.subheading}>Key steps in your rental application</Text>
-          <View style={styles.steps}>
-            {vm.journey.map((row, i) => (
-              <Reveal key={row.id} delay={160 + 40 * Math.min(i, 6)}>
-                <JourneyStepRow row={row} onPress={() => vm.openStep(row)} />
-              </Reveal>
-            ))}
-          </View>
+          <Text style={styles.subheading}>Track the progress of your rental application.</Text>
+          {/* No Reveal per row: the rail must stay one continuous line */}
+          <Reveal delay={160}>
+            <View style={styles.steps}>
+              {vm.journey.map((row, i) => (
+                <JourneyStepRow
+                  key={row.id}
+                  row={row}
+                  first={i === 0}
+                  last={i === vm.journey.length - 1}
+                  prevDone={i > 0 && vm.journey[i - 1].state === 'done'}
+                  onPress={() => vm.openStep(row)}
+                />
+              ))}
+            </View>
+          </Reveal>
         </View>
       </ScrollView>
 
-      {/* Pinned Close; the page tint fades in above it */}
+      {/* Pinned Close: hidden for now (back button covers it)
       <View style={[styles.footer, { paddingBottom: bottom }]}>
         <Button title="Close" variant="brand" onPress={vm.back} />
-      </View>
+      </View> */}
 
       <AppDialog {...vm.dialog} />
     </View>
@@ -152,8 +164,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xxs,
   },
   steps: {
-    marginTop: spacing.lg,
-    gap: spacing.sm,
+    marginTop: spacing.md,
   },
   footer: {
     position: 'absolute',

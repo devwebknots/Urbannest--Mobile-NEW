@@ -188,6 +188,10 @@ export interface JourneyStep {
   readonly title: string;
   readonly detail: string;
   readonly icon: ApplicationIconName;
+  /** The renter does this step (accept, review, pay, sign): blinking arrow when current */
+  readonly userAction?: boolean;
+  /** Done card shows "View" (not for the review-only Application Status) */
+  readonly viewable?: boolean;
 }
 
 export type JourneyState = 'done' | 'current' | 'upcoming';

@@ -8,13 +8,20 @@
  *  - CurrentStatusCard: "CURRENT STATUS" eyebrow, Playfair title and line,
  *    the design's document illustration on the left, soft blue swell in the
  *    bottom-right corner.
- *  - JourneyStepRow: icon tile, title + line, chevron. Done steps get the
- *    app's done tick (DONE_BLUE circle, white check); every other step,
- *    the current one included, looks the same.
+ *  - JourneyStepRow: timeline rail on the left (done = the app's DONE_BLUE
+ *    tick, current = secondary-blue ring + dot, upcoming = grey dot; the
+ *    line is DONE_BLUE up to the current step) and a card: icon tile,
+ *    title + line; done cards show the date + "View" (not on Application
+ *    Status), the current one is pale blue with a loader, or a blinking
+ *    arrow when it's the renter's turn (accept, review, pay, sign).
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  AccessibilityInfo,
+  ActivityIndicator,
+  Animated,
+  Easing,
   Image,
   Pressable,
   ScrollView,
@@ -22,9 +29,9 @@ import {
   Text,
   View,
 } from 'react-native';
-import { ChevronRightIcon } from '@/components/icons';
 import { borderRadius, colors, shadows, spacing, typographyPresets } from '@/config/theme';
-import { TILE_BG, TILE_BORDER } from '@/features/renter/components/checkin/CheckInChecklist';
+import { TILE_BORDER } from '@/features/renter/components/checkin/CheckInChecklist';
+import { ChevronRightIcon } from '@/components/icons';
 import { DONE_BLUE } from '@/features/renter/components/checkin/CompletedBadge';
 import { RenterIcon } from '@/features/renter/components/dashboard/RenterIcon';
 import { moderateScale as ms } from '@/utils/responsive';
@@ -180,45 +187,151 @@ export const CurrentStatusCard: React.FC<{ title: string; message: string }> = (
 
 /* ---------- Journey ---------- */
 
-export const JourneyStepRow: React.FC<{ row: JourneyRow; onPress: () => void }> = ({
-  row,
-  onPress,
-}) => {
-  const done = row.state === 'done';
+/**
+ * "Your turn" cue on the current step when the renter must act (Offer
+ * Acceptance, Lease Review, Payment, Lease Signing): the rows' chevron,
+ * blinking and nudging right. Still with Reduce Motion on.
+ */
+const ActionArrow: React.FC = () => {
+  const blink = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    let loop: Animated.CompositeAnimation | null = null;
+    let cancelled = false;
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then(reduce => {
+        if (cancelled || reduce) {
+          return;
+        }
+        const step = (toValue: number) =>
+          Animated.timing(blink, {
+            toValue,
+            duration: 650,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          });
+        loop = Animated.loop(Animated.sequence([step(0), step(1)]));
+        loop.start();
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      loop?.stop();
+    };
+  }, [blink]);
+
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${row.title}, ${row.detail}`}
-      style={({ pressed }) => [styles.step, pressed && styles.pressed]}
+    <Animated.View
+      accessibilityLabel="Your action needed"
+      style={[
+        styles.actionArrow,
+        {
+          opacity: blink.interpolate({ inputRange: [0, 1], outputRange: [0.35, 1] }),
+          transform: [
+            { translateX: blink.interpolate({ inputRange: [0, 1], outputRange: [ms(3), 0] }) },
+          ],
+        },
+      ]}
     >
-      <View style={styles.stepTile}>
-        {done ? (
-          // The app's done tick (as on the Maintenance timeline / Check-In)
-          <View style={styles.doneTick}>
-            <RenterIcon name="check" size={ms(13)} color={colors.white} />
-          </View>
-        ) : (
-          <ApplicationIcon name={row.icon} size={ms(19)} color={colors.navy} />
-        )}
-      </View>
-      <View style={styles.stepText}>
-        <Text style={styles.stepTitle} numberOfLines={1}>
-          {row.title}
-        </Text>
-        <Text style={styles.stepDetail} numberOfLines={2}>
-          {row.detail}
-        </Text>
-      </View>
       <ChevronRightIcon size={ms(14)} color={colors.navy} />
-    </Pressable>
+    </Animated.View>
+  );
+};
+
+/** Rail marker: done tick / current ring + dot / upcoming grey dot */
+const RailMarker: React.FC<{ state: JourneyRow['state'] }> = ({ state }) => {
+  if (state === 'done') {
+    // The app's done tick (as on the Maintenance timeline / Check-In)
+    return (
+      <View style={styles.markerDone}>
+        <RenterIcon name="check" size={ms(11)} color={colors.white} />
+      </View>
+    );
+  }
+  if (state === 'current') {
+    return (
+      <View style={styles.markerCurrent}>
+        <View style={styles.markerCurrentDot} />
+      </View>
+    );
+  }
+  return <View style={styles.markerUpcoming} />;
+};
+
+/**
+ * One journey step: the rail (line above, marker, line below) and the card.
+ * The line below a done step is DONE_BLUE, so the filled part of the rail
+ * runs from the first step to the current one.
+ */
+export const JourneyStepRow: React.FC<{
+  row: JourneyRow;
+  first: boolean;
+  last: boolean;
+  /** The step above is done (colours the line into this marker) */
+  prevDone: boolean;
+  onPress: () => void;
+}> = ({ row, first, last, prevDone, onPress }) => {
+  const done = row.state === 'done';
+  const current = row.state === 'current';
+  return (
+    <View style={styles.stepRow}>
+      <View style={styles.rail}>
+        <View style={[styles.railLine, first && styles.railHidden, prevDone && styles.railDone]} />
+        <RailMarker state={row.state} />
+        <View style={[styles.railLine, last && styles.railHidden, done && styles.railDone]} />
+      </View>
+
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${row.title}, ${row.detail}`}
+        style={({ pressed }) => [
+          styles.step,
+          current && styles.stepCurrent,
+          pressed && styles.pressed,
+        ]}
+      >
+        <View style={[styles.stepTile, current && styles.stepTileCurrent]}>
+          <ApplicationIcon name={row.icon} size={ms(18)} color={colors.navy} />
+        </View>
+        <View style={styles.stepText}>
+          <Text style={styles.stepTitle} numberOfLines={1}>
+            {row.title}
+          </Text>
+          <Text style={styles.stepDetail} numberOfLines={2}>
+            {row.detail}
+          </Text>
+        </View>
+        {done ? (
+          row.date || row.viewable ? (
+            <View style={styles.stepAside}>
+              {row.date ? <Text style={styles.stepDate}>{row.date}</Text> : null}
+              {row.viewable ? (
+                <View style={styles.viewPill}>
+                  <Text style={styles.viewText}>View</Text>
+                </View>
+              ) : null}
+            </View>
+          ) : null
+        ) : current ? (
+          // Renter's turn: blinking arrow; otherwise we're working on it: loader
+          row.userAction ? (
+            <ActionArrow />
+          ) : (
+            <ActivityIndicator size="small" color={colors.headerGradientEnd} />
+          )
+        ) : null}
+      </Pressable>
+    </View>
   );
 };
 
 /** How far the photo's curved edge bulges out in the middle (share of its width) */
 const PHOTO_BULGE = 0.1;
 const FACT_TILE = ms(24);
-const STEP_TILE = ms(44);
+const STEP_TILE = ms(40);
+const RAIL = ms(22);
+const MARKER = ms(22);
 const ART = ms(72);
 
 const styles = StyleSheet.create({
@@ -357,8 +470,9 @@ const styles = StyleSheet.create({
     ...typographyPresets.eyebrow,
     color: colors.textSecondary,
   },
+  // Smallest Playfair heading in the app (formHeading, 15)
   statusTitle: {
-    ...typographyPresets.sectionTitle,
+    ...typographyPresets.formHeading,
     marginTop: spacing.xxs,
     color: colors.navy,
   },
@@ -367,17 +481,78 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   // Journey
+  // Rail + card
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
+  rail: {
+    width: RAIL,
+    alignItems: 'center',
+  },
+  railLine: {
+    flex: 1,
+    width: 2,
+    backgroundColor: colors.border,
+  },
+  railHidden: {
+    backgroundColor: 'transparent',
+  },
+  railDone: {
+    backgroundColor: DONE_BLUE,
+  },
+  // The app's done tick: DONE_BLUE circle, white check
+  markerDone: {
+    width: MARKER,
+    height: MARKER,
+    borderRadius: MARKER / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: DONE_BLUE,
+  },
+  // Current: secondary-blue ring with a dot
+  markerCurrent: {
+    width: MARKER,
+    height: MARKER,
+    borderRadius: MARKER / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.headerGradientEnd,
+    backgroundColor: colors.white,
+  },
+  markerCurrentDot: {
+    width: ms(9),
+    height: ms(9),
+    borderRadius: ms(4.5),
+    backgroundColor: colors.headerGradientEnd,
+  },
+  markerUpcoming: {
+    width: ms(10),
+    height: ms(10),
+    borderRadius: ms(5),
+    backgroundColor: colors.textSubtle,
+  },
   step: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
+    marginVertical: spacing.xs,
+    marginLeft: spacing.sm,
     paddingVertical: spacing.sm + 2,
     paddingLeft: spacing.sm + 2,
     paddingRight: spacing.md,
     borderRadius: borderRadius.lg,
-    backgroundColor: TILE_BG,
+    backgroundColor: colors.white,
     borderWidth: 1,
-    borderColor: TILE_BORDER,
+    borderColor: colors.borderLight,
+    ...shadows.sm,
+  },
+  // Next step after the completed ones: pale blue card
+  stepCurrent: {
+    backgroundColor: colors.chipBlue,
+    borderColor: colors.chipBlue,
   },
   stepTile: {
     width: STEP_TILE,
@@ -387,14 +562,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.tileBlue,
   },
-  // The app's done tick: DONE_BLUE circle, white check (TicketTimeline size)
-  doneTick: {
-    width: ms(30),
-    height: ms(30),
-    borderRadius: ms(15),
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: DONE_BLUE,
+  stepTileCurrent: {
+    backgroundColor: colors.white,
+  },
+  stepAside: {
+    alignItems: 'flex-end',
+    gap: spacing.xs,
+  },
+  stepDate: {
+    ...typographyPresets.label,
+    color: colors.textSecondary,
+  },
+  // Bare arrow tucked into the card's right padding: takes almost no width,
+  // so the step text doesn't wrap and the card keeps its height
+  actionArrow: {
+    marginLeft: -spacing.sm,
+    marginRight: -spacing.xs,
+  },
+  viewPill: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: ms(4),
+    borderRadius: borderRadius.pill,
+    backgroundColor: colors.chipBlue,
+  },
+  viewText: {
+    ...typographyPresets.badge,
+    color: colors.navy,
   },
   stepText: {
     flex: 1,

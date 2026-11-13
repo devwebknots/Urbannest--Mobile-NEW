@@ -301,16 +301,20 @@ export const APPLICATION_RECORDS: readonly ApplicationRecord[] = [
 
 /* ---- Application Details page ---- */
 
-/** "Application Journey" (the design's steps; {date} = applied date) */
+/**
+ * "Application Journey" (the design's steps; {date} = applied date).
+ * userAction: the renter does it (blinking arrow when current, not a loader).
+ * viewable: a done card shows "View" (the review step has nothing to view).
+ */
 export const APPLICATION_JOURNEY: readonly JourneyStep[] = [
-  { id: 'submitted', title: 'Application Submitted', detail: 'Successfully received on {date}.', icon: 'circleCheck' },
+  { id: 'submitted', title: 'Application Submitted', detail: 'Successfully received.', icon: 'circleCheck', viewable: true },
   { id: 'status', title: 'Application Status', detail: 'Reviewing your documents.', icon: 'fileSearch' },
-  { id: 'offer', title: 'Offer Acceptance', detail: 'Accept the rental offer to proceed.', icon: 'handshake' },
-  { id: 'review', title: 'Lease Review', detail: 'Review the lease terms and details.', icon: 'eye' },
-  { id: 'agreement', title: 'Lease Agreement', detail: 'Final lease agreement will be shared.', icon: 'fileText' },
-  { id: 'payment', title: 'Payment', detail: 'Complete the required payments.', icon: 'wallet' },
-  { id: 'signing', title: 'Lease Signing', detail: 'Sign the lease digitally.', icon: 'signature' },
-  { id: 'movein', title: 'Move-in Details', detail: 'Get your move-in date and instructions.', icon: 'key' },
+  { id: 'offer', title: 'Offer Acceptance', detail: 'Accept the rental offer to proceed.', icon: 'handshake', userAction: true, viewable: true },
+  { id: 'review', title: 'Lease Review', detail: 'Review the lease terms and details.', icon: 'eye', userAction: true, viewable: true },
+  { id: 'agreement', title: 'Lease Agreement', detail: 'Final lease agreement will be shared.', icon: 'fileText', viewable: true },
+  { id: 'payment', title: 'Payment', detail: 'Complete the required payments.', icon: 'wallet', userAction: true, viewable: true },
+  { id: 'signing', title: 'Lease Signing', detail: 'Sign the lease digitally.', icon: 'signature', userAction: true, viewable: true },
+  { id: 'movein', title: 'Move-in Details', detail: 'Get your move-in date and instructions.', icon: 'key', viewable: true },
 ];
 
 const REVIEWING: ApplicationProgress = {
