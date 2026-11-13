@@ -335,6 +335,17 @@ export const AGREEMENT_READY_PROGRESS: ApplicationProgress = {
   statusDetail: 'Approved.',
 };
 
+/** After the renter pays: current step moves to Lease Signing */
+export const PAYMENT_DONE_PROGRESS: ApplicationProgress = {
+  step: 6,
+  title: 'Sign Your Lease',
+  message: 'Your payment was received. Sign your lease digitally to continue.',
+  statusDetail: 'Approved.',
+};
+
+/** Payment Summary: tax on the lease payment (sample rate) */
+export const LEASE_PAYMENT_TAX_RATE = 0.1;
+
 /**
  * Demo only: the owner "generates" the lease agreement this long after
  * Lease Agreement becomes the current step (no owner side / API yet)

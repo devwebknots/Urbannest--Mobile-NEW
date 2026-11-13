@@ -545,6 +545,11 @@ $icons = [ordered]@{
     'path:M14 2v4a2 2 0 0 0 2 2h4',
     'path:M8 17c.8-1.6 1.6-2.4 2.2-2.2.7.3-.3 2.2.4 2.4.6.2 1.2-1 1.9-1.1.5 0 .7.7 1.5.9H16'
   )
+  # lucide: credit-card (rect as a path): Payment
+  'credit_card' = @(
+    'path:M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z',
+    'path:M2 10h20'
+  )
   # (share reuses property/share.png)
   # lucide: scan (four corners: full screen)
   'expand' = @(

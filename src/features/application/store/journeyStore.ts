@@ -9,7 +9,7 @@
 import { useSyncExternalStore } from 'react';
 
 /** Steps finished in the app (agreement: owner side, demo timer for now) */
-export type RenterStepId = 'offer' | 'review' | 'agreement';
+export type RenterStepId = 'offer' | 'review' | 'agreement' | 'payment';
 
 const done = new Set<string>();
 const listeners = new Set<() => void>();

@@ -43,6 +43,12 @@ export type RootStackParamList = {
     /** Step already done: show "Lease Confirmed", no buttons */
     confirmed?: boolean;
   };
+  /** "Payment Summary" (proceed to pay), opened from the Payment step */
+  LeasePayment: {
+    record: import('@/features/application/types').ApplicationRecord;
+    /** Step already done: show "Payment Complete", no button */
+    paid?: boolean;
+  };
   PersonaSelect: undefined;
   RenterHome: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */

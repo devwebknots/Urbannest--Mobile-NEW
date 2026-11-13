@@ -17,6 +17,7 @@ import {
   APPLICATION_PROGRESS,
   DEMO_OWNER_AGREEMENT_MS,
   OFFER_ACCEPTED_PROGRESS,
+  PAYMENT_DONE_PROGRESS,
 } from '../constants';
 import { journeyStore, useJourneyStore } from '../store/journeyStore';
 import type { ApplicationRecord, JourneyState, JourneyStep } from '../types';
@@ -29,6 +30,7 @@ export interface ApplicationDetailsNavigation {
     (route: 'SubmittedApplication', params: { record: ApplicationRecord }): void;
     (route: 'OfferAcceptance', params: { record: ApplicationRecord; accepted?: boolean }): void;
     (route: 'LeaseReview', params: { record: ApplicationRecord; confirmed?: boolean }): void;
+    (route: 'LeasePayment', params: { record: ApplicationRecord; paid?: boolean }): void;
   };
 }
 
@@ -74,14 +76,16 @@ export function useApplicationDetails(
   const base = APPLICATION_PROGRESS[record.status];
   // Lease confirmed -> Lease Agreement (the "lease" status' progress);
   // offer accepted -> Lease Review. Never moves an application backwards.
-  // Owner generated the agreement -> Payment
-  const reached = journeyStore.isDone(record.id, 'agreement')
-    ? AGREEMENT_READY_PROGRESS
-    : journeyStore.isDone(record.id, 'review')
-      ? APPLICATION_PROGRESS.lease
-      : journeyStore.isDone(record.id, 'offer')
-        ? OFFER_ACCEPTED_PROGRESS
-        : base;
+  // Paid -> Lease Signing; owner generated the agreement -> Payment
+  const reached = journeyStore.isDone(record.id, 'payment')
+    ? PAYMENT_DONE_PROGRESS
+    : journeyStore.isDone(record.id, 'agreement')
+      ? AGREEMENT_READY_PROGRESS
+      : journeyStore.isDone(record.id, 'review')
+        ? APPLICATION_PROGRESS.lease
+        : journeyStore.isDone(record.id, 'offer')
+          ? OFFER_ACCEPTED_PROGRESS
+          : base;
   const progress = reached.step > base.step ? reached : base;
   const agreementCurrent = APPLICATION_JOURNEY[progress.step]?.id === 'agreement';
 
@@ -200,6 +204,16 @@ export function useApplicationDetails(
           navigation.navigate('LeaseReview', params);
         } else {
           navigate('LeaseReview', params);
+        }
+        return;
+      }
+      // Payment: once the agreement is ready (current) or paid (done)
+      if (row.id === 'payment' && row.state !== 'upcoming') {
+        const params = { record, paid: row.state === 'done' };
+        if (navigation?.navigate) {
+          navigation.navigate('LeasePayment', params);
+        } else {
+          navigate('LeasePayment', params);
         }
         return;
       }

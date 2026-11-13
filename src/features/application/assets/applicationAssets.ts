@@ -70,6 +70,8 @@ export const applicationIcons = {
   building: require('@/assets/icons/property/building.png'),
   // Lease Review (same script, -Stroke 2.2)
   fileSignature: require('@/assets/icons/application/file_signature.png'),
+  // Payment (same script, -Stroke 2.2)
+  creditCard: require('@/assets/icons/application/credit_card.png'),
   key: require('@/assets/icons/manage/key.png'),
   wallet: require('@/assets/icons/property/wallet.png'),
   layers: require('@/assets/icons/property/layers.png'),

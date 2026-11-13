@@ -5,3 +5,4 @@ export { default as ApplicationDetailsScreen } from './screens/ApplicationDetail
 export { default as SubmittedApplicationScreen } from './screens/SubmittedApplicationScreen';
 export { default as OfferAcceptanceScreen } from './screens/OfferAcceptanceScreen';
 export { default as LeaseReviewScreen } from './screens/LeaseReviewScreen';
+export { default as LeasePaymentScreen } from './screens/LeasePaymentScreen';
