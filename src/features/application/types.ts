@@ -207,6 +207,24 @@ export interface ApplicationProgress {
   readonly statusDetail: string;
 }
 
+/** Offer Acceptance: the owner's lease offer for an approved application */
+export interface LeaseOffer {
+  /** Street address under the property name */
+  readonly address: string;
+  /** Tag beside the name, e.g. "Student Housing" */
+  readonly category: string;
+  /** MM/DD/YYYY */
+  readonly startDate: string;
+  /** MM/DD/YYYY */
+  readonly moveInDate: string;
+  readonly durationMonths: number;
+  /** Whole dollars per month */
+  readonly rent: number;
+  readonly securityDeposit: number;
+  /** Due when the offer is accepted */
+  readonly oneTimePayment: number;
+}
+
 export interface ChoiceOption {
   readonly id: string;
   readonly label: string;

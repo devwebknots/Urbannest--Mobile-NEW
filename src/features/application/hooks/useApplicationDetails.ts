@@ -11,7 +11,12 @@ import { useCallback, useMemo } from 'react';
 import { useAppDialog } from '@/components/AppDialog';
 import { goBack, navigate } from '@/navigation/navigationRef';
 import { renterAssets } from '@/features/renter/assets/renterAssets';
-import { APPLICATION_JOURNEY, APPLICATION_PROGRESS } from '../constants';
+import {
+  APPLICATION_JOURNEY,
+  APPLICATION_PROGRESS,
+  OFFER_ACCEPTED_PROGRESS,
+} from '../constants';
+import { offerStore, useOfferStore } from '../store/offerStore';
 import type { ApplicationRecord, JourneyState, JourneyStep } from '../types';
 
 export interface ApplicationDetailsNavigation {
@@ -20,6 +25,7 @@ export interface ApplicationDetailsNavigation {
     (route: 'GuestHome'): void;
     (route: 'RentalApplication', params: { propertyId: string }): void;
     (route: 'SubmittedApplication', params: { record: ApplicationRecord }): void;
+    (route: 'OfferAcceptance', params: { record: ApplicationRecord; accepted?: boolean }): void;
   };
 }
 
@@ -60,7 +66,14 @@ export function useApplicationDetails(
 ) {
   const dialog = useAppDialog();
   const showDialog = dialog.show;
-  const progress = APPLICATION_PROGRESS[record.status];
+  // Re-render when an offer is accepted on the Offer Acceptance page
+  useOfferStore();
+  const base = APPLICATION_PROGRESS[record.status];
+  // Offer accepted while Offer Acceptance was current: move on to Lease Review
+  const progress =
+    offerStore.isAccepted(record.id) && base.step < OFFER_ACCEPTED_PROGRESS.step
+      ? OFFER_ACCEPTED_PROGRESS
+      : base;
   const appliedOn = longDate(record.appliedOn);
 
   const facts = useMemo(
@@ -141,6 +154,16 @@ export function useApplicationDetails(
           navigation.navigate('SubmittedApplication', { record });
         } else {
           navigate('SubmittedApplication', { record });
+        }
+        return;
+      }
+      // Offer Acceptance: once the offer is out (current) or answered (done)
+      if (row.id === 'offer' && row.state !== 'upcoming') {
+        const params = { record, accepted: row.state === 'done' };
+        if (navigation?.navigate) {
+          navigation.navigate('OfferAcceptance', params);
+        } else {
+          navigate('OfferAcceptance', params);
         }
         return;
       }

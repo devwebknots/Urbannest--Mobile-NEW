@@ -14,6 +14,7 @@ import type {
   ApplicationRecord,
   ApplicationStatusId,
   JourneyStep,
+  LeaseOffer,
   ConsentItem,
   Pet,
   Vehicle,
@@ -317,6 +318,14 @@ export const APPLICATION_JOURNEY: readonly JourneyStep[] = [
   { id: 'movein', title: 'Move-in Details', detail: 'Get your move-in date and instructions.', icon: 'key', viewable: true },
 ];
 
+/** After the renter accepts the offer: current step moves to Lease Review */
+export const OFFER_ACCEPTED_PROGRESS: ApplicationProgress = {
+  step: 3,
+  title: 'Review Your Lease',
+  message: 'You accepted the rental offer. Review the lease terms and details to continue.',
+  statusDetail: 'Approved.',
+};
+
 const REVIEWING: ApplicationProgress = {
   step: 1,
   title: 'Reviewing Your Documents',
@@ -364,4 +373,18 @@ export const APPLICATION_PROGRESS: Record<ApplicationStatusId, ApplicationProgre
     message: "Your lease agreement is being generated. We'll share it with you shortly.",
     statusDetail: 'Approved.',
   },
+};
+
+/* ---- Offer Acceptance page ---- */
+
+/** The design's sample offer, until offers come from the API */
+export const APPLICATION_OFFER: LeaseOffer = {
+  address: '701 Treeside Ct, Aspen Grove, CO 81611',
+  category: 'Student Housing',
+  startDate: '12/20/2025',
+  moveInDate: '12/19/2025',
+  durationMonths: 12,
+  rent: 1500,
+  securityDeposit: 500,
+  oneTimePayment: 500,
 };

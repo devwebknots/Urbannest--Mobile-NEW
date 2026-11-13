@@ -6,7 +6,7 @@
  *  - DocumentHeading: icon tile, "Rental Application" (subtitle hidden)
  *  - one white card: FileBar (PDF tile, name + size, download / share /
  *    full screen) over the document paper
- *  - "Close" (brand button) pinned to the bottom
+ *  - "Close" (brand button) pinned to the bottom: commented out for now
  * Full screen opens the paper alone in a modal (pinch to zoom on iOS).
  */
 
@@ -22,6 +22,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppDialog } from '@/components/AppDialog';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for the hidden Close button
 import { Button } from '@/components/Button';
 import { CloseIcon } from '@/components/icons';
 import { borderRadius, colors, shadows, spacing, typographyPresets } from '@/config/theme';
@@ -45,7 +46,8 @@ interface Props {
   route: { params: { record: ApplicationRecord } };
 }
 
-/** Button height + its padding above */
+/** Button height + its padding above (for the hidden Close footer) */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for the hidden Close button
 const FOOTER = ms(48) + spacing.lg;
 
 export const SubmittedApplicationScreen: React.FC<Props> = ({ navigation, route }) => {
@@ -61,7 +63,8 @@ export const SubmittedApplicationScreen: React.FC<Props> = ({ navigation, route 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: insets.top + spacing.sm,
-          paddingBottom: FOOTER + bottom + spacing.xl,
+          // Close footer hidden: FOOTER + bottom + spacing.xl while it shows
+          paddingBottom: bottom + spacing.xl,
         }}
       >
         {/* Soft blue glow behind the top of the page (as on Application Details) */}
@@ -97,9 +100,10 @@ export const SubmittedApplicationScreen: React.FC<Props> = ({ navigation, route 
         </Reveal>
       </ScrollView>
 
+      {/* Pinned Close: hidden for now (back button covers it)
       <View style={[styles.footer, { paddingBottom: bottom }]}>
         <Button title="Close" variant="brand" size="lg" onPress={vm.back} />
-      </View>
+      </View> */}
 
       {/* Full screen: the paper alone */}
       <Modal

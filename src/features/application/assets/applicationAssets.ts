@@ -12,7 +12,13 @@ export const applicationAssets = {
   // "Current Status" document illustration, cropped from the "Application
   // Details" design (230 x 215), edges feathered to transparent
   statusDocuments: require('@/assets/images/application/status_documents.png'),
+  // "Offer Received" signed-document illustration, cropped from the "Offer
+  // Acceptance" design (280 x 210), edges feathered to transparent
+  offerDocument: require('@/assets/images/application/offer_document.png'),
 };
+
+/** Width / height of offer_document.png */
+export const OFFER_DOCUMENT_ASPECT = 280 / 210;
 
 /** Width / height of status_documents.png */
 export const STATUS_DOCUMENTS_ASPECT = 230 / 215;
@@ -60,6 +66,8 @@ export const applicationIcons = {
   expand: require('@/assets/icons/application/expand.png'),
   fileCheck: require('@/assets/icons/application/file_check.png'),
   share: require('@/assets/icons/property/share.png'),
+  // Offer Acceptance
+  building: require('@/assets/icons/property/building.png'),
   key: require('@/assets/icons/manage/key.png'),
   wallet: require('@/assets/icons/property/wallet.png'),
   layers: require('@/assets/icons/property/layers.png'),

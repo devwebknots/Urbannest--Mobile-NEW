@@ -31,6 +31,12 @@ export type RootStackParamList = {
   ApplicationDetails: { record: import('@/features/application/types').ApplicationRecord };
   /** The submitted lease application document, opened by "View" on Application Submitted */
   SubmittedApplication: { record: import('@/features/application/types').ApplicationRecord };
+  /** The owner's lease offer (accept / reject), opened from the Offer Acceptance step */
+  OfferAcceptance: {
+    record: import('@/features/application/types').ApplicationRecord;
+    /** Step already done: show "Offer Accepted", no buttons */
+    accepted?: boolean;
+  };
   PersonaSelect: undefined;
   RenterHome: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */
