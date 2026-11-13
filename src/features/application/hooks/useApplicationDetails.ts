@@ -19,6 +19,7 @@ export interface ApplicationDetailsNavigation {
   navigate?: {
     (route: 'GuestHome'): void;
     (route: 'RentalApplication', params: { propertyId: string }): void;
+    (route: 'SubmittedApplication', params: { record: ApplicationRecord }): void;
   };
 }
 
@@ -133,15 +134,25 @@ export function useApplicationDetails(
   );
 
   const openStep = useCallback(
-    (row: JourneyRow) =>
+    (row: JourneyRow) => {
+      // Built step pages: Application Submitted -> the submitted document
+      if (row.id === 'submitted' && row.state === 'done') {
+        if (navigation?.navigate) {
+          navigation.navigate('SubmittedApplication', { record });
+        } else {
+          navigate('SubmittedApplication', { record });
+        }
+        return;
+      }
       showDialog({
         tone: 'info',
         title: row.title,
         message: row.id === 'status' && row.state === 'current' ? progress.message : row.detail,
         details: [{ label: 'Step', value: STATE_LABEL[row.state] }],
         actions: [{ label: 'OK', variant: 'brand' }],
-      }),
-    [progress.message, showDialog],
+      });
+    },
+    [navigation, progress.message, record, showDialog],
   );
 
   const more = useCallback(() => {

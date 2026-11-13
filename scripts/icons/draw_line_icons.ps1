@@ -532,6 +532,31 @@ $icons = [ordered]@{
     'path:m21 17-2.156-1.868A.5.5 0 0 0 18 15.5v.5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1c0-2.545-3.991-3.97-8.5-4a1 1 0 0 0 0 5c4.153 0 4.745-11.295 5.708-13.5a2.5 2.5 0 1 1 3.31 3.284',
     'path:M3 21h18'
   )
+  # Submitted Application (application set, -Stroke 2.2)
+  # lucide: download
+  'download' = @(
+    'path:M12 15V3',
+    'path:M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4',
+    'path:m7 10 5 5 5-5'
+  )
+  # (share reuses property/share.png)
+  # lucide: scan (four corners: full screen)
+  'expand' = @(
+    'path:M3 7V5a2 2 0 0 1 2-2h2',
+    'path:M17 3h2a2 2 0 0 1 2 2v2',
+    'path:M21 17v2a2 2 0 0 1-2 2h-2',
+    'path:M7 21H5a2 2 0 0 1-2-2v-2'
+  )
+  # lucide file-text, with a check badge in the bottom-right corner
+  'file_check' = @(
+    'path:M11 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9l5 5v4',
+    'path:M14 2v4a2 2 0 0 0 2 2h4',
+    'path:M8 9h2',
+    'path:M8 13h5',
+    'path:M8 17h2',
+    'circle:17.5,17.5,4.5',
+    'path:m15.5 17.5 1.5 1.5 2.5-2.5'
+  )
 }
 
 New-Item -ItemType Directory -Force $OutDir | Out-Null

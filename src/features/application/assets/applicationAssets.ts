@@ -55,6 +55,11 @@ export const applicationIcons = {
   fileSearch: require('@/assets/icons/application/file_search.png'),
   fileText: require('@/assets/icons/application/file_text.png'),
   signature: require('@/assets/icons/application/signature.png'),
+  // Submitted Application (same script, -Stroke 2.2; share from the property set)
+  download: require('@/assets/icons/application/download.png'),
+  expand: require('@/assets/icons/application/expand.png'),
+  fileCheck: require('@/assets/icons/application/file_check.png'),
+  share: require('@/assets/icons/property/share.png'),
   key: require('@/assets/icons/manage/key.png'),
   wallet: require('@/assets/icons/property/wallet.png'),
   layers: require('@/assets/icons/property/layers.png'),

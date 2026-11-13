@@ -11,6 +11,7 @@ import {
   ApplicationStatusScreen,
   ApplicationSubmittedScreen,
   RentalApplicationScreen,
+  SubmittedApplicationScreen,
 } from '@/features/application';
 import { GuestHomeScreen, PropertyDetailsScreen } from '@/features/guest';
 import { HomeScreen } from '@/features/home';
@@ -78,6 +79,11 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="ApplicationDetails"
         component={ApplicationDetailsScreen as React.ComponentType}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="SubmittedApplication"
+        component={SubmittedApplicationScreen as React.ComponentType}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen

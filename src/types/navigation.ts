@@ -29,6 +29,8 @@ export type RootStackParamList = {
     | undefined;
   /** One application's details + journey, opened from an Application Status card */
   ApplicationDetails: { record: import('@/features/application/types').ApplicationRecord };
+  /** The submitted lease application document, opened by "View" on Application Submitted */
+  SubmittedApplication: { record: import('@/features/application/types').ApplicationRecord };
   PersonaSelect: undefined;
   RenterHome: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */
