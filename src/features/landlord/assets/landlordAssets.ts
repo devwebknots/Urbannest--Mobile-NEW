@@ -12,6 +12,9 @@ export const landlordAssets = {
   regentPlaza: require('@/assets/images/landlord/asset_regent_plaza.jpg'),
   emeraldGardens: require('@/assets/images/landlord/asset_emerald_gardens.jpg'),
   oakridge: require('@/assets/images/landlord/asset_oakridge.jpg'),
+  // Portfolio Overview "No properties found" card: the room photo cropped
+  // from the "Portfolio Overview" design (620 x 423, text left out)
+  emptyPropertiesRoom: require('@/assets/images/landlord/empty_properties_room.jpg'),
 };
 
 /** Width / height of header_building.png */

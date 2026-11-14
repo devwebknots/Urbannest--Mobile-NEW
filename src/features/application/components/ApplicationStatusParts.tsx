@@ -59,12 +59,21 @@ export const StatusPill: React.FC<{
   );
 };
 
-export const StatusFilterChips: React.FC<{
-  filters: readonly { id: ApplicationFilterId; label: string; icon?: ApplicationIconName }[];
-  value: ApplicationFilterId;
-  counts: Record<ApplicationFilterId, number>;
-  onChange: (id: ApplicationFilterId) => void;
-}> = ({ filters, value, counts, onChange }) => (
+/**
+ * Generic over the filter id (application statuses, landlord property
+ * filters…); `counts` is optional: without it the chips show just the label.
+ */
+export const StatusFilterChips = <T extends string = ApplicationFilterId>({
+  filters,
+  value,
+  counts,
+  onChange,
+}: {
+  filters: readonly { id: T; label: string; icon?: ApplicationIconName }[];
+  value: T;
+  counts?: Record<T, number>;
+  onChange: (id: T) => void;
+}) => (
   <ScrollView
     horizontal
     showsHorizontalScrollIndicator={false}
@@ -79,14 +88,14 @@ export const StatusFilterChips: React.FC<{
           onPress={() => onChange(f.id)}
           accessibilityRole="tab"
           accessibilityState={{ selected: on }}
-          accessibilityLabel={`${f.label}, ${counts[f.id]}`}
+          accessibilityLabel={counts ? `${f.label}, ${counts[f.id]}` : f.label}
           style={({ pressed }) => [styles.chip, on && styles.chipOn, pressed && styles.pressed]}
         >
           {f.icon ? (
             <ApplicationIcon name={f.icon} size={ms(15)} color={on ? colors.white : colors.navy} />
           ) : null}
           <Text style={[styles.chipText, on && styles.chipTextOn]}>
-            {`${f.label} (${counts[f.id]})`}
+            {counts ? `${f.label} (${counts[f.id]})` : f.label}
           </Text>
         </Pressable>
       );

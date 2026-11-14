@@ -59,6 +59,8 @@ export type RootStackParamList = {
   LandlordOnboarding: undefined;
   /** Landlord's Properties page: dashboard burger menu, or after onboarding is activated */
   LandlordProperties: undefined;
+  /** "Add New Property" form, opened by Add Property on the Portfolio Overview */
+  LandlordAddProperty: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */
   ResidenceDashboard: { residenceId: string };
   /** "My Home" page of an active lease, opened by "Manage" on My Residences */

@@ -33,6 +33,14 @@ test('landlord dashboard shows every section and selects a chart month', async (
   });
   expect(json()).toContain('₹4,05,000');
 
+  // Burger opens the side menu (reused guest drawer) with Properties
+  const burger = tree.root.findByProps({ accessibilityLabel: 'Open menu' });
+  await ReactTestRenderer.act(() => {
+    burger.props.onPress();
+  });
+  expect(json()).toContain('Verified Property Owner');
+  expect(json()).toContain('Portfolio');
+
   await ReactTestRenderer.act(() => {
     tree.unmount();
   });

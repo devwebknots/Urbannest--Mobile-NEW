@@ -23,6 +23,7 @@ import {
   RENT_RANGE_LABELS,
   VENDOR_PERFORMANCE,
 } from '../constants';
+import type { LandlordMenuKey } from '../components/LandlordSideMenu';
 import type { LandlordTab, RecentDocument, RentRange } from '../types';
 import { greetingFor, percent } from '../utils';
 
@@ -80,8 +81,31 @@ export function useLandlordDashboard() {
   const [tab, setTab] = useState<LandlordTab>('dashboard');
   const tabDialogOpen = useRef(false);
 
+  /** Side menu "Properties" and the Properties tab: Portfolio Overview */
+  const openProperties = useCallback(() => {
+    if (navigationRef.isReady()) {
+      navigationRef.navigate('LandlordProperties');
+    }
+  }, []);
+
+  // Burger menu (top right) opens the side menu
+  const [menuOpen, setMenuOpen] = useState(false);
+  const onMenuSelect = useCallback(
+    (key: LandlordMenuKey) => {
+      if (key === 'properties') {
+        openProperties();
+      }
+    },
+    [openProperties],
+  );
+
   const onTabChange = useCallback(
     (next: LandlordTab) => {
+      if (next === 'properties') {
+        // Properties is its own page (Portfolio Overview); Home stays selected here
+        openProperties();
+        return;
+      }
       setTab(next);
       if (next === 'dashboard') {
         return;
@@ -91,7 +115,7 @@ export function useLandlordDashboard() {
         comingSoon(TAB_TITLES[next]);
       }, 280);
     },
-    [comingSoon],
+    [comingSoon, openProperties],
   );
 
   useEffect(() => {
@@ -114,16 +138,13 @@ export function useLandlordDashboard() {
 
   const greeting = useMemo(() => greetingFor(new Date()), []);
 
-  /** Burger menu (top right): the landlord's Properties page */
-  const openProperties = useCallback(() => {
-    if (navigationRef.isReady()) {
-      navigationRef.navigate('LandlordProperties');
-    }
-  }, []);
-
   return {
     dialog,
     openProperties,
+    menuOpen,
+    openMenu: () => setMenuOpen(true),
+    closeMenu: () => setMenuOpen(false),
+    onMenuSelect,
     profile: LANDLORD_PROFILE,
     greeting,
     portfolioStats: PORTFOLIO_STATS,

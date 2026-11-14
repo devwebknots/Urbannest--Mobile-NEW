@@ -14,7 +14,8 @@ export const PROFILE_AVATAR_SIZE = ms(36);
 
 interface Props {
   initials: string;
-  onPress: () => void;
+  /** Optional: without it the avatar is just a picture (not a button) */
+  onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   /**
    * light (default): white circle, navy initials.
@@ -38,7 +39,8 @@ export const ProfileAvatar: React.FC<Props> = ({
       pressed && styles.pressed,
       style,
     ]}
-    accessibilityRole="button"
+    disabled={!onPress}
+    accessibilityRole={onPress ? 'button' : 'image'}
     accessibilityLabel="Profile"
   >
     <Text style={[styles.text, variant === 'glass' && styles.glassText]} numberOfLines={1}>

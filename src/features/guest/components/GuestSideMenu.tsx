@@ -7,6 +7,8 @@
  * Closes on backdrop tap, the close button, Android back, or a swipe to
  * the right. The chosen option is reported after the close animation so
  * scrolling / navigation doesn't fight the slide.
+ * Reused by other personas: pass `groups` (their options) and `header`
+ * (replaces Log In / Register), e.g. the landlord dashboard menu.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -61,23 +63,41 @@ export type GuestMenuKey =
   | 'about'
   | 'terms';
 
-interface Props {
-  visible: boolean;
-  onClose: () => void;
-  onSelect: (key: GuestMenuKey) => void;
-}
-
 type IconRender = (color: string) => React.ReactNode;
 
-interface MenuItem {
-  key: GuestMenuKey;
+export interface SideMenuItem<K extends string = GuestMenuKey> {
+  key: K;
   label: string;
   icon: IconRender;
 }
 
-const ICON = ms(17);
+export interface SideMenuGroup<K extends string = GuestMenuKey> {
+  title: string;
+  items: SideMenuItem<K>[];
+}
 
-const GROUPS: { title: string; items: MenuItem[] }[] = [
+interface Props<K extends string> {
+  visible: boolean;
+  onClose: () => void;
+  onSelect: (key: K) => void;
+  /**
+   * Reuse for other personas (e.g. the landlord dashboard): the drawer's
+   * groups. Default: the guest groups (Explore / Discover / Support).
+   */
+  groups?: readonly SideMenuGroup<K>[];
+  /**
+   * Content left of the close button in the navy header (e.g. the
+   * landlord's avatar + name). Default: the guest Log In button and the
+   * "New to Urban Nest? Register" link.
+   */
+  header?: React.ReactNode;
+}
+
+/** Icon size for menu items (export so other menus match) */
+export const SIDE_MENU_ICON = ms(17);
+const ICON = SIDE_MENU_ICON;
+
+const GROUPS: SideMenuGroup<GuestMenuKey>[] = [
   {
     title: 'Explore',
     items: [
@@ -153,11 +173,14 @@ const GROUPS: { title: string; items: MenuItem[] }[] = [
 const OPEN_MS = 300;
 const CLOSE_MS = 220;
 
-export const GuestSideMenu: React.FC<Props> = ({
+export const GuestSideMenu = <K extends string = GuestMenuKey>({
   visible,
   onClose,
   onSelect,
-}) => {
+  groups,
+  header,
+}: Props<K>) => {
+  const menuGroups = (groups ?? GROUPS) as readonly SideMenuGroup<K>[];
   const { width } = useWindowDimensions();
   const insets = useStatusBarInsets();
   const drawerWidth = Math.min(width * 0.84, 360);
@@ -168,7 +191,7 @@ export const GuestSideMenu: React.FC<Props> = ({
   const drag = useRef(new Animated.Value(0)).current;
   // Keep the Modal mounted until the close animation ends
   const [mounted, setMounted] = useState(visible);
-  const pending = useRef<GuestMenuKey | null>(null);
+  const pending = useRef<K | null>(null);
 
   useEffect(() => {
     if (visible) {
@@ -200,7 +223,7 @@ export const GuestSideMenu: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
-  const choose = (key: GuestMenuKey) => {
+  const choose = (key: K) => {
     pending.current = key;
     onClose();
   };
@@ -274,15 +297,19 @@ export const GuestSideMenu: React.FC<Props> = ({
         {/* Like Airbnb / Booking: one clear Log In button, Register as a link */}
         <View style={[styles.header, { paddingTop: spacing.lg }]}>
           <View style={styles.headerRow}>
-            <Pressable
-              onPress={() => choose('login')}
-              accessibilityRole="button"
-            >
-              <View style={styles.loginButton}>
-                <UserIcon size={ms(13)} color={colors.navy} />
-                <Text style={styles.loginText}>Log In</Text>
-              </View>
-            </Pressable>
+            {header !== undefined ? (
+              <View style={styles.flex}>{header}</View>
+            ) : (
+              <Pressable
+                onPress={() => choose('login' as K)}
+                accessibilityRole="button"
+              >
+                <View style={styles.loginButton}>
+                  <UserIcon size={ms(13)} color={colors.navy} />
+                  <Text style={styles.loginText}>Log In</Text>
+                </View>
+              </Pressable>
+            )}
             <Pressable
               onPress={onClose}
               hitSlop={10}
@@ -293,17 +320,19 @@ export const GuestSideMenu: React.FC<Props> = ({
               <CloseIcon size={ms(13)} color={colors.white} />
             </Pressable>
           </View>
-          <Pressable
-            onPress={() => choose('register')}
-            hitSlop={8}
-            accessibilityRole="button"
-            style={styles.registerRow}
-          >
-            <Text style={styles.registerText}>
-              New to Urban Nest?{' '}
-              <Text style={styles.registerLink}>Register</Text>
-            </Text>
-          </Pressable>
+          {header !== undefined ? null : (
+            <Pressable
+              onPress={() => choose('register' as K)}
+              hitSlop={8}
+              accessibilityRole="button"
+              style={styles.registerRow}
+            >
+              <Text style={styles.registerText}>
+                New to Urban Nest?{' '}
+                <Text style={styles.registerLink}>Register</Text>
+              </Text>
+            </Pressable>
+          )}
         </View>
 
         <ScrollView
@@ -311,7 +340,7 @@ export const GuestSideMenu: React.FC<Props> = ({
           contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }}
           showsVerticalScrollIndicator={false}
         >
-          {GROUPS.map(group => (
+          {menuGroups.map(group => (
             <View key={group.title} style={styles.group}>
               <Text style={styles.groupTitle}>{group.title}</Text>
               {group.items.map(item => (

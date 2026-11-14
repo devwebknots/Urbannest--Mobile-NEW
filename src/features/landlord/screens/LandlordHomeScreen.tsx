@@ -11,6 +11,7 @@ import React from 'react';
 import { Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppDialog } from '@/components/AppDialog';
+import { LandlordSideMenu } from '../components/LandlordSideMenu';
 import { colors, spacing, typographyPresets } from '@/config/theme';
 import { SectionHeader } from '@/features/guest/components/SectionHeader';
 import { Reveal } from '@/features/renter/components/Reveal';
@@ -53,7 +54,7 @@ export const LandlordHomeScreen: React.FC = () => {
           onNotifications={() => vm.comingSoon('Notifications')}
           onHelp={() => vm.comingSoon('Help Center')}
           onProfile={() => vm.comingSoon('Profile')}
-          onMenu={vm.openProperties}
+          onMenu={vm.openMenu}
           onAddRequest={() => vm.comingSoon('Add Request')}
           onMessagePm={() => vm.comingSoon('Message PM')}
         />
@@ -196,6 +197,12 @@ export const LandlordHomeScreen: React.FC = () => {
         bottomInset={insets.bottom}
         onChange={vm.onTabChange}
         onAdd={() => vm.comingSoon('Quick Add')}
+      />
+      <LandlordSideMenu
+        visible={vm.menuOpen}
+        profile={vm.profile}
+        onClose={vm.closeMenu}
+        onSelect={vm.onMenuSelect}
       />
       <AppDialog {...vm.dialog.props} />
     </View>

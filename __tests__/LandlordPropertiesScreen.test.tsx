@@ -2,7 +2,7 @@ import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import { LandlordPropertiesScreen } from '../src/features/landlord';
 
-test('add property page shows every section, amenities and the locked unit tab', async () => {
+test('portfolio overview shows empty stats, filters and the add property card', async () => {
   const goBack = jest.fn();
   let tree!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
@@ -10,22 +10,25 @@ test('add property page shows every section, amenities and the locked unit tab',
   });
   const json = () => JSON.stringify(tree.toJSON());
   for (const text of [
-    'Add New Property',
-    'Property Basics',
-    'Upload Main Image',
-    'Address Details',
-    'Upload Property Video',
-    'Location Preview',
-    'Save & Continue',
+    'Portfolio Overview',
+    'OWNER MODE: ACTIVE',
+    'Total Properties',
+    'Rent This Month',
+    'Managed Assets',
+    'Needs Attention',
+    'No properties found',
+    'Add Property',
+    'Recent Unit Activities',
+    'No unit activity yet.',
   ]) {
     expect(json()).toContain(text);
   }
 
-  const amenities = tree.root.findByProps({ accessibilityLabel: 'Amenities' });
+  const search = tree.root.findByProps({ accessibilityLabel: 'Search properties' });
   await ReactTestRenderer.act(() => {
-    amenities.props.onPress();
+    search.props.onPress();
   });
-  expect(json()).toContain('Swimming Pool');
+  expect(json()).toContain('Search by property name or city');
 
   await ReactTestRenderer.act(() => {
     tree.unmount();

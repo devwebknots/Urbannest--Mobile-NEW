@@ -79,7 +79,7 @@ interface Props {
   onNotifications: () => void;
   onHelp: () => void;
   onProfile: () => void;
-  /** Burger menu at the far right: opens the Properties page */
+  /** Burger menu at the far right: opens the side menu */
   onMenu: () => void;
   onAddRequest: () => void;
   onMessagePm: () => void;
@@ -195,6 +195,8 @@ export const LandlordHero: React.FC<Props> = ({
             Landlord Dashboard
           </Text> */}
         </View>
+        {/* Commented out on request (notifications + help hidden for now);
+            styles.headerDivider kept for when they come back
         <HeaderIconButton
           icon="bell"
           label="Notifications"
@@ -202,9 +204,9 @@ export const LandlordHero: React.FC<Props> = ({
           dot={profile.unreadAlerts > 0}
         />
         <HeaderIconButton icon="help" label="Help" onPress={onHelp} />
-        <View style={styles.headerDivider} />
+        <View style={styles.headerDivider} /> */}
         <ProfileAvatar initials={profile.initials} onPress={onProfile} variant="glass" />
-        <HeaderIconButton icon="menu" label="Menu, Properties" onPress={onMenu} />
+        <HeaderIconButton icon="menu" label="Open menu" onPress={onMenu} />
       </View>
       {/* Divider under the brand row removed on request (styles.rule kept)
       <View style={styles.rule} /> */}
