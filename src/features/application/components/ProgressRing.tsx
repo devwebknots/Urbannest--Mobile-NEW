@@ -18,12 +18,27 @@ interface Props {
   progress: number;
   size?: number;
   stroke?: number;
+  /** Show the % in the middle (default true) */
+  showLabel?: boolean;
+  /** Arc colour (default secondary blue) */
+  color?: string;
+  /** Track colour (default pale secondary blue) */
+  trackColor?: string;
+  accessibilityLabel?: string;
 }
 
 // colors.headerGradientEnd (#518EF9) as rgb
 const BLUE = '81,142,249';
 
-export const ProgressRing: React.FC<Props> = ({ progress, size = ms(46), stroke = ms(4) }) => {
+export const ProgressRing: React.FC<Props> = ({
+  progress,
+  size = ms(46),
+  stroke = ms(4),
+  showLabel = true,
+  color = colors.headerGradientEnd,
+  trackColor = `rgba(${BLUE},0.18)`,
+  accessibilityLabel,
+}) => {
   const p = Math.max(0, Math.min(1, progress));
   const value = useRef(new Animated.Value(p)).current;
 
@@ -46,7 +61,7 @@ export const ProgressRing: React.FC<Props> = ({ progress, size = ms(46), stroke 
     height: size,
     borderRadius: half,
     borderWidth: stroke,
-    borderColor: colors.headerGradientEnd,
+    borderColor: color,
   };
   // First half of the progress turns the right arc 0 → 180°, the second the left arc
   const rightRotate = value.interpolate({
@@ -62,9 +77,9 @@ export const ProgressRing: React.FC<Props> = ({ progress, size = ms(46), stroke 
     <View
       style={{ width: size, height: size }}
       accessibilityRole="progressbar"
-      accessibilityLabel={`${Math.round(p * 100)}% uploaded`}
+      accessibilityLabel={accessibilityLabel ?? `${Math.round(p * 100)}% uploaded`}
     >
-      <View style={[ring, styles.track, { borderColor: `rgba(${BLUE},0.18)` }]} />
+      <View style={[ring, styles.track, { borderColor: trackColor }]} />
 
       {/* Right side: a left half-ring rotating into the right clip */}
       <View style={[styles.clip, { left: half, width: half, height: size }]}>
@@ -100,9 +115,11 @@ export const ProgressRing: React.FC<Props> = ({ progress, size = ms(46), stroke 
         </Animated.View>
       </View>
 
-      <View style={styles.center}>
-        <Text style={styles.text}>{Math.round(p * 100)}%</Text>
-      </View>
+      {showLabel ? (
+        <View style={styles.center}>
+          <Text style={styles.text}>{Math.round(p * 100)}%</Text>
+        </View>
+      ) : null}
     </View>
   );
 };

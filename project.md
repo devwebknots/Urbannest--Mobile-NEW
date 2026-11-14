@@ -151,6 +151,7 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | `ApplicationStatus` | `ApplicationStatusScreen` (`@/features/application`), optional params `{ propertyId, applicationId, submittedAt }` (the application just sent) | `animation: 'slide_from_right'` |
 | `PersonaSelect` | `PersonaSelectScreen` (`@/features/persona`) | `gestureEnabled: false` |
 | `RenterHome` | `RenterHomeScreen` (`@/features/renter`) | `animation: 'slide_from_right'` |
+| `LandlordHome` | `LandlordHomeScreen` (`@/features/landlord`) | `animation: 'slide_from_right'` |
 | `ManageResidence` | `ManageResidenceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | ~~`ResidenceDashboard`~~ | Unwired (commented out in the navigator); `ResidenceDashboardScreen` kept in `@/features/renter` | — |
 | `Maintenance` | `MaintenanceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
@@ -197,6 +198,7 @@ Child components (`ScheduleSection`, `QuickActionBar`, `BottomNavBar`, …) only
 - **RentalApplication → ApplicationSubmitted** (`replace`): "Submit Official Application" once step 4 passes its checks; back / "Back to Home" leave it (back → the property, "Back to Home" → GuestHome).
 - **ApplicationSubmitted → ApplicationStatus** (`navigate`): "Track Application Status" (passes the new application so it shows first). Back returns to the submitted page.
 - **PersonaSelect → RenterHome** (`replace`): "Continue as Renter".
+- **PersonaSelect → LandlordHome** (`replace`): "Continue as Landlord" (Landlord persona is now `active`; `ROUTE_FOR_PERSONA.landlord`).
 - **RenterHome → CheckIn** (`navigate`): tap a Move-In Ready card ("Check-In Now").
 - **CheckIn → Utilities → UtilityProviders**: the "Utilities" tile opens the Utilities list; a utility card opens its providers page (info only). "Confirm Utilities" navigates back to `CheckIn` with `utilitiesConfirmed: true` (`merge`), which ticks the tile.
 - **RenterHome → ManageResidence** (`navigate`): tap an Active Lease card ("Manage") (past leases show "coming soon"). Back button / system back returns.
@@ -575,6 +577,7 @@ Tokens (`borderRadius` in `theme.ts`): `xs` 4 · `sm` 6 · `md` 8 · `lg` 12 · 
 | `soft` | `chipBlue` fill, navy text | Secondary action | "Manage", "View on Map", "See More Properties" |
 | `light` | white fill, navy text | Buttons on dark panels or photos | Hero "Explore Homes" |
 | `link` | no fill, navy text (+ arrow) | Inline text action | Expired lease action on `ResidenceCard` |
+| `glass` | white 8% fill, white 45% hairline rim, white text | Second action on a dark panel, next to `light` | Landlord hero "Message PM", Communication Hub "Open Messenger" |
 | `primary` / `secondary` / `outline` / `danger` | old styles | Login screen only — don't use on new screens | — |
 
 Shared look: radius `borderRadius.button` (10), text `typographyPresets.button` (Inter SemiBold 13.5), horizontal padding `spacing.xl`, icon gap `spacing.sm`, disabled = 45% opacity.
@@ -748,6 +751,22 @@ Supports two operational modes:
 - **Role**: Opened from "Log In / Sign Up" on the guest home; pick Renter, Landlord or Property Manager (or Add Persona).
 - **Pieces**: blurred photo backdrop that cross-fades with the centered card, `PersonaCarousel` (snapping cards that scale, drop and fade, with photo parallax), `PaginationDots` (sliding pill in a frosted capsule), and one white "Continue as …" button the same width as the cards. Fades use `Scrim` (stretched `fade.png`, no banding).
 - **Logic**: `usePersonaSelection` (ViewModel); data in `persona/constants.ts`; photos in `src/assets/images/personas/` (Unsplash).
+
+### 0c-L. Landlord Home — Dashboard (`src/features/landlord/screens/LandlordHomeScreen.tsx`)
+Layout from the "UrbanNest Landlord Dashboard Overview" design, in app styles. MVVM: `hooks/useLandlordDashboard.ts` (figures, chart range / selected month, tab, AppDialog), sample data in `constants.ts` (design text), `utils.ts` (`formatInr` Indian grouping, `formatLakh`, `formatTrend`, `percent`, `greetingFor`).
+- **Hero** (`LandlordHero`), matched to the design: deep indigo `colors.landlordHero` (#15204F) with a `landlordHeroGlow` (#304088) radial glow behind the building and a large soft arc disc over the top left (centre/radius as shares of screen width, `ARC`); `HeaderBrand` + "Landlord Dashboard"; plain white bell (red dot) / help icons, hairline divider, `ProfileAvatar variant="glass"`; glass "Executive Profile" pill (gold crown) + green "Active Portfolio"; time-based greeting (`bodyMedium`), name (`heroTitle`) + scalloped secondary-blue verified seal (two rounded squares, one turned 45°); building `header_building.png` (alpha feathered left / top / bottom, so no square edge; 58% of the screen width) on the right edge, its base running under the strip by 0.054 × screen width (design ratio; strip height measured with onLayout); frosted glass strip = lighter indigo fill + a `blurRadius` copy of the building at the same screen position + white sheen (no native blur lib), cells = icon circle + `caption` label over `price` value with hairline dividers (`maxFontSizeMultiplier` 1); `Button` `light` "Add Request" + `glass` "Message PM". Below it an indigo → transparent fade over `pageTint`; the KPI cards overlap it.
+- **KPIs** (`KpiCards`): Rent Collection (`priceLarge` navy %, `TrendPill`, animated gradient bar, ₹ collected of expected) and Occupancy (% + ring) side by side; 2 × 2 `QuickStatGrid` (tone tiles: blue / green / amber / red from theme status colours).
+- **Monthly Rent Collection** (`RentChartCard`): View-drawn bar chart (₹0–₹6.0L grid), bars grow in, tap a bar → navy bar + ₹L tooltip, header total + trend vs. the month before; range chip opens an AppDialog (Last 3 / 6 / 12 Months).
+- **Prime Assets**: `SectionHeader` (+ "View Analytics" link) on the page; `PrimeAssetCard` rows (design photo, status pill, location, units / occupied, `ProgressRing` + chevron).
+- **Open Operations** + **Vendor Performance** (`OperationsCards`): stacked full width (side by side doesn't fit at phone width); sparkline = thin gradient columns.
+- **Recent Documents** (`RecentDocuments`): page header, white card with red file tiles + download buttons, `soft` "Open Document Hub".
+- **Communication Hub**: navy gradient panel, glass message rows, "N new" pill, `glass` "Open Messenger".
+- **UrbanNest Intelligence** (`InsightCards`): snapping horizontal cards (blue / amber tints). Footer: © current year + links.
+- **Tab bar** (`LandlordTabBar`): RenterTabBar language (solid white bar, sliding navy capsule) with Home / Properties / Leases / More and a round "+" in the exact centre of the bar. Labels ignore the system font scale (`maxFontSizeMultiplier` 1) and shrink to fit. Tabs without a page slide there, show "coming soon", glide back to Home.
+- Everything without a page yet opens a "coming soon" `AppDialog`.
+- **Assets**: photos cropped from the design into `src/assets/images/landlord/` (`header_building.jpg` 720 × 258, `asset_*.jpg` 308 × 149); icons = Lucide line set at stroke 2.2 in `src/assets/icons/landlord/` (`draw_line_icons.ps1 -OutDir src/assets/icons/landlord -Stroke 2.2 -Only …`, list in the script), `LandlordIcon`.
+- **Shared changes**: `Button` `glass` variant; `ProfileAvatar` `variant` (`light` default / `glass`: translucent white, white initials); theme `landlordHero` / `landlordHeroGlow`; `ProgressRing` gained `showLabel`, `color`, `trackColor`, `accessibilityLabel` (defaults unchanged).
+- Test: `__tests__/LandlordHomeScreen.test.tsx`.
 
 ### 0c. Renter Home — My Residences (`src/features/renter/screens/RenterHomeScreen.tsx`)
 - **Role**: Landing page after choosing the Renter persona. Built from the "Urban Nest Residences Dashboard" design in the app theme.

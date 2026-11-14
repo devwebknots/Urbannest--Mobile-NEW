@@ -51,6 +51,8 @@ export type RootStackParamList = {
   };
   PersonaSelect: undefined;
   RenterHome: undefined;
+  /** Landlord dashboard, opened by "Continue as Landlord" on PersonaSelect */
+  LandlordHome: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */
   ResidenceDashboard: { residenceId: string };
   /** "My Home" page of an active lease, opened by "Manage" on My Residences */

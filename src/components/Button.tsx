@@ -9,6 +9,8 @@
  *  - light: white fill, navy text, for dark / photo backgrounds
  *           (e.g. hero "Explore Homes")
  *  - link:  no fill, navy text, usually with an arrow (e.g. "Renew")
+ *  - glass: clear fill, white hairline rim, white text; the second action
+ *           on a dark panel next to `light` (e.g. landlord "Message PM")
  * All share radius 10, the `button` text preset and optional icons.
  * Sizes: md = 44 high, lg = 48 high.
  *
@@ -47,7 +49,8 @@ export type ButtonVariant =
   | 'brand'
   | 'soft'
   | 'light'
-  | 'link';
+  | 'link'
+  | 'glass';
 
 export type ButtonSize = 'md' | 'lg';
 
@@ -70,7 +73,7 @@ export interface ButtonProps {
   readonly testID?: string;
 }
 
-const APP_VARIANTS: readonly ButtonVariant[] = ['brand', 'soft', 'light', 'link'];
+const APP_VARIANTS: readonly ButtonVariant[] = ['brand', 'soft', 'light', 'link', 'glass'];
 
 export const Button: React.FC<ButtonProps> = ({
   title,
@@ -98,6 +101,8 @@ export const Button: React.FC<ButtonProps> = ({
         return [styles.appContainer, styles[size], styles.softContainer];
       case 'light':
         return [styles.appContainer, styles[size], styles.lightContainer];
+      case 'glass':
+        return [styles.appContainer, styles[size], styles.glassContainer];
       case 'link':
         return styles.linkContainer;
       case 'secondary':
@@ -115,6 +120,7 @@ export const Button: React.FC<ButtonProps> = ({
   const getTextStyle = (): StyleProp<TextStyle> => {
     switch (variant) {
       case 'brand':
+      case 'glass':
         return [styles.appText, styles.lightText];
       case 'soft':
       case 'light':
@@ -195,6 +201,11 @@ const styles = StyleSheet.create({
   },
   lightContainer: {
     backgroundColor: colors.white,
+  },
+  glassContainer: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.45)',
   },
   linkContainer: {
     alignSelf: 'flex-start',

@@ -5,3 +5,4 @@ export * from './persona';
 export * from './splash';
 export * from './renter';
 export * from './application';
+export * from './landlord';

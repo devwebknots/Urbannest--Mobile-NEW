@@ -568,6 +568,98 @@ $icons = [ordered]@{
     'circle:17.5,17.5,4.5',
     'path:m15.5 17.5 1.5 1.5 2.5-2.5'
   )
+  # ---- Landlord dashboard (draw into icons/landlord at -Stroke 2.2):
+  #      -Only building,layers,users,plus,house,database,file_text,alert,map_pin,download,crown,shield_check,sparkles,tools,message_square,bell,circle_help,tag,chart_column,chevron_right,chevron_down,arrow_right,arrow_up,clipboard_list,file_clock,circle_dot,target,folder,lightbulb,menu
+  # lucide: message-square-text
+  'message_square' = @(
+    'path:M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+    'path:M13 8H7',
+    'path:M17 12H7'
+  )
+  # lucide: bell
+  'bell' = @(
+    'path:M10.268 21a2 2 0 0 0 3.464 0',
+    'path:M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326'
+  )
+  # lucide: circle-help
+  'circle_help' = @(
+    'circle:12,12,10',
+    'path:M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3',
+    'path:M12 17h.01'
+  )
+  # lucide: tag
+  'tag' = @(
+    'path:M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z',
+    'circle:7.5,7.5,1'
+  )
+  # lucide: chart-column
+  'chart_column' = @(
+    'path:M3 3v16a2 2 0 0 0 2 2h16',
+    'path:M18 17V9',
+    'path:M13 17V5',
+    'path:M8 17v-3'
+  )
+  # lucide: chevron-right
+  'chevron_right' = @(
+    'path:m9 18 6-6-6-6'
+  )
+  # lucide: chevron-down
+  'chevron_down' = @(
+    'path:m6 9 6 6 6-6'
+  )
+  # lucide: arrow-right
+  'arrow_right' = @(
+    'path:M5 12h14',
+    'path:m12 5 7 7-7 7'
+  )
+  # lucide: arrow-up
+  'arrow_up' = @(
+    'path:m5 12 7-7 7 7',
+    'path:M12 19V5'
+  )
+  # lucide: clipboard-list
+  'clipboard_list' = @(
+    'path:M9 2h6a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z',
+    'path:M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2',
+    'path:M12 11h4',
+    'path:M12 16h4',
+    'path:M8 11h.01',
+    'path:M8 16h.01'
+  )
+  # lucide: file-clock (lease renewals)
+  'file_clock' = @(
+    'path:M16 22h2a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3',
+    'path:M14 2v4a2 2 0 0 0 2 2h4',
+    'circle:8,16,6',
+    'path:M9.5 17.5 8 16.25V14'
+  )
+  # lucide: circle-dot, larger centre (inspection due)
+  'circle_dot' = @(
+    'circle:12,12,10',
+    'circle:12,12,4'
+  )
+  # lucide: target
+  'target' = @(
+    'circle:12,12,10',
+    'circle:12,12,6',
+    'circle:12,12,2'
+  )
+  # lucide: folder
+  'folder' = @(
+    'path:M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z'
+  )
+  # lucide: lightbulb
+  'lightbulb' = @(
+    'path:M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5',
+    'path:M9 18h6',
+    'path:M10 22h4'
+  )
+  # lucide: menu
+  'menu' = @(
+    'path:M4 12h16',
+    'path:M4 6h16',
+    'path:M4 18h16'
+  )
 }
 
 New-Item -ItemType Directory -Force $OutDir | Out-Null

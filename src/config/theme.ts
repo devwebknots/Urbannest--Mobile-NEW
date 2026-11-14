@@ -113,6 +113,11 @@ export const colors = {
   favorite: '#EF4444',
   // Soft card fill that matches the property details art (floor plan card)
   surfaceSoft: '#F6F9FD',
+
+  // Landlord dashboard hero (sampled from the "Landlord Dashboard Overview"
+  // design): deep indigo base, brighter indigo glow / arc
+  landlordHero: '#15204F',
+  landlordHeroGlow: '#304088',
 } as const;
 
 export const gradients = {

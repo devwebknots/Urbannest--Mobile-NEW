@@ -29,7 +29,7 @@ export const PERSONA_SLIDES: readonly PersonaSlide[] = [
       description:
         'Follow rent roll, occupancy and owner statements across your portfolio.',
       tags: ['Portfolio', 'Income', 'Tenants'],
-      status: 'inactive',
+      status: 'active',
       icon: 'key',
       image: personaAssets.landlord,
     },

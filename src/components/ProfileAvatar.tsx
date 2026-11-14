@@ -16,17 +16,32 @@ interface Props {
   initials: string;
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
+  /**
+   * light (default): white circle, navy initials.
+   * glass: translucent white circle, white initials (landlord hero).
+   */
+  variant?: 'light' | 'glass';
 }
 
-export const ProfileAvatar: React.FC<Props> = ({ initials, onPress, style }) => (
+export const ProfileAvatar: React.FC<Props> = ({
+  initials,
+  onPress,
+  style,
+  variant = 'light',
+}) => (
   <Pressable
     onPress={onPress}
     hitSlop={8}
-    style={({ pressed }) => [styles.avatar, pressed && styles.pressed, style]}
+    style={({ pressed }) => [
+      styles.avatar,
+      variant === 'glass' && styles.glass,
+      pressed && styles.pressed,
+      style,
+    ]}
     accessibilityRole="button"
     accessibilityLabel="Profile"
   >
-    <Text style={styles.text} numberOfLines={1}>
+    <Text style={[styles.text, variant === 'glass' && styles.glassText]} numberOfLines={1}>
       {initials}
     </Text>
   </Pressable>
@@ -48,6 +63,13 @@ const styles = StyleSheet.create({
     ...typographyPresets.button,
     fontSize: typography.fontSize.sm,
     color: colors.navy,
+  },
+  glass: {
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  glassText: {
+    color: colors.white,
   },
   pressed: {
     transform: [{ scale: 0.94 }],
