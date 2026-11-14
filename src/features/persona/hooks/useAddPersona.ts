@@ -15,7 +15,14 @@ import { PersonaRoute, ROUTE_FOR_PERSONA } from './usePersonaSelection';
 export interface AddPersonaNavigation {
   replace: (route: PersonaRoute) => void;
   goBack: () => void;
+  /** Opens a role's onboarding (Landlord → LandlordOnboarding) */
+  navigate?: (route: 'LandlordOnboarding') => void;
 }
+
+/** Roles whose Continue opens their onboarding flow first */
+const ONBOARDING_FOR_ROLE: Record<string, 'LandlordOnboarding'> = {
+  landlord: 'LandlordOnboarding',
+};
 
 /** Persona ids that are active on the account (from the carousel). */
 const ACTIVE_PERSONAS = new Set(
@@ -85,6 +92,15 @@ export function useAddPersona(navigation?: AddPersonaNavigation) {
   );
 
   const onContinue = useCallback(() => {
+    const onboarding = ONBOARDING_FOR_ROLE[selected.id];
+    if (onboarding) {
+      if (navigation?.navigate) {
+        navigation.navigate(onboarding);
+      } else if (navigationRef.isReady()) {
+        navigationRef.navigate(onboarding);
+      }
+      return;
+    }
     if (added && selected.personaId) {
       open(ROUTE_FOR_PERSONA[selected.personaId] ?? 'Home');
       return;
@@ -106,7 +122,7 @@ export function useAddPersona(navigation?: AddPersonaNavigation) {
         { label: 'Cancel', variant: 'link' },
       ],
     });
-  }, [added, selected, open, show, showSent]);
+  }, [added, selected, open, show, showSent, navigation]);
 
   const addedCount = useMemo(() => roles.filter(isRoleAdded).length, [roles]);
 

@@ -9,6 +9,9 @@
  * The track runs from the first to the last circle; its navy → blue fill
  * slides to the current circle when the step changes (scaleX, native
  * driver). Circles are tappable (`onStepPress`).
+ * `edgeAligned` (landlord onboarding): first step on the left edge, last on
+ * the right edge, so labels line up with the page text; the track and its
+ * fill follow the measured circle centres.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -35,6 +38,17 @@ interface Props {
   current: number;
   /** Tap on another step */
   onStepPress?: (index: number) => void;
+  /**
+   * First step hugs the left edge and the last the right edge (each circle
+   * stays centred over its label), so the labels line up with the page
+   * text above. Default: every step centred in an equal column.
+   */
+  edgeAligned?: boolean;
+}
+
+interface Slot {
+  x: number;
+  width: number;
 }
 
 const BIG = ms(40);
@@ -91,13 +105,33 @@ const ActiveCircle: React.FC<{ number: number }> = ({ number }) => {
   );
 };
 
-export const ApplicationStepper: React.FC<Props> = ({ steps, current, onStepPress }) => {
+export const ApplicationStepper: React.FC<Props> = ({
+  steps,
+  current,
+  onStepPress,
+  edgeAligned = false,
+}) => {
   const [width, setWidth] = useState(0);
+  // Edge-aligned: where each step's circle + label block sits in its column
+  const [slots, setSlots] = useState<(Slot | undefined)[]>([]);
   const last = Math.max(steps.length - 1, 1);
+  const colW = width / steps.length;
+
+  // Circle centres across the row
+  const centers = steps.map((_, i) => {
+    const slot = edgeAligned ? slots[i] : undefined;
+    return slot ? colW * i + slot.x + slot.width / 2 : colW * i + colW / 2;
+  });
+  const trackStart = centers[0] ?? 0;
+  const trackLength = Math.max((centers[centers.length - 1] ?? 0) - trackStart, 1);
+  const fraction = edgeAligned
+    ? ((centers[current] ?? trackStart) - trackStart) / trackLength
+    : current / last;
+
   const progress = useRef(new Animated.Value(current / last)).current;
 
   useEffect(() => {
-    const to = current / last;
+    const to = fraction;
     if (IS_TEST) {
       progress.setValue(to);
       return;
@@ -108,10 +142,28 @@ export const ApplicationStepper: React.FC<Props> = ({ steps, current, onStepPres
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
-  }, [current, last, progress]);
+  }, [fraction, progress]);
 
-  const colW = width / steps.length;
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
+  const onSlotLayout = (i: number) => (e: LayoutChangeEvent) => {
+    const { x, width: w } = e.nativeEvent.layout;
+    setSlots(prev => {
+      if (prev[i]?.x === x && prev[i]?.width === w) {
+        return prev;
+      }
+      const next = [...prev];
+      next[i] = { x, width: w };
+      return next;
+    });
+  };
+  const colAlign = (i: number) =>
+    !edgeAligned
+      ? undefined
+      : i === 0
+        ? styles.colStart
+        : i === steps.length - 1
+          ? styles.colEnd
+          : undefined;
 
   return (
     <View
@@ -121,7 +173,7 @@ export const ApplicationStepper: React.FC<Props> = ({ steps, current, onStepPres
     >
       {/* Track from the first circle's centre to the last one's */}
       {width > 0 ? (
-        <View style={[styles.track, { left: colW / 2, width: width - colW }]}>
+        <View style={[styles.track, { left: trackStart, width: trackLength }]}>
           <Animated.View style={[styles.trackFill, { transform: [{ scaleX: progress }] }]} />
         </View>
       ) : null}
@@ -136,13 +188,16 @@ export const ApplicationStepper: React.FC<Props> = ({ steps, current, onStepPres
               onPress={onStepPress && !active ? () => onStepPress(i) : undefined}
               disabled={!onStepPress || active}
               hitSlop={6}
-              style={styles.col}
+              style={[styles.col, colAlign(i)]}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
               accessibilityLabel={`Step ${i + 1}, ${step.label}${done ? ', done' : ''}`}
             >
               {({ pressed }) => (
-                <>
+                <View
+                  style={styles.slot}
+                  onLayout={edgeAligned ? onSlotLayout(i) : undefined}
+                >
                   <View style={styles.circleSlot}>
                     {active ? (
                       <ActiveCircle key={`active-${current}`} number={i + 1} />
@@ -163,12 +218,17 @@ export const ApplicationStepper: React.FC<Props> = ({ steps, current, onStepPres
                     )}
                   </View>
                   <Text
-                    style={[styles.label, active && styles.labelActive, done && styles.labelDone]}
+                    style={[
+                      styles.label,
+                      edgeAligned && styles.labelEdge,
+                      active && styles.labelActive,
+                      done && styles.labelDone,
+                    ]}
                     numberOfLines={2}
                   >
                     {step.label}
                   </Text>
-                </>
+                </View>
               )}
             </Pressable>
           );
@@ -198,6 +258,18 @@ const styles = StyleSheet.create({
   col: {
     flex: 1,
     alignItems: 'center',
+  },
+  // Edge-aligned: first step hugs the left edge, last the right edge
+  colStart: {
+    alignItems: 'flex-start',
+  },
+  colEnd: {
+    alignItems: 'flex-end',
+  },
+  // Circle + label block; the circle stays centred over the label
+  slot: {
+    alignItems: 'center',
+    maxWidth: '100%',
   },
   circleSlot: {
     height: BIG,
@@ -264,6 +336,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xs,
     textAlign: 'center',
     color: colors.textMuted,
+  },
+  // No side padding, so the first / last label meets the page edge exactly
+  labelEdge: {
+    paddingHorizontal: 0,
   },
   labelActive: {
     color: colors.navy,

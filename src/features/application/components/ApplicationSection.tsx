@@ -7,25 +7,35 @@
 
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, spacing, typographyPresets } from '@/config/theme';
+import { borderRadius, colors, spacing, typographyPresets } from '@/config/theme';
+import { moderateScale as ms } from '@/utils/responsive';
+import type { ApplicationIconName } from '../types';
+import { ApplicationIcon } from './ApplicationIcon';
 
 interface Props {
   title: string;
   subtitle?: string;
+  /** Optional line icon (primary blue) in a secondary-blue tile before the title (landlord onboarding) */
+  icon?: ApplicationIconName;
   /** Beside the title + subtitle, e.g. an upload progress ring */
   right?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export const ApplicationSection: React.FC<Props> = ({ title, subtitle, right, children }) => (
+export const ApplicationSection: React.FC<Props> = ({ title, subtitle, icon, right, children }) => (
   <View>
     <View style={styles.head}>
+      {icon ? (
+        <View style={styles.iconTile}>
+          <ApplicationIcon name={icon} size={ms(22)} color={colors.primary} />
+        </View>
+      ) : null}
       <View style={styles.headText}>
         <Text style={styles.title} accessibilityRole="header" numberOfLines={1}>
           {title}
         </Text>
         {subtitle ? (
-          <Text style={styles.subtitle} numberOfLines={1}>
+          <Text style={styles.subtitle} numberOfLines={2}>
             {`“${subtitle}”`}
           </Text>
         ) : null}
@@ -44,6 +54,15 @@ const styles = StyleSheet.create({
   },
   headText: {
     flex: 1,
+  },
+  iconTile: {
+    width: ms(46),
+    height: ms(46),
+    borderRadius: borderRadius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // Secondary blue (#518EF9) wash at ~14%
+    backgroundColor: `${colors.headerGradientEnd}24`,
   },
   title: {
     ...typographyPresets.sectionHeading,

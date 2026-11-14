@@ -2,13 +2,14 @@ import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import { AddPersonaScreen } from '../src/features/persona';
 
-test('add persona page lists every role and opens an added one', async () => {
+test('add persona page lists every role and opens landlord onboarding', async () => {
   const replace = jest.fn();
   const goBack = jest.fn();
+  const navigate = jest.fn();
   let tree!: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
     tree = ReactTestRenderer.create(
-      <AddPersonaScreen navigation={{ replace, goBack }} />,
+      <AddPersonaScreen navigation={{ replace, goBack, navigate }} />,
     );
   });
 
@@ -35,7 +36,7 @@ test('add persona page lists every role and opens an added one', async () => {
   await ReactTestRenderer.act(() => {
     cta.props.onPress();
   });
-  expect(replace).toHaveBeenCalledWith('LandlordHome');
+  expect(navigate).toHaveBeenCalledWith('LandlordOnboarding');
 
   await ReactTestRenderer.act(() => {
     tree.unmount();

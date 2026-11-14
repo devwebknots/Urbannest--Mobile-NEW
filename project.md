@@ -153,6 +153,7 @@ Add any new global provider (theme context, query client, toast host, etc.) insi
 | `AddPersona` | `AddPersonaScreen` (`@/features/persona`) | `animation: 'fade_from_bottom'` |
 | `RenterHome` | `RenterHomeScreen` (`@/features/renter`) | `animation: 'slide_from_right'` |
 | `LandlordHome` | `LandlordHomeScreen` (`@/features/landlord`) | `animation: 'slide_from_right'` |
+| `LandlordOnboarding` | `LandlordOnboardingScreen` (`@/features/landlord`, folder `landlord/onboarding/`) | `animation: 'slide_from_right'` |
 | `ManageResidence` | `ManageResidenceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
 | ~~`ResidenceDashboard`~~ | Unwired (commented out in the navigator); `ResidenceDashboardScreen` kept in `@/features/renter` | — |
 | `Maintenance` | `MaintenanceScreen` (`@/features/renter`), params `{ residenceId }` | `animation: 'slide_from_right'` |
@@ -1090,3 +1091,13 @@ When a user requests the next screen:
 5. **Connect navigation** via `RootNavigator.tsx` and `src/types/navigation.ts` (checklist in Section 4).
 6. **Run** `npx tsc --noEmit` and `npm test`.
 7. **Update this file** (Section 10 + any changed architecture/config) before ending the session.
+
+### Landlord onboarding (`src/features/landlord/onboarding/`)
+- **AddPersona → LandlordOnboarding** (`navigate`): Landlord tile → "Continue as Landlord" (`ONBOARDING_FOR_ROLE` in `useAddPersona`). Carousel "Continue as Landlord" still goes straight to LandlordHome.
+- 3 steps from the "Landlord Onboarding" design, built from the rental application parts: `LightTopBar` ("Landlord Onboarding"), header building + glow, "Independent Landlord" (`heroTitleCompact` navy) / "Registration & Profile Setup" (`bodyBold` primary) / body line, `ApplicationStepper` with `edgeAligned` (Personal Details · Residential Address · Identity Verification; first label on the page's left edge, last on the right), one `ApplicationSection` per step (new optional `icon` prop: secondary-blue (#518EF9 at ~14%) square + primary-blue line icon), `FieldInput` / `PhoneField` / `FormSelect` / `CategorySheet` pickers.
+  1. Personal Details: First / Last Name*, Profile Photo (round avatar + soft "Upload photo"), Phone Number*, Occupation.
+  2. Residential Address: Country* (picker), State / Region* (US: state picker, else text), Street Address*, Street Address 2, City* + ZIP / Postal Code*, Landmark.
+  3. Identity Verification: ID Type* (picker), ID Number*, Upload Document(s)* (dashed drop zone, camera / library, up to 5 files with remove), green activation note.
+- Footer: one full-width "Continue →" on step 1; on steps 2–3 two equal-width buttons, soft "← Back" + "Continue →" / "Activate ✓" (short label so it fits a half-width button) (`prevStepLabel` is the back target); the top-bar back arrow and done stepper circles also go back. Each step is checked before moving on (errors under fields); stepper taps go back freely, forward only through valid steps. Submit → success AppDialog → "Go to Dashboard" → `replace('LandlordHome')`.
+- Logic: `useLandlordOnboarding`; data: `onboarding/constants.ts`; parts: `OnboardingParts.tsx`. Nothing is sent to a server yet.
+- **Validation bypassed for now** (`BYPASS_VALIDATION = true` in `useLandlordOnboarding`): screens-only phase, Continue / stepper always move on with empty fields. Set it to `false` to turn the checks back on.
