@@ -8,7 +8,6 @@ import React, { useEffect, useRef } from 'react';
 import {
   Animated,
   Easing,
-  Pressable,
   StatusBar,
   StyleSheet,
   Text,
@@ -16,10 +15,10 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ChevronRightIcon } from '@/components/icons';
-import { borderRadius, colors, spacing, typography, typographyPresets } from '@/config/theme';
+import { colors, spacing, typography, typographyPresets } from '@/config/theme';
 import { PaginationDots } from '../components/PaginationDots';
 import { PersonaCarousel } from '../components/PersonaCarousel';
+import { PersonaCta } from '../components/PersonaCta';
 import { Scrim } from '../components/Scrim';
 import { PERSONA_LAYOUT } from '../constants';
 import {
@@ -118,23 +117,11 @@ export const PersonaSelectScreen: React.FC<Props> = ({ navigation }) => {
           rise(40),
         ]}
       >
-        <Pressable
+        <PersonaCta
+          label={vm.ctaLabel}
+          width={cardWidth}
           onPress={vm.onContinue}
-          accessibilityRole="button"
-          accessibilityLabel={vm.ctaLabel}
-          style={({ pressed }) => [
-            styles.cta,
-            { width: cardWidth },
-            pressed && styles.ctaPressed,
-          ]}
-        >
-          <Text style={styles.ctaText} numberOfLines={1}>
-            {vm.ctaLabel}
-          </Text>
-          <View style={styles.ctaArrow}>
-            <ChevronRightIcon size={14} color={colors.white} />
-          </View>
-        </Pressable>
+        />
       </Animated.View>
     </View>
   );
@@ -217,39 +204,6 @@ const styles = StyleSheet.create({
   footer: {
     alignItems: 'center',
     paddingTop: spacing.sm,
-  },
-  cta: {
-    height: 56,
-    borderRadius: borderRadius.button,
-    backgroundColor: colors.white,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 18,
-    elevation: 8,
-  },
-  ctaPressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.98 }],
-  },
-  ctaText: {
-    fontFamily: typography.fontFamily.body.semiBold,
-    fontSize: typography.fontSize.lg,
-    color: colors.headerDarkBlue,
-    letterSpacing: 0.2,
-  },
-  ctaArrow: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    marginLeft: spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.headerDarkBlue,
   },
 });
 

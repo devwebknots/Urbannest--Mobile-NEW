@@ -27,3 +27,22 @@ export interface Persona {
 export type PersonaSlide =
   | { readonly kind: 'persona'; readonly persona: Persona }
   | { readonly kind: 'add'; readonly image: ImageSourcePropType };
+
+/** One role the user can add on the Add Persona page. */
+export interface PersonaRole {
+  readonly id: string;
+  readonly title: string;
+  /** Shorter name for the button, e.g. "Agent" */
+  readonly ctaName?: string;
+  /** Short role line, e.g. "Property owner" */
+  readonly eyebrow: string;
+  readonly description: string;
+  /** Three things the role unlocks */
+  readonly perks: readonly string[];
+  /** Small round photo that shows the role (keys, laptop, villa…) */
+  readonly image: ImageSourcePropType;
+  /** Persona id already on the account (opens its dashboard), if any */
+  readonly personaId?: string;
+  /** Review time shown when a new role is requested */
+  readonly review: string;
+}

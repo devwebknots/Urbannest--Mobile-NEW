@@ -12,13 +12,15 @@ import type { PersonaSlide } from '../types';
 /** Where each active persona lands after "Continue". */
 export type PersonaRoute = 'Home' | 'RenterHome' | 'LandlordHome';
 
-const ROUTE_FOR_PERSONA: Record<string, PersonaRoute> = {
+export const ROUTE_FOR_PERSONA: Record<string, PersonaRoute> = {
   renter: 'RenterHome',
   landlord: 'LandlordHome',
 };
 
 export interface PersonaNavigation {
   replace: (route: PersonaRoute) => void;
+  /** Opens the Add Persona page */
+  navigate?: (route: 'AddPersona') => void;
 }
 
 export interface PersonaSelection {
@@ -54,10 +56,11 @@ export function usePersonaSelection(
         return;
       }
       if (slide.kind === 'add') {
-        Alert.alert(
-          'Add a persona',
-          'Adding new roles is coming soon. Contact support to unlock one today.',
-        );
+        if (navigation?.navigate) {
+          navigation.navigate('AddPersona');
+        } else if (navigationRef.isReady()) {
+          navigationRef.navigate('AddPersona');
+        }
         return;
       }
       if (slide.persona.status === 'inactive') {
@@ -69,7 +72,7 @@ export function usePersonaSelection(
       }
       goTo(ROUTE_FOR_PERSONA[slide.persona.id] ?? 'Home');
     },
-    [goTo],
+    [goTo, navigation],
   );
 
   const onContinue = useCallback(

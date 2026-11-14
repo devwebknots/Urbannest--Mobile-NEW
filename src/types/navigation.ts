@@ -50,6 +50,8 @@ export type RootStackParamList = {
     paid?: boolean;
   };
   PersonaSelect: undefined;
+  /** Role picker (Landlord, PM, Tenant, PMS Company, Agent, UN Admin), opened by the "Add Persona" card */
+  AddPersona: undefined;
   RenterHome: undefined;
   /** Landlord dashboard, opened by "Continue as Landlord" on PersonaSelect */
   LandlordHome: undefined;

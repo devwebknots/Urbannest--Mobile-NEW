@@ -19,7 +19,7 @@ import {
 import { GuestHomeScreen, PropertyDetailsScreen } from '@/features/guest';
 import { HomeScreen } from '@/features/home';
 import { LandlordHomeScreen } from '@/features/landlord';
-import { PersonaSelectScreen } from '@/features/persona';
+import { AddPersonaScreen, PersonaSelectScreen } from '@/features/persona';
 import {
   CheckInScreen,
   InspectionAreaScreen,
@@ -109,6 +109,11 @@ export const RootNavigator: React.FC = () => (
         name="PersonaSelect"
         component={PersonaSelectScreen}
         options={{ gestureEnabled: false }}
+      />
+      <Stack.Screen
+        name="AddPersona"
+        component={AddPersonaScreen as React.ComponentType}
+        options={{ animation: 'fade_from_bottom' }}
       />
       <Stack.Screen
         name="RenterHome"
