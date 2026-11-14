@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppDialog } from '@/components/AppDialog';
+import { navigationRef } from '@/navigation/navigationRef';
 import {
   HUB_MESSAGES,
   INSIGHTS,
@@ -113,8 +114,16 @@ export function useLandlordDashboard() {
 
   const greeting = useMemo(() => greetingFor(new Date()), []);
 
+  /** Burger menu (top right): the landlord's Properties page */
+  const openProperties = useCallback(() => {
+    if (navigationRef.isReady()) {
+      navigationRef.navigate('LandlordProperties');
+    }
+  }, []);
+
   return {
     dialog,
+    openProperties,
     profile: LANDLORD_PROFILE,
     greeting,
     portfolioStats: PORTFOLIO_STATS,

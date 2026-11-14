@@ -57,6 +57,8 @@ export type RootStackParamList = {
   LandlordHome: undefined;
   /** 3-step "Independent Landlord" registration, opened by Landlord → Continue on AddPersona */
   LandlordOnboarding: undefined;
+  /** Landlord's Properties page: dashboard burger menu, or after onboarding is activated */
+  LandlordProperties: undefined;
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */
   ResidenceDashboard: { residenceId: string };
   /** "My Home" page of an active lease, opened by "Manage" on My Residences */

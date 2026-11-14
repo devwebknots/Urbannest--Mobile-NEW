@@ -15,18 +15,23 @@ import { moderateScale as ms } from '@/utils/responsive';
 interface Props {
   options: readonly string[];
   value?: string;
+  /**
+   * Multi-select (e.g. property amenities): every chip in this list gets
+   * the tick; onChange gets the tapped option (the caller toggles it)
+   */
+  values?: readonly string[];
   onChange: (value: string) => void;
 }
 
-export const ChoiceChips: React.FC<Props> = ({ options, value, onChange }) => (
+export const ChoiceChips: React.FC<Props> = ({ options, value, values, onChange }) => (
   <View style={styles.chips}>
     {options.map(o => {
-      const on = o === value;
+      const on = values ? values.includes(o) : o === value;
       return (
         <Pressable
           key={o}
           onPress={() => onChange(o)}
-          accessibilityRole="radio"
+          accessibilityRole={values ? 'checkbox' : 'radio'}
           accessibilityState={{ selected: on }}
           accessibilityLabel={o}
           style={({ pressed }) => [styles.chip, pressed && styles.pressed]}

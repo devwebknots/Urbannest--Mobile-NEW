@@ -53,6 +53,7 @@ export const LandlordHomeScreen: React.FC = () => {
           onNotifications={() => vm.comingSoon('Notifications')}
           onHelp={() => vm.comingSoon('Help Center')}
           onProfile={() => vm.comingSoon('Profile')}
+          onMenu={vm.openProperties}
           onAddRequest={() => vm.comingSoon('Add Request')}
           onMessagePm={() => vm.comingSoon('Message PM')}
         />

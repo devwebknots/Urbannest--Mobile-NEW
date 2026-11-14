@@ -18,7 +18,11 @@ import {
 } from '@/features/application';
 import { GuestHomeScreen, PropertyDetailsScreen } from '@/features/guest';
 import { HomeScreen } from '@/features/home';
-import { LandlordHomeScreen, LandlordOnboardingScreen } from '@/features/landlord';
+import {
+  LandlordHomeScreen,
+  LandlordOnboardingScreen,
+  LandlordPropertiesScreen,
+} from '@/features/landlord';
 import { AddPersonaScreen, PersonaSelectScreen } from '@/features/persona';
 import {
   CheckInScreen,
@@ -128,6 +132,11 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="LandlordOnboarding"
         component={LandlordOnboardingScreen as React.ComponentType}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="LandlordProperties"
+        component={LandlordPropertiesScreen as React.ComponentType}
         options={{ animation: 'slide_from_right' }}
       />
       {/* Unwired: "Manage" now opens ManageResidence.

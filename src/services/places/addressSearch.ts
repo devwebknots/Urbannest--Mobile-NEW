@@ -142,3 +142,16 @@ export async function addressFromLocation(lat: number, lng: number): Promise<Par
   }
   return parse(props);
 }
+
+/** Map point for a typed address (Location Preview); null if none found */
+export async function geocodeAddress(
+  query: string,
+  signal?: AbortSignal,
+): Promise<{ lat: number; lng: number } | null> {
+  const json = await getJson(
+    `${BASE}/api/?q=${encodeURIComponent(query)}&lang=en&limit=1`,
+    signal,
+  );
+  const coords: [number, number] | undefined = json.features?.[0]?.geometry?.coordinates;
+  return coords ? { lat: coords[1], lng: coords[0] } : null;
+}

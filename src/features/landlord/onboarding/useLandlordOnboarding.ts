@@ -4,7 +4,7 @@
  * Verification). Holds the form, checks each step before moving on, picks
  * the profile photo / ID files (camera or library, like the rental
  * application documents) and, on "Activate", shows the success
- * dialog and opens the landlord dashboard.
+ * dialog and opens the landlord's Properties page (dashboard underneath).
  */
 
 import { createElement, useCallback, useMemo, useState } from 'react';
@@ -28,7 +28,7 @@ import {
 } from './constants';
 
 export interface LandlordOnboardingNavigation {
-  replace: (route: 'LandlordHome') => void;
+  replace: (route: 'LandlordProperties') => void;
   goBack: () => void;
 }
 
@@ -156,11 +156,18 @@ export function useLandlordOnboarding(navigation?: LandlordOnboardingNavigation)
     }
   }, [step, goBack]);
 
-  const openDashboard = useCallback(() => {
-    if (navigation?.replace) {
-      navigation.replace('LandlordHome');
-    } else if (navigationRef.isReady()) {
-      navigationRef.reset({ index: 0, routes: [{ name: 'LandlordHome' }] });
+  /**
+   * After activation: Properties, with the dashboard under it so back (and
+   * the dashboard's burger menu) work like for an existing landlord
+   */
+  const openProperties = useCallback(() => {
+    if (navigationRef.isReady()) {
+      navigationRef.reset({
+        index: 1,
+        routes: [{ name: 'LandlordHome' }, { name: 'LandlordProperties' }],
+      });
+    } else if (navigation?.replace) {
+      navigation.replace('LandlordProperties');
     }
   }, [navigation]);
 
@@ -184,9 +191,9 @@ export function useLandlordOnboarding(navigation?: LandlordOnboardingNavigation)
         { label: 'ID', value: ID_TYPES.find(t => t.id === form.idTypeId)?.label ?? '' },
       ].filter(d => d.value),
       dismissible: false,
-      actions: [{ label: 'Go to Dashboard', variant: 'brand', onPress: openDashboard }],
+      actions: [{ label: 'View Properties', variant: 'brand', onPress: openProperties }],
     });
-  }, [check, step, show, form, openDashboard]);
+  }, [check, step, show, form, openProperties]);
 
   /** Stepper tap: back any time, forward only through finished steps */
   const goToStep = useCallback(

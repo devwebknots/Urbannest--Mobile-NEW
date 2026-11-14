@@ -1,0 +1,402 @@
+/**
+ * useAddProperty: ViewModel for the landlord's "Add New Property" page
+ * (Property tab → Basic / Amenities; Unit tab unlocks after saving).
+ *  - form fields + pickers (property type, ownership, country, state)
+ *  - street address suggestions + "use current location" (shared
+ *    useAddressLookup, free Photon search)
+ *  - main image, 3 extra photos and a video (camera or library)
+ *  - Location Preview: the typed address is looked up (debounced) and the
+ *    map pin moves there; +/− zoom
+ *  - Save & Continue: success dialog, unlocks and opens the Unit tab
+ */
+
+import { createElement, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Asset,
+  ImagePickerResponse,
+  launchCamera,
+  launchImageLibrary,
+} from 'react-native-image-picker';
+import { useAppDialog } from '@/components/AppDialog';
+import { UploadIcon } from '@/components/icons';
+import { colors } from '@/config/theme';
+import { US_STATES } from '@/features/application/constants';
+import { useAddressLookup } from '@/features/application/hooks/useAddressLookup';
+import { useDebounce } from '@/hooks/useDebounce';
+import { navigationRef } from '@/navigation/navigationRef';
+import { geocodeAddress } from '@/services/places/addressSearch';
+import { moderateScale as ms } from '@/utils/responsive';
+import { ONBOARDING_COUNTRIES } from '../onboarding/constants';
+import {
+  DEFAULT_MAP_POINT,
+  EXTRA_IMAGE_SLOTS,
+  MAP_ZOOM,
+  OWNERSHIP_TYPES,
+  PROPERTY_TYPES,
+} from './constants';
+
+/** Screens-only phase: skip required-field checks (set false to turn on) */
+const BYPASS_VALIDATION = true;
+
+export type PropertyTab = 'property' | 'unit';
+export type PropertySubTab = 'basic' | 'amenities';
+
+export interface PropertyForm {
+  name: string;
+  typeId: string;
+  value: string;
+  builtYear: string;
+  ownershipId: string;
+  description: string;
+  countryId: string;
+  street1: string;
+  street2: string;
+  landmark: string;
+  city: string;
+  stateId: string;
+  /** Typed state when the country has no list */
+  region: string;
+  zip: string;
+}
+
+export interface PickedMedia {
+  readonly uri: string;
+  readonly name: string;
+}
+
+type Picker = 'type' | 'ownership' | 'country' | 'state' | null;
+type Errors = Partial<Record<keyof PropertyForm, string>>;
+
+const EMPTY: PropertyForm = {
+  name: '',
+  typeId: '',
+  value: '',
+  builtYear: '',
+  ownershipId: '',
+  description: '',
+  countryId: 'us',
+  street1: '',
+  street2: '',
+  landmark: '',
+  city: '',
+  stateId: '',
+  region: '',
+  zip: '',
+};
+
+const PHOTO = { mediaType: 'photo' as const, quality: 0.8 as const, maxWidth: 2000, maxHeight: 2000 };
+const VIDEO = { mediaType: 'video' as const, videoQuality: 'high' as const };
+
+export function useAddProperty(navigation?: { goBack: () => void }) {
+  const [tab, setTab] = useState<PropertyTab>('property');
+  const [subTab, setSubTab] = useState<PropertySubTab>('basic');
+  const [unitUnlocked, setUnitUnlocked] = useState(false);
+  const [form, setForm] = useState<PropertyForm>(EMPTY);
+  const [errors, setErrors] = useState<Errors>({});
+  const [picker, setPicker] = useState<Picker>(null);
+  const [mainImage, setMainImage] = useState<PickedMedia | null>(null);
+  const [extraImages, setExtraImages] = useState<(PickedMedia | null)[]>(
+    () => Array(EXTRA_IMAGE_SLOTS).fill(null),
+  );
+  const [video, setVideo] = useState<PickedMedia | null>(null);
+  const [amenities, setAmenities] = useState<string[]>([]);
+  const [mapPoint, setMapPoint] = useState(DEFAULT_MAP_POINT);
+  const [located, setLocated] = useState(false);
+  const [zoom, setZoom] = useState(MAP_ZOOM.initial);
+  const dialog = useAppDialog();
+  const { show } = dialog;
+
+  const hasStateList = form.countryId === 'us';
+
+  const setField = useCallback((key: keyof PropertyForm, value: string) => {
+    setForm(prev => ({ ...prev, [key]: value }));
+    setErrors(prev => (prev[key] ? { ...prev, [key]: undefined } : prev));
+  }, []);
+
+  // Street suggestions / current location fill the address fields
+  const lookup = useAddressLookup((address, from) => {
+    const country = ONBOARDING_COUNTRIES.find(
+      c => c.id === address.countryCode.toLowerCase(),
+    );
+    setForm(prev => ({
+      ...prev,
+      countryId: country?.id ?? prev.countryId,
+      street1: address.street1 || prev.street1,
+      street2: from === 'street2' ? '' : prev.street2,
+      city: address.city || prev.city,
+      stateId: country?.id === 'us' ? address.stateCode : prev.stateId,
+      region: country?.id === 'us' ? prev.region : address.stateCode,
+      zip: address.zip || prev.zip,
+    }));
+  }, show);
+
+  // Location Preview follows the typed address (debounced, free service)
+  const stateText = hasStateList ? form.stateId : form.region;
+  const countryLabel = ONBOARDING_COUNTRIES.find(c => c.id === form.countryId)?.label;
+  const addressQuery = useDebounce(
+    form.street1.trim() && form.city.trim()
+      ? [form.street1, form.city, stateText, form.zip, countryLabel]
+          .map(s => s?.trim())
+          .filter(Boolean)
+          .join(', ')
+      : '',
+    900,
+  );
+  useEffect(() => {
+    if (!addressQuery) {
+      return;
+    }
+    const controller = new AbortController();
+    geocodeAddress(addressQuery, controller.signal)
+      .then(point => {
+        if (point) {
+          setMapPoint(point);
+          setLocated(true);
+        }
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [addressQuery]);
+
+  const goBack = useCallback(() => {
+    if (navigation?.goBack) {
+      navigation.goBack();
+    } else if (navigationRef.isReady() && navigationRef.canGoBack()) {
+      navigationRef.goBack();
+    }
+  }, [navigation]);
+
+  /** Camera / library choice for photos or a video */
+  const pickMedia = useCallback(
+    (title: string, kind: 'photo' | 'video', onPicked: (asset: Asset) => void) => {
+      const handle = (response: ImagePickerResponse) => {
+        if (response.didCancel) {
+          return;
+        }
+        const asset = response.assets?.[0];
+        if (response.errorCode || !asset?.uri) {
+          show({
+            tone: 'warning',
+            title: 'Could not add file',
+            message: response.errorMessage ?? 'Please try again.',
+            actions: [{ label: 'OK' }],
+          });
+          return;
+        }
+        onPicked(asset);
+      };
+      const options = kind === 'photo' ? PHOTO : VIDEO;
+      show({
+        tone: 'info',
+        icon: createElement(UploadIcon, { size: ms(22), color: colors.navy }),
+        title,
+        message:
+          kind === 'photo'
+            ? 'Take a photo of the property or pick one from your library.'
+            : 'Record a short walkthrough or pick a video from your library.',
+        actions: [
+          {
+            label: kind === 'photo' ? 'Take Photo' : 'Record Video',
+            onPress: () => launchCamera(options).then(handle),
+          },
+          {
+            label: 'Choose from Library',
+            variant: 'soft',
+            onPress: () => launchImageLibrary({ ...options, selectionLimit: 1 }).then(handle),
+          },
+          { label: 'Cancel', variant: 'link' },
+        ],
+      });
+    },
+    [show],
+  );
+
+  const toMedia = (a: Asset, fallback: string): PickedMedia => ({
+    uri: a.uri!,
+    name: a.fileName ?? fallback,
+  });
+
+  const uploadMainImage = useCallback(
+    () => pickMedia('Main image', 'photo', a => setMainImage(toMedia(a, 'property.jpg'))),
+    [pickMedia],
+  );
+
+  const uploadExtraImage = useCallback(
+    (slot: number) =>
+      pickMedia('Property photo', 'photo', a =>
+        setExtraImages(prev =>
+          prev.map((m, i) => (i === slot ? toMedia(a, `property_${slot + 2}.jpg`) : m)),
+        ),
+      ),
+    [pickMedia],
+  );
+
+  const removeExtraImage = useCallback(
+    (slot: number) => setExtraImages(prev => prev.map((m, i) => (i === slot ? null : m))),
+    [],
+  );
+
+  const uploadVideo = useCallback(
+    () => pickMedia('Property video', 'video', a => setVideo(toMedia(a, 'property_video.mp4'))),
+    [pickMedia],
+  );
+
+  const toggleAmenity = useCallback(
+    (a: string) =>
+      setAmenities(prev => (prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a])),
+    [],
+  );
+
+  const check = useCallback((): Errors => {
+    const e: Errors = {};
+    if (BYPASS_VALIDATION) {
+      return e;
+    }
+    const need = (key: keyof PropertyForm) => {
+      if (!form[key].trim()) {
+        e[key] = 'Required';
+      }
+    };
+    need('name');
+    need('typeId');
+    need('ownershipId');
+    need('countryId');
+    need('street1');
+    need('city');
+    need(hasStateList ? 'stateId' : 'region');
+    need('zip');
+    return e;
+  }, [form, hasStateList]);
+
+  const saveAndContinue = useCallback(() => {
+    const e = check();
+    setErrors(e);
+    if (Object.keys(e).length > 0) {
+      setSubTab('basic');
+      return;
+    }
+    show({
+      tone: 'success',
+      title: 'Property saved',
+      message: 'Next, add the units inside this property.',
+      details: form.name.trim() ? [{ label: 'Property', value: form.name.trim() }] : undefined,
+      dismissible: false,
+      actions: [
+        {
+          label: 'Add Units',
+          variant: 'brand',
+          onPress: () => {
+            setUnitUnlocked(true);
+            setTab('unit');
+          },
+        },
+      ],
+    });
+  }, [check, show, form.name]);
+
+  const cancel = useCallback(() => {
+    show({
+      tone: 'warning',
+      title: 'Discard this property?',
+      message: 'The details you entered will not be saved.',
+      actions: [
+        { label: 'Discard', variant: 'danger', onPress: goBack },
+        { label: 'Keep Editing', variant: 'link' },
+      ],
+    });
+  }, [show, goBack]);
+
+  const selectTab = useCallback(
+    (next: PropertyTab) => {
+      if (next === 'unit' && !unitUnlocked) {
+        show({
+          tone: 'info',
+          title: 'Unit details are locked',
+          message: 'Save the property first, then add its units here.',
+          actions: [{ label: 'OK' }],
+        });
+        return;
+      }
+      setTab(next);
+    },
+    [unitUnlocked, show],
+  );
+
+  const pick = useCallback(
+    (id: string) => {
+      if (picker === 'type') {
+        setField('typeId', id);
+      } else if (picker === 'ownership') {
+        setField('ownershipId', id);
+      } else if (picker === 'country') {
+        setForm(prev => ({ ...prev, countryId: id, stateId: '', region: '' }));
+      } else if (picker === 'state') {
+        setField('stateId', id);
+      }
+      setPicker(null);
+    },
+    [picker, setField],
+  );
+
+  const pickerProps = useMemo(() => {
+    switch (picker) {
+      case 'type':
+        return { title: 'Property Type', options: PROPERTY_TYPES, selectedId: form.typeId };
+      case 'ownership':
+        return { title: 'Ownership Type', options: OWNERSHIP_TYPES, selectedId: form.ownershipId };
+      case 'country':
+        return { title: 'Country', options: ONBOARDING_COUNTRIES, selectedId: form.countryId };
+      case 'state':
+        return { title: 'State', options: US_STATES, selectedId: form.stateId };
+      default:
+        return { title: '', options: [], selectedId: undefined };
+    }
+  }, [picker, form.typeId, form.ownershipId, form.countryId, form.stateId]);
+
+  const zoomIn = useCallback(() => setZoom(z => Math.min(MAP_ZOOM.max, z + 1)), []);
+  const zoomOut = useCallback(() => setZoom(z => Math.max(MAP_ZOOM.min, z - 1)), []);
+
+  const addressLine = located
+    ? [form.street1, form.city, hasStateList ? form.stateId : form.region]
+        .map(s => s.trim())
+        .filter(Boolean)
+        .join(', ')
+    : 'Enter the address to place the pin';
+
+  return {
+    tab,
+    selectTab,
+    unitUnlocked,
+    subTab,
+    setSubTab,
+    form,
+    errors,
+    setField,
+    hasStateList,
+    typeLabel: PROPERTY_TYPES.find(t => t.id === form.typeId)?.label,
+    ownershipLabel: OWNERSHIP_TYPES.find(t => t.id === form.ownershipId)?.label,
+    countryLabel,
+    stateLabel: US_STATES.find(s => s.id === form.stateId)?.label,
+    lookup,
+    mainImage,
+    uploadMainImage,
+    extraImages,
+    uploadExtraImage,
+    removeExtraImage,
+    video,
+    uploadVideo,
+    removeVideo: () => setVideo(null),
+    amenities,
+    toggleAmenity,
+    map: { point: mapPoint, zoom, located, addressLine, zoomIn, zoomOut },
+    picker,
+    pickerProps,
+    openPicker: setPicker,
+    closePicker: () => setPicker(null),
+    pick,
+    saveAndContinue,
+    cancel,
+    goBack,
+    dialog,
+  };
+}

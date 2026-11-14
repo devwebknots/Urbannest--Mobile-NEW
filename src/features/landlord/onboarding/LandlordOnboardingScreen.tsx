@@ -12,7 +12,8 @@
  *  - fixed footer: full-width "Continue →" on step 1; on steps 2–3 two
  *    equal-width buttons, soft "← Back" + "Continue →" / "Activate ✓"
  *    (the top-bar arrow and done stepper circles also go back)
- * Submit shows the success dialog, then opens the landlord dashboard.
+ * Activate shows the success dialog, then "View Properties" opens the
+ * landlord Properties page (dashboard underneath, so back goes there).
  */
 
 import React, { useEffect, useRef } from 'react';

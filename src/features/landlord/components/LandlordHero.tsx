@@ -79,6 +79,8 @@ interface Props {
   onNotifications: () => void;
   onHelp: () => void;
   onProfile: () => void;
+  /** Burger menu at the far right: opens the Properties page */
+  onMenu: () => void;
   onAddRequest: () => void;
   onMessagePm: () => void;
 }
@@ -118,6 +120,7 @@ export const LandlordHero: React.FC<Props> = ({
   onNotifications,
   onHelp,
   onProfile,
+  onMenu,
   onAddRequest,
   onMessagePm,
 }) => {
@@ -201,6 +204,7 @@ export const LandlordHero: React.FC<Props> = ({
         <HeaderIconButton icon="help" label="Help" onPress={onHelp} />
         <View style={styles.headerDivider} />
         <ProfileAvatar initials={profile.initials} onPress={onProfile} variant="glass" />
+        <HeaderIconButton icon="menu" label="Menu, Properties" onPress={onMenu} />
       </View>
       {/* Divider under the brand row removed on request (styles.rule kept)
       <View style={styles.rule} /> */}

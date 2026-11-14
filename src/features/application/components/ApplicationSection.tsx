@@ -15,8 +15,12 @@ import { ApplicationIcon } from './ApplicationIcon';
 interface Props {
   title: string;
   subtitle?: string;
-  /** Optional line icon (primary blue) in a secondary-blue tile before the title (landlord onboarding) */
-  icon?: ApplicationIconName;
+  /**
+   * Optional line icon (primary blue) in a secondary-blue tile before the
+   * title (landlord pages): an application icon name, or any icon element
+   * (e.g. a video camera)
+   */
+  icon?: ApplicationIconName | React.ReactElement;
   /** Beside the title + subtitle, e.g. an upload progress ring */
   right?: React.ReactNode;
   children: React.ReactNode;
@@ -27,7 +31,11 @@ export const ApplicationSection: React.FC<Props> = ({ title, subtitle, icon, rig
     <View style={styles.head}>
       {icon ? (
         <View style={styles.iconTile}>
-          <ApplicationIcon name={icon} size={ms(22)} color={colors.primary} />
+          {typeof icon === 'string' ? (
+            <ApplicationIcon name={icon} size={ms(22)} color={colors.primary} />
+          ) : (
+            icon
+          )}
         </View>
       ) : null}
       <View style={styles.headText}>
