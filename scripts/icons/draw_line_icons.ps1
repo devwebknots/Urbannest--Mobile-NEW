@@ -431,6 +431,14 @@ $icons = [ordered]@{
     'path:m17 8-5-5-5 5',
     'path:M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'
   )
+  # lucide: file-up ("Upload Main Image" pill on Add New Property;
+  # icons/application, -Stroke 2.2)
+  'file_up' = @(
+    'path:M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z',
+    'path:M14 2v4a2 2 0 0 0 2 2h4',
+    'path:M12 12v6',
+    'path:m15 15-3-3-3 3'
+  )
   # lucide: send (application submitted pill; icons/application, -Stroke 2.2)
   'send' = @(
     'path:M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z',

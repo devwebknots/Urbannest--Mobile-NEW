@@ -4,7 +4,7 @@
  *  - form fields + pickers (property type, ownership, country, state)
  *  - street address suggestions + "use current location" (shared
  *    useAddressLookup, free Photon search)
- *  - main image, 3 extra photos and a video (camera or library)
+ *  - property photos (upload area + "+" tile, several at once) and a video
  *  - Location Preview: the typed address is looked up (debounced) and the
  *    map pin moves there; +/− zoom
  *  - Save & Continue: success dialog, unlocks and opens the Unit tab
@@ -29,7 +29,7 @@ import { moderateScale as ms } from '@/utils/responsive';
 import { ONBOARDING_COUNTRIES } from '../onboarding/constants';
 import {
   DEFAULT_MAP_POINT,
-  EXTRA_IMAGE_SLOTS,
+  MAX_PROPERTY_IMAGES,
   MAP_ZOOM,
   OWNERSHIP_TYPES,
   PROPERTY_TYPES,
@@ -94,10 +94,7 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
   const [form, setForm] = useState<PropertyForm>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
   const [picker, setPicker] = useState<Picker>(null);
-  const [mainImage, setMainImage] = useState<PickedMedia | null>(null);
-  const [extraImages, setExtraImages] = useState<(PickedMedia | null)[]>(
-    () => Array(EXTRA_IMAGE_SLOTS).fill(null),
-  );
+  const [images, setImages] = useState<PickedMedia[]>([]);
   const [video, setVideo] = useState<PickedMedia | null>(null);
   const [amenities, setAmenities] = useState<string[]>([]);
   const [mapPoint, setMapPoint] = useState(DEFAULT_MAP_POINT);
@@ -168,13 +165,19 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
 
   /** Camera / library choice for photos or a video */
   const pickMedia = useCallback(
-    (title: string, kind: 'photo' | 'video', onPicked: (asset: Asset) => void) => {
+    (
+      title: string,
+      kind: 'photo' | 'video',
+      onPicked: (assets: Asset[]) => void,
+      /** Library: how many can be picked at once */
+      limit = 1,
+    ) => {
       const handle = (response: ImagePickerResponse) => {
         if (response.didCancel) {
           return;
         }
-        const asset = response.assets?.[0];
-        if (response.errorCode || !asset?.uri) {
+        const assets = (response.assets ?? []).filter(a => a.uri);
+        if (response.errorCode || assets.length === 0) {
           show({
             tone: 'warning',
             title: 'Could not add file',
@@ -183,7 +186,7 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
           });
           return;
         }
-        onPicked(asset);
+        onPicked(assets);
       };
       const options = kind === 'photo' ? PHOTO : VIDEO;
       show({
@@ -202,7 +205,7 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
           {
             label: 'Choose from Library',
             variant: 'soft',
-            onPress: () => launchImageLibrary({ ...options, selectionLimit: 1 }).then(handle),
+            onPress: () => launchImageLibrary({ ...options, selectionLimit: limit }).then(handle),
           },
           { label: 'Cancel', variant: 'link' },
         ],
@@ -216,28 +219,42 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
     name: a.fileName ?? fallback,
   });
 
-  const uploadMainImage = useCallback(
-    () => pickMedia('Main image', 'photo', a => setMainImage(toMedia(a, 'property.jpg'))),
-    [pickMedia],
-  );
-
-  const uploadExtraImage = useCallback(
-    (slot: number) =>
-      pickMedia('Property photo', 'photo', a =>
-        setExtraImages(prev =>
-          prev.map((m, i) => (i === slot ? toMedia(a, `property_${slot + 2}.jpg`) : m)),
+  /** Upload area / "+" tile: add photos (several at once from the library) */
+  const uploadImages = useCallback(() => {
+    const left = MAX_PROPERTY_IMAGES - images.length;
+    if (left <= 0) {
+      show({
+        tone: 'warning',
+        title: 'Photo limit reached',
+        message: `You can add up to ${MAX_PROPERTY_IMAGES} photos. Remove one to add another.`,
+        actions: [{ label: 'OK' }],
+      });
+      return;
+    }
+    pickMedia(
+      'Upload images',
+      'photo',
+      assets =>
+        setImages(prev =>
+          [
+            ...prev,
+            ...assets.map((a, i) => toMedia(a, `property_${prev.length + i + 1}.jpg`)),
+          ].slice(0, MAX_PROPERTY_IMAGES),
         ),
-      ),
-    [pickMedia],
-  );
+      left,
+    );
+  }, [images.length, pickMedia, show]);
 
-  const removeExtraImage = useCallback(
-    (slot: number) => setExtraImages(prev => prev.map((m, i) => (i === slot ? null : m))),
+  const removeImage = useCallback(
+    (uri: string) => setImages(prev => prev.filter(m => m.uri !== uri)),
     [],
   );
 
   const uploadVideo = useCallback(
-    () => pickMedia('Property video', 'video', a => setVideo(toMedia(a, 'property_video.mp4'))),
+    () =>
+      pickMedia('Property video', 'video', ([a]) =>
+        setVideo(toMedia(a, 'property_video.mp4')),
+      ),
     [pickMedia],
   );
 
@@ -378,11 +395,9 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
     countryLabel,
     stateLabel: US_STATES.find(s => s.id === form.stateId)?.label,
     lookup,
-    mainImage,
-    uploadMainImage,
-    extraImages,
-    uploadExtraImage,
-    removeExtraImage,
+    images,
+    uploadImages,
+    removeImage,
     video,
     uploadVideo,
     removeVideo: () => setVideo(null),

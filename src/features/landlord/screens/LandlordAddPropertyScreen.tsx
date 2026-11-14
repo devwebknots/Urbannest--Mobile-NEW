@@ -10,7 +10,7 @@
  *  - Property | Unit 🔒 switch (Unit unlocks after saving), then
  *    Basic | Amenities tabs
  *  - Basic: Property Basics (name, type, value, built year, ownership,
- *    description, main image + 3 photos), Address Details (country,
+ *    description, photos: upload area + thumbnails), Address Details (country,
  *    streets with suggestions, landmark, city, state, ZIP), Upload Property
  *    Video, Location Preview (map follows the address)
  *  - Amenities: multi-select chips
@@ -50,9 +50,8 @@ import { LANDLORD_PROFILE } from '../constants';
 import { PROPERTY_AMENITIES } from '../properties/constants';
 import {
   DescriptionField,
-  ExtraImageSlots,
   LocationPreview,
-  MainImageField,
+  PropertyImagesField,
   PropertyTabs,
   SubTabs,
   VideoDropZone,
@@ -217,15 +216,12 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
                   onChangeText={t => setField('description', t)}
                 />
               </LabeledField>
-              <LabeledField label="Upload Property Image">
-                <View style={styles.media}>
-                  <MainImageField image={vm.mainImage} onUpload={vm.uploadMainImage} />
-                  <ExtraImageSlots
-                    images={vm.extraImages}
-                    onAdd={vm.uploadExtraImage}
-                    onRemove={vm.removeExtraImage}
-                  />
-                </View>
+              <LabeledField label="Upload Property Images">
+                <PropertyImagesField
+                  images={vm.images}
+                  onUpload={vm.uploadImages}
+                  onRemove={vm.removeImage}
+                />
               </LabeledField>
             </ApplicationSection>
 
@@ -443,9 +439,6 @@ const styles = StyleSheet.create({
   },
   half: {
     flex: 1,
-  },
-  media: {
-    gap: spacing.md,
   },
   footer: {
     position: 'absolute',

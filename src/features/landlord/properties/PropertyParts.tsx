@@ -5,8 +5,9 @@
  *    on the active half)
  *  - SubTabs: "Basic" / "Amenities" underline tabs (MessageTabs look)
  *  - DescriptionField: multi-line field with a character counter
- *  - MainImageField: wide photo with a white "Upload Main Image" pill
- *  - ExtraImageSlots: 3 dashed slots for more photos (tap to add, ✕ to remove)
+ *  - PropertyImagesField: dashed upload area (image-plus icon, "Upload
+ *    Images", line, "Supports" pill), then a row of photo thumbnails (white
+ *    round ✕) + a dashed "+" tile
  *  - VideoDropZone: dashed box for the property video
  *  - LocationPreview: small map (free CARTO tiles, no key) with the pin,
  *    +/− zoom and the address + coordinates under it
@@ -17,6 +18,7 @@ import {
   Image,
   LayoutChangeEvent,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -31,7 +33,7 @@ import {
 import { borderRadius, colors, gradients, spacing, typographyPresets } from '@/config/theme';
 import { ApplicationIcon } from '@/features/application/components/ApplicationIcon';
 import { LockIcon } from '@/features/guest/components/GuestIcons';
-import { personaAssets } from '@/features/persona/assets/personaAssets';
+import { renterIcons } from '@/features/renter/assets/renterAssets';
 import { DONE_BLUE } from '@/features/renter/components/checkin/CompletedBadge';
 import { TILE_BG, TILE_BORDER } from '@/features/renter/components/checkin/CheckInChecklist';
 import { formStyles } from '@/features/renter/components/form/formStyles';
@@ -122,64 +124,62 @@ export const DescriptionField: React.FC<{
   </View>
 );
 
-export const MainImageField: React.FC<{
-  image: PickedMedia | null;
-  onUpload: () => void;
-}> = ({ image, onUpload }) => (
-  <Pressable
-    onPress={onUpload}
-    accessibilityRole="button"
-    accessibilityLabel={image ? 'Change main image' : 'Upload main image'}
-    style={styles.mainImage}
-  >
-    <Image
-      source={image ? { uri: image.uri } : personaAssets.landlord}
-      style={StyleSheet.absoluteFill}
-      resizeMode="cover"
-    />
-    <View style={[styles.mainShade, image && styles.mainShadeLight]} />
-    <View style={styles.mainCenter}>
-      <View style={styles.uploadPill}>
-        <ApplicationIcon name="upload" size={ms(16)} color={colors.primary} />
-        <Text style={styles.uploadPillText}>{image ? 'Change Main Image' : 'Upload Main Image'}</Text>
-      </View>
-      <Text style={styles.mainHint}>JPG or PNG (Max 5MB)</Text>
-    </View>
-  </Pressable>
-);
+/** Photo row: thumbnail size (about 1.6 : 1, as the design) */
+const THUMB_W = ms(104);
+const THUMB_H = ms(66);
 
-export const ExtraImageSlots: React.FC<{
-  images: readonly (PickedMedia | null)[];
-  onAdd: (slot: number) => void;
-  onRemove: (slot: number) => void;
-}> = ({ images, onAdd, onRemove }) => (
-  <View style={styles.slots}>
-    {images.map((img, i) => (
-      <Pressable
-        key={i}
-        onPress={() => onAdd(i)}
-        accessibilityRole="button"
-        accessibilityLabel={img ? `Replace photo ${i + 2}` : `Add photo ${i + 2}`}
-        style={({ pressed }) => [styles.slot, !img && styles.dashed, pressed && styles.pressed]}
+export const PropertyImagesField: React.FC<{
+  images: readonly PickedMedia[];
+  onUpload: () => void;
+  onRemove: (uri: string) => void;
+}> = ({ images, onUpload, onRemove }) => (
+  <View style={styles.imagesField}>
+    {/* Dashed upload area */}
+    <Pressable
+      onPress={onUpload}
+      accessibilityRole="button"
+      accessibilityLabel="Upload images"
+      style={({ pressed }) => [styles.uploadZone, pressed && styles.pressed]}
+    >
+      <Image source={renterIcons.lineImagePlus} style={styles.uploadIcon} resizeMode="contain" />
+      <Text style={styles.uploadTitle}>Upload Images</Text>
+      <Text style={styles.uploadBody}>Take a photo or select files from your device</Text>
+      <View style={styles.supportsPill}>
+        <Text style={styles.supportsText}>Supports: JPG, PNG (Max 15MB each)</Text>
+      </View>
+    </Pressable>
+
+    {/* Uploaded photos + dashed "+" tile */}
+    {images.length > 0 ? (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.thumbs}
       >
-        {img ? (
-          <>
-            <Image source={{ uri: img.uri }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        {images.map((img, i) => (
+          <View key={img.uri} style={styles.thumb}>
+            <Image source={{ uri: img.uri }} style={styles.thumbPhoto} resizeMode="cover" />
             <Pressable
-              onPress={() => onRemove(i)}
+              onPress={() => onRemove(img.uri)}
               hitSlop={8}
               accessibilityRole="button"
-              accessibilityLabel={`Remove photo ${i + 2}`}
-              style={styles.slotRemove}
+              accessibilityLabel={`Remove photo ${i + 1}`}
+              style={({ pressed }) => [styles.thumbRemove, pressed && styles.pressed]}
             >
-              <CloseIcon size={ms(10)} color={colors.white} />
+              <CloseIcon size={ms(9)} color={colors.textPrimary} />
             </Pressable>
-          </>
-        ) : (
-          <PlusIcon size={ms(20)} color={colors.textSecondary} />
-        )}
-      </Pressable>
-    ))}
+          </View>
+        ))}
+        <Pressable
+          onPress={onUpload}
+          accessibilityRole="button"
+          accessibilityLabel="Add more photos"
+          style={({ pressed }) => [styles.thumb, styles.addTile, pressed && styles.pressed]}
+        >
+          <PlusIcon size={ms(20)} color={colors.navy} />
+        </Pressable>
+      </ScrollView>
+    ) : null}
   </View>
 );
 
@@ -391,71 +391,83 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 0,
   },
-  mainImage: {
-    height: ms(170),
-    borderRadius: borderRadius.xl,
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
-    backgroundColor: TILE_BG,
-  },
-  mainShade: {
-    ...StyleSheet.absoluteFill,
-    backgroundImage: 'linear-gradient(180deg, rgba(11,29,58,0) 30%, rgba(11,29,58,0.55) 100%)',
-  },
-  mainShadeLight: {
-    backgroundImage: 'linear-gradient(180deg, rgba(11,29,58,0) 50%, rgba(11,29,58,0.45) 100%)',
-  },
-  mainCenter: {
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  uploadPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.xl,
-    height: ms(42),
-    borderRadius: borderRadius.pill,
-    backgroundColor: colors.white,
-    boxShadow: '0px 6px 16px rgba(11,29,58,0.25)',
-  },
-  uploadPillText: {
-    ...typographyPresets.button,
-    color: colors.primary,
-  },
-  mainHint: {
-    ...typographyPresets.cardSubtitle,
-    color: colors.white,
-  },
-  slots: {
-    flexDirection: 'row',
+  // Images: dashed upload area (design: icon, bold blue title, line,
+  // "Supports" pill), then a row of thumbnails + dashed "+" tile
+  imagesField: {
     gap: spacing.md,
   },
-  slot: {
-    flex: 1,
-    height: ms(72),
-    borderRadius: borderRadius.lg,
-    overflow: 'hidden',
+  uploadZone: {
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: TILE_BG,
-  },
-  dashed: {
+    paddingVertical: spacing.xxl,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.xl,
     borderWidth: 1.5,
     borderStyle: 'dashed',
     borderColor: TILE_BORDER,
+    backgroundColor: TILE_BG,
   },
-  slotRemove: {
+  uploadIcon: {
+    width: ms(30),
+    height: ms(30),
+    tintColor: colors.primary,
+  },
+  uploadTitle: {
+    ...typographyPresets.bodyBold,
+    fontSize: typographyPresets.sectionTitle.fontSize,
+    marginTop: spacing.md,
+    color: colors.primary,
+  },
+  uploadBody: {
+    ...typographyPresets.body,
+    marginTop: spacing.xs,
+    textAlign: 'center',
+    color: colors.textSecondary,
+  },
+  supportsPill: {
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs + 2,
+    borderRadius: borderRadius.pill,
+    backgroundColor: colors.chipBlue,
+  },
+  supportsText: {
+    ...typographyPresets.cardSubtitle,
+    color: colors.textSecondary,
+  },
+  thumbs: {
+    gap: spacing.md,
+  },
+  thumb: {
+    width: THUMB_W,
+    height: THUMB_H,
+    borderRadius: borderRadius.lg,
+    overflow: 'hidden',
+    backgroundColor: TILE_BG,
+  },
+  // Explicit size so a picked photo never draws at its pixel size
+  thumbPhoto: {
+    width: '100%',
+    height: '100%',
+  },
+  // White round ✕ in the top-right corner
+  thumbRemove: {
     position: 'absolute',
-    top: spacing.xs,
-    right: spacing.xs,
+    top: spacing.xs + 1,
+    right: spacing.xs + 1,
     width: ms(20),
     height: ms(20),
     borderRadius: ms(10),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(11,29,58,0.65)',
+    backgroundColor: colors.white,
+    boxShadow: '0px 1px 4px rgba(11,29,58,0.25)',
+  },
+  addTile: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: TILE_BORDER,
   },
   drop: {
     alignItems: 'center',

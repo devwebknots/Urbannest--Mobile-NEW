@@ -45,6 +45,8 @@ export const applicationIcons = {
   car: require('@/assets/icons/application/car.png'),
   package: require('@/assets/icons/application/package.png'),
   upload: require('@/assets/icons/application/upload.png'),
+  // lucide file-up: "Upload Main Image" pill (Add New Property)
+  fileUp: require('@/assets/icons/application/file_up.png'),
   send: require('@/assets/icons/application/send.png'),
   locate: require('@/assets/icons/application/locate.png'),
   mapPin: require('@/assets/icons/application/map_pin.png'),
