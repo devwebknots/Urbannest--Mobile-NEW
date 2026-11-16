@@ -21,6 +21,7 @@ import {
   Animated,
   Easing,
   Image,
+  ImageSourcePropType,
   LayoutChangeEvent,
   Pressable,
   ScrollView,
@@ -76,18 +77,35 @@ export const PropertyTabs: React.FC<{
   </View>
 );
 
-const SUB_TABS: readonly { id: PropertySubTab; label: string }[] = [
+export interface SubTabItem<T extends string> {
+  readonly id: T;
+  readonly label: string;
+  /** Optional line icon before the label (tinted like the label) */
+  readonly icon?: ImageSourcePropType;
+}
+
+/** Property tab: Basic | Amenities */
+export const PROPERTY_SUB_TABS: readonly SubTabItem<PropertySubTab>[] = [
   { id: 'basic', label: 'Basic' },
   { id: 'amenities', label: 'Amenities' },
 ];
 
-export const SubTabs: React.FC<{
-  tab: PropertySubTab;
-  onChange: (tab: PropertySubTab) => void;
-}> = ({ tab, onChange }) => (
-  <View style={styles.subTabs} accessibilityRole="tablist">
-    {SUB_TABS.map(t => {
+/** Underline tabs (MessageTabs look); `spread` shares the width evenly */
+export const SubTabs = <T extends string>({
+  tabs,
+  tab,
+  onChange,
+  spread,
+}: {
+  tabs: readonly SubTabItem<T>[];
+  tab: T;
+  onChange: (tab: T) => void;
+  spread?: boolean;
+}) => (
+  <View style={[styles.subTabs, spread && styles.subTabsSpread]} accessibilityRole="tablist">
+    {tabs.map(t => {
       const on = t.id === tab;
+      const color = on ? colors.primary : colors.textSecondary;
       return (
         <Pressable
           key={t.id}
@@ -95,14 +113,52 @@ export const SubTabs: React.FC<{
           accessibilityRole="tab"
           accessibilityState={{ selected: on }}
           accessibilityLabel={t.label}
-          style={styles.subTab}
+          style={[styles.subTab, spread && styles.subTabSpread]}
         >
-          <Text style={[styles.subTabText, on && styles.subTabTextOn]}>{t.label}</Text>
+          <View style={styles.subTabLabel}>
+            {t.icon ? (
+              <Image source={t.icon} style={[styles.subTabIcon, { tintColor: color }]} />
+            ) : null}
+            <Text style={[styles.subTabText, on && styles.subTabTextOn]} numberOfLines={1}>
+              {t.label}
+            </Text>
+          </View>
           <View style={[styles.underline, on && styles.underlineOn]} />
         </Pressable>
       );
     })}
   </View>
+);
+
+/** Soft blue disc behind an upload icon (video, floor plan) */
+export const UploadDisc: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <View style={styles.dropIcon}>{children}</View>
+);
+
+/**
+ * Dashed upload area (app form look): icon, bold blue title, optional line,
+ * "Supports" pill. Images, video and floor plans all use it.
+ */
+export const UploadZone: React.FC<{
+  icon: React.ReactNode;
+  title: string;
+  body?: string;
+  supports: string;
+  onPress: () => void;
+}> = ({ icon, title, body, supports, onPress }) => (
+  <Pressable
+    onPress={onPress}
+    accessibilityRole="button"
+    accessibilityLabel={title}
+    style={({ pressed }) => [styles.uploadZone, pressed && styles.pressed]}
+  >
+    {icon}
+    <Text style={styles.uploadTitle}>{title}</Text>
+    {body ? <Text style={styles.uploadBody}>{body}</Text> : null}
+    <View style={styles.supportsPill}>
+      <Text style={styles.supportsText}>{supports}</Text>
+    </View>
+  </Pressable>
 );
 
 /* ─────────────────────── Fields / media ─────────────────────── */
@@ -112,17 +168,24 @@ const DESCRIPTION_MAX = 500;
 export const DescriptionField: React.FC<{
   value: string;
   onChangeText: (text: string) => void;
-}> = ({ value, onChangeText }) => (
+  placeholder?: string;
+  accessibilityLabel?: string;
+}> = ({
+  value,
+  onChangeText,
+  placeholder = "Detailed overview of the property's unique value propositions and structural highlights...",
+  accessibilityLabel = 'Description',
+}) => (
   <View style={[formStyles.field, formStyles.textArea]}>
     <TextInput
       value={value}
       onChangeText={onChangeText}
-      placeholder="Detailed overview of the property's unique value propositions and structural highlights..."
+      placeholder={placeholder}
       placeholderTextColor={colors.textMuted}
       multiline
       maxLength={DESCRIPTION_MAX}
       textAlignVertical="top"
-      accessibilityLabel="Description"
+      accessibilityLabel={accessibilityLabel}
       style={[formStyles.input, styles.textArea]}
     />
     <Text style={formStyles.counter}>{`${value.length} / ${DESCRIPTION_MAX}`}</Text>
@@ -139,20 +202,15 @@ export const PropertyImagesField: React.FC<{
   onRemove: (uri: string) => void;
 }> = ({ images, onUpload, onRemove }) => (
   <View style={styles.imagesField}>
-    {/* Dashed upload area */}
-    <Pressable
+    <UploadZone
+      icon={
+        <Image source={renterIcons.lineImagePlus} style={styles.uploadIcon} resizeMode="contain" />
+      }
+      title="Upload Images"
+      body="Take a photo or select files from your device"
+      supports="Supports: JPG, PNG (Max 15MB each)"
       onPress={onUpload}
-      accessibilityRole="button"
-      accessibilityLabel="Upload images"
-      style={({ pressed }) => [styles.uploadZone, pressed && styles.pressed]}
-    >
-      <Image source={renterIcons.lineImagePlus} style={styles.uploadIcon} resizeMode="contain" />
-      <Text style={styles.uploadTitle}>Upload Images</Text>
-      <Text style={styles.uploadBody}>Take a photo or select files from your device</Text>
-      <View style={styles.supportsPill}>
-        <Text style={styles.supportsText}>Supports: JPG, PNG (Max 15MB each)</Text>
-      </View>
-    </Pressable>
+    />
 
     {/* Uploaded photos + dashed "+" tile */}
     {images.length > 0 ? (
@@ -229,25 +287,18 @@ export const VideoDropZone: React.FC<{
       </Pressable>
     </View>
   ) : (
-    // Same dashed area as "Upload Images": icon disc, bold blue title,
-    // line, "Supports" pill
-    <Pressable
+    // Same dashed area as "Upload Images", camera on a soft blue disc
+    <UploadZone
+      icon={
+        <UploadDisc>
+          <VideoCameraIcon size={ms(24)} color={colors.primary} />
+        </UploadDisc>
+      }
+      title="Upload Property Video"
+      body="Record a walkthrough or select a video from your device"
+      supports="Supports: MP4, MOV (Max 50MB)"
       onPress={onUpload}
-      accessibilityRole="button"
-      accessibilityLabel="Upload property video"
-      style={({ pressed }) => [styles.uploadZone, pressed && styles.pressed]}
-    >
-      <View style={styles.dropIcon}>
-        <VideoCameraIcon size={ms(24)} color={colors.primary} />
-      </View>
-      <Text style={styles.uploadTitle}>Upload Property Video</Text>
-      <Text style={styles.uploadBody}>
-        Record a walkthrough or select a video from your device
-      </Text>
-      <View style={styles.supportsPill}>
-        <Text style={styles.supportsText}>Supports: MP4, MOV (Max 50MB)</Text>
-      </View>
-    </Pressable>
+    />
   );
 
 /* ─────────────────────── Location preview ─────────────────────── */
@@ -483,8 +534,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  subTabsSpread: {
+    gap: 0,
+  },
   subTab: {
     paddingTop: spacing.md,
+  },
+  subTabSpread: {
+    flex: 1,
+  },
+  subTabLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs + 2,
+  },
+  subTabIcon: {
+    width: ms(17),
+    height: ms(17),
   },
   subTabText: {
     ...typographyPresets.segmentLabel,

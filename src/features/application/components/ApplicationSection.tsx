@@ -23,7 +23,8 @@ interface Props {
   icon?: ApplicationIconName | React.ReactElement;
   /** Beside the title + subtitle, e.g. an upload progress ring */
   right?: React.ReactNode;
-  children: React.ReactNode;
+  /** Nothing (e.g. a collapsed section): the heading only */
+  children?: React.ReactNode;
 }
 
 export const ApplicationSection: React.FC<Props> = ({ title, subtitle, icon, right, children }) => (
@@ -50,7 +51,7 @@ export const ApplicationSection: React.FC<Props> = ({ title, subtitle, icon, rig
       </View>
       {right}
     </View>
-    <View style={styles.body}>{children}</View>
+    {children ? <View style={styles.body}>{children}</View> : null}
   </View>
 );
 

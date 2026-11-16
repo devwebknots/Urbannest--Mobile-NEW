@@ -52,3 +52,45 @@ export const MAX_PROPERTY_IMAGES = 10;
 /** Map shown before an address is found (New York, the form's sample city) */
 export const DEFAULT_MAP_POINT = { lat: 40.7128, lng: -74.006 };
 export const MAP_ZOOM = { initial: 15, min: 11, max: 18, pinned: 17 };
+
+/* ───────────── Unit tab ("Unit / Home Information") ───────────── */
+
+export const UNIT_TYPES: readonly { id: string; label: string }[] = [
+  { id: 'studio', label: 'Studio' },
+  { id: '1br', label: '1 BR' },
+  { id: '2br', label: '2 BR' },
+  { id: '3br', label: '3 BR' },
+  { id: '4br', label: '4 BR+' },
+  { id: 'studentRoom', label: 'Student Room' },
+  { id: 'serviced', label: 'Serviced' },
+  { id: 'commercial', label: 'Commercial' },
+];
+
+export const LEASE_TYPES: readonly { id: string; label: string }[] = [
+  { id: 'fixed', label: 'Fixed Term (12 Months)' },
+  { id: 'monthly', label: 'Month-to-Month' },
+  { id: 'short', label: 'Short Term' },
+  { id: 'corporate', label: 'Corporate Lease' },
+];
+
+export const MANAGEMENT_MODELS: readonly { id: string; label: string }[] = [
+  { id: 'self', label: 'Self-Managed' },
+  { id: 'manager', label: 'Property Manager' },
+  { id: 'co', label: 'Co-Managed' },
+];
+
+/** "Unit Types Guide": the design's 5 items (left column, then right) */
+export const UNIT_TYPE_GUIDE: readonly {
+  title: string;
+  body: string;
+  icon: 'bed' | 'graduationCap' | 'conciergeBell' | 'store';
+}[] = [
+  { title: 'Studio', body: 'Open plan, no separate bedroom', icon: 'bed' },
+  { title: '1BR–4BR+', body: 'Bedroom count', icon: 'bed' },
+  { title: 'Student Room', body: 'Per-room bed config', icon: 'graduationCap' },
+  { title: 'Serviced', body: 'Hotel-style amenities', icon: 'conciergeBell' },
+  { title: 'Commercial', body: 'Non-residential use', icon: 'store' },
+];
+
+/** Floor plan drawings: dashed slots under the upload area */
+export const MAX_FLOOR_PLANS = 3;

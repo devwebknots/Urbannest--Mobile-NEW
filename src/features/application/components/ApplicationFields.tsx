@@ -67,6 +67,8 @@ interface FieldInputProps {
   rightIcon?: ApplicationIconName;
   /** Text before the value, e.g. "$" */
   prefix?: string;
+  /** Unit after the value behind a divider, e.g. "sq ft" */
+  suffix?: string;
   invalid?: boolean;
   keyboardType?: KeyboardTypeOptions;
   autoCapitalize?: TextInputProps['autoCapitalize'];
@@ -83,6 +85,7 @@ export const FieldInput: React.FC<FieldInputProps> = ({
   leftIcon,
   rightIcon,
   prefix,
+  suffix,
   invalid,
   placeholder,
   ...input
@@ -97,6 +100,12 @@ export const FieldInput: React.FC<FieldInputProps> = ({
       style={[formStyles.input, styles.input]}
     />
     {rightIcon ? <ApplicationIcon name={rightIcon} size={ICON} color={colors.navy} /> : null}
+    {suffix ? (
+      <>
+        <View style={styles.divider} />
+        <Text style={styles.suffix}>{suffix}</Text>
+      </>
+    ) : null}
   </View>
 );
 
@@ -159,6 +168,10 @@ const styles = StyleSheet.create({
   },
   prefix: {
     marginRight: -spacing.xs,
+    color: colors.textSecondary,
+  },
+  suffix: {
+    ...typographyPresets.cardSubtitle,
     color: colors.textSecondary,
   },
   error: {

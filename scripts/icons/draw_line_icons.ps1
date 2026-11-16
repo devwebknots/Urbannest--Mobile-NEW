@@ -723,6 +723,58 @@ $icons = [ordered]@{
     'path:M12 16v-4',
     'path:M12 8h.01'
   )
+  # ---- Landlord Add Property → Unit (draw into icons/unit at -Stroke 2):
+  #      -Only door,list,scan,banknote,receipt,image,concierge_bell,store
+  # lucide: door-closed (Unit Basics, Floor)
+  'door' = @(
+    'path:M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14',
+    'path:M2 20h20',
+    'path:M14 12v.01'
+  )
+  # lucide: list (Unit Summary)
+  'list' = @(
+    'path:M3 12h.01',
+    'path:M3 18h.01',
+    'path:M3 6h.01',
+    'path:M8 12h13',
+    'path:M8 18h13',
+    'path:M8 6h13'
+  )
+  # lucide: scan (Size & Configuration, Area)
+  'scan' = @(
+    'path:M3 7V5a2 2 0 0 1 2-2h2',
+    'path:M17 3h2a2 2 0 0 1 2 2v2',
+    'path:M21 17v2a2 2 0 0 1-2 2h-2',
+    'path:M7 21H5a2 2 0 0 1-2-2v-2'
+  )
+  # lucide: banknote (Financials)
+  'banknote' = @(
+    'path:M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z',
+    'circle:12,12,2',
+    'path:M6 12h.01',
+    'path:M18 12h.01'
+  )
+  # lucide: image (Gallery tab, floor plan slots)
+  'image' = @(
+    'path:M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z',
+    'circle:9,9,2',
+    'path:m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'
+  )
+  # lucide: concierge-bell (Serviced)
+  'concierge_bell' = @(
+    'path:M3 20a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1Z',
+    'path:M20 16a8 8 0 1 0-16 0',
+    'path:M12 4v4',
+    'path:M10 4h4'
+  )
+  # lucide: store (Commercial)
+  'store' = @(
+    'path:m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7',
+    'path:M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8',
+    'path:M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4',
+    'path:M2 7h20',
+    'path:M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7'
+  )
 }
 
 New-Item -ItemType Directory -Force $OutDir | Out-Null

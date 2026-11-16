@@ -16,7 +16,10 @@
  *  - Amenities ("Property Amenities" design): Amenities (search + 4-column
  *    tiles), Amenities Access (selected shared amenities to grant +
  *    Generate Access), info note
- *  - fixed footer: Cancel + Save & Continue → (Save Property → on Amenities)
+ *  - Unit (after saving; "Unit / Home Information" design): Unit/Home Info |
+ *    Amenities | Gallery tabs, body in properties/UnitTab (useAddUnit)
+ *  - fixed footer: Cancel + Save & Continue → (Save Property → on Amenities;
+ *    Next → / Save Unit on the Unit tab)
  * Sections lay on the page (no cards), app form rule.
  */
 
@@ -37,7 +40,11 @@ import { AppDialog } from '@/components/AppDialog';
 import { Button } from '@/components/Button';
 import { VideoCameraIcon } from '@/components/icons';
 import { colors, spacing, typographyPresets } from '@/config/theme';
-import { HEADER_BUILDING_ASPECT, applicationAssets } from '@/features/application/assets/applicationAssets';
+import {
+  HEADER_BUILDING_ASPECT,
+  applicationAssets,
+  applicationIcons,
+} from '@/features/application/assets/applicationAssets';
 import { AddressSuggestions, CurrentLocationButton } from '@/features/application/components/AddressLookupParts';
 import { FieldInput, FieldRow, LabeledField } from '@/features/application/components/ApplicationFields';
 import { ApplicationSection } from '@/features/application/components/ApplicationSection';
@@ -48,7 +55,7 @@ import { CategorySheet } from '@/features/renter/components/inspection/CategoryS
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { moderateScale as ms } from '@/utils/responsive';
 import { LANDLORD_PROFILE } from '../constants';
-import { amenityIcons } from '../assets/landlordAssets';
+import { amenityIcons, unitIcons } from '../assets/landlordAssets';
 import {
   AmenityAccessList,
   AmenityGrid,
@@ -59,12 +66,40 @@ import {
 import {
   DescriptionField,
   LocationPreview,
+  PROPERTY_SUB_TABS,
   PropertyImagesField,
   PropertyTabs,
+  SubTabItem,
   SubTabs,
   VideoDropZone,
 } from '../properties/PropertyParts';
+import { UnitTabContent } from '../properties/UnitTab';
 import { useAddProperty } from '../properties/useAddProperty';
+import { UnitSubTab, useAddUnit } from '../properties/useAddUnit';
+
+const UNIT_SUB_TABS: readonly SubTabItem<UnitSubTab>[] = [
+  { id: 'info', label: 'Unit/Home Info' },
+  { id: 'amenities', label: 'Amenities', icon: applicationIcons.layers },
+  { id: 'gallery', label: 'Gallery', icon: unitIcons.image },
+];
+
+/** Heading kicker + line per page state */
+const HEADINGS = {
+  basic: {
+    kicker: 'Property Basic Information',
+    line: 'Enter the foundational details, property type, value and address for your new real estate asset.',
+  },
+  amenities: {
+    kicker: 'Property Amenities',
+    line: 'Select amenities and manage access for the selected amenities.',
+  },
+  info: {
+    kicker: 'Unit / Home Information',
+    line: 'Enter the unit-level details including type, size, rent and configuration.',
+  },
+  unitAmenities: { kicker: 'Unit Amenities', line: 'Select the amenities this unit has.' },
+  gallery: { kicker: 'Unit Gallery', line: 'Add photos of this unit.' },
+};
 
 interface Props {
   navigation?: { goBack: () => void };
@@ -75,13 +110,18 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
   const { width } = useWindowDimensions();
   const vm = useAddProperty(navigation);
   const { form, errors, setField, lookup } = vm;
+  const unit = useAddUnit(vm.dialog.show, vm.pickMedia);
 
   const buildingW = Math.round(width * 0.4);
   const buildingH = Math.round(buildingW / HEADER_BUILDING_ASPECT);
   const footerPadBottom = Math.max(insets.bottom, spacing.md);
   const footerH = spacing.lg + ms(48) + footerPadBottom;
   const { isKeyboardVisible } = useKeyboard();
-  const onAmenities = vm.tab === 'property' && vm.subTab === 'amenities';
+  const onUnit = vm.tab === 'unit';
+  const onAmenities = !onUnit && vm.subTab === 'amenities';
+  const heading = onUnit
+    ? HEADINGS[unit.subTab === 'amenities' ? 'unitAmenities' : unit.subTab]
+    : HEADINGS[vm.subTab];
 
   return (
     <KeyboardAvoidingView
@@ -127,31 +167,25 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
           >
             Add New Property
           </Text>
-          <Text style={styles.kicker}>
-            {onAmenities ? 'Property Amenities' : 'Property Basic Information'}
-          </Text>
-          <Text style={styles.subtitle}>
-            {onAmenities
-              ? 'Select amenities and manage access for the selected amenities.'
-              : 'Enter the foundational details, property type, value and address for your new real estate asset.'}
-          </Text>
+          <Text style={styles.kicker}>{heading.kicker}</Text>
+          <Text style={styles.subtitle}>{heading.line}</Text>
         </View>
 
         <View style={styles.tabs}>
           <PropertyTabs tab={vm.tab} unitUnlocked={vm.unitUnlocked} onChange={vm.selectTab} />
-          {vm.tab === 'property' ? <SubTabs tab={vm.subTab} onChange={vm.setSubTab} /> : null}
+          {onUnit ? (
+            <SubTabs tabs={UNIT_SUB_TABS} tab={unit.subTab} onChange={unit.setSubTab} spread />
+          ) : (
+            <SubTabs tabs={PROPERTY_SUB_TABS} tab={vm.subTab} onChange={vm.setSubTab} />
+          )}
         </View>
 
-        {vm.tab === 'unit' ? (
-          <View style={styles.sections}>
-            <ApplicationSection
-              title="Units"
-              subtitle="Add the units inside this property."
-              icon="layers"
-            >
-              <Text style={styles.subtitle}>Unit setup comes next.</Text>
-            </ApplicationSection>
-          </View>
+        {onUnit ? (
+          <UnitTabContent
+            unit={unit}
+            propertyName={form.name.trim()}
+            propertyType={vm.typeLabel}
+          />
         ) : vm.subTab === 'amenities' ? (
           <View style={styles.sections}>
             <ApplicationSection
@@ -414,9 +448,17 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
         <View style={[styles.footer, { paddingBottom: footerPadBottom }]}>
           <Button title="Cancel" variant="soft" onPress={vm.cancel} style={styles.cancel} />
           <Button
-            title={onAmenities ? 'Save Property' : 'Save & Continue'}
+            title={
+              onUnit
+                ? unit.isLastStep
+                  ? 'Save Unit'
+                  : 'Next'
+                : onAmenities
+                  ? 'Save Property'
+                  : 'Save & Continue'
+            }
             variant="brand"
-            onPress={vm.saveAndContinue}
+            onPress={onUnit ? unit.next : vm.saveAndContinue}
             style={styles.save}
             rightIcon={<ArrowRightIcon size={ms(16)} color={colors.white} />}
           />
@@ -430,6 +472,14 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
         selectedId={vm.pickerProps.selectedId}
         onSelect={vm.pick}
         onClose={vm.closePicker}
+      />
+      <CategorySheet
+        visible={unit.picker !== null}
+        title={unit.pickerProps.title}
+        categories={unit.pickerProps.options}
+        selectedId={unit.pickerProps.selectedId}
+        onSelect={unit.pick}
+        onClose={unit.closePicker}
       />
       <AppDialog {...vm.dialog.props} />
     </KeyboardAvoidingView>

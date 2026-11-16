@@ -15,6 +15,10 @@ export const landlordAssets = {
   // Portfolio Overview "No properties found" card: the room photo cropped
   // from the "Portfolio Overview" design (620 x 423, text left out)
   emptyPropertiesRoom: require('@/assets/images/landlord/empty_properties_room.jpg'),
+  // Add Property → Unit "Property Context" card: the building from the
+  // "Unit / Home Information" design (440 x 240), "Units so far" text
+  // painted out, misty left side, left edge faded to transparent
+  contextBuilding: require('@/assets/images/landlord/context_building.png'),
 };
 
 /** Width / height of header_building.png */
@@ -81,3 +85,20 @@ export const amenityIcons = {
 };
 
 export type AmenityIconName = keyof typeof amenityIcons;
+
+/**
+ * Add Property → Unit icons (Lucide line icons, drawn by
+ * scripts/icons/draw_line_icons.ps1 at -Stroke 2 into icons/unit).
+ */
+export const unitIcons = {
+  door: require('@/assets/icons/unit/door.png'),
+  list: require('@/assets/icons/unit/list.png'),
+  scan: require('@/assets/icons/unit/scan.png'),
+  banknote: require('@/assets/icons/unit/banknote.png'),
+  receipt: require('@/assets/icons/unit/receipt.png'),
+  image: require('@/assets/icons/unit/image.png'),
+  conciergeBell: require('@/assets/icons/unit/concierge_bell.png'),
+  store: require('@/assets/icons/unit/store.png'),
+};
+
+export type UnitIconName = keyof typeof unitIcons;

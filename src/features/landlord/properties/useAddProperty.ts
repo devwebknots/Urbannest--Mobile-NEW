@@ -481,6 +481,8 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
     video,
     uploadVideo,
     removeVideo: () => setVideo(null),
+    /** Camera / library choice (shared with the Unit tab) */
+    pickMedia,
     amenities,
     toggleAmenity,
     amenityQuery,

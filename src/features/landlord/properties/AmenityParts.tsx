@@ -8,7 +8,7 @@
  *    name, "Provide access to the … for units/tenants.", checkbox)
  *  - InfoNote: (i) + one grey line under the section
  * Selected state follows the app rule: no stroke / fill change on the
- * card, a filled secondary-blue checkbox and a blue icon instead.
+ * card or icon, only the checkbox fills secondary blue with a white tick.
  */
 
 import React, { useState } from 'react';
@@ -103,7 +103,7 @@ export const AmenityGrid: React.FC<{
                 <AmenityIcon
                   name={a.icon}
                   size={ms(26)}
-                  color={on ? colors.primary : colors.navy}
+                  color={colors.navy}
                 />
                 <Text style={styles.tileLabel} numberOfLines={2}>
                   {a.label}
