@@ -60,3 +60,24 @@ export const landlordIcons = {
   lightbulb: require('@/assets/icons/landlord/lightbulb.png'),
   menu: require('@/assets/icons/landlord/menu.png'),
 };
+
+/**
+ * Add Property amenity icons: Lucide line icons (custom balcony / elevator in
+ * the same style), drawn by scripts/icons/draw_line_icons.ps1 (-Stroke 2,
+ * into icons/amenities). White PNGs, tint with tintColor.
+ */
+export const amenityIcons = {
+  airVent: require('@/assets/icons/amenities/air_vent.png'),
+  balcony: require('@/assets/icons/amenities/balcony.png'),
+  cctv: require('@/assets/icons/amenities/cctv.png'),
+  dumbbell: require('@/assets/icons/amenities/dumbbell.png'),
+  users: require('@/assets/icons/amenities/users.png'),
+  elevator: require('@/assets/icons/amenities/elevator.png'),
+  sprout: require('@/assets/icons/amenities/sprout.png'),
+  washingMachine: require('@/assets/icons/amenities/washing_machine.png'),
+  search: require('@/assets/icons/amenities/search.png'),
+  info: require('@/assets/icons/amenities/info.png'),
+  key: require('@/assets/icons/amenities/key.png'),
+};
+
+export type AmenityIconName = keyof typeof amenityIcons;

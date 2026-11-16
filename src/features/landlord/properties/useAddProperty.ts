@@ -8,7 +8,11 @@
  *  - Location Preview: a picked suggestion / current location pins its
  *    exact point (zoomed in); a typed address is looked up (debounced) and
  *    the pin moves there; +/− zoom
- *  - Save & Continue: success dialog, unlocks and opens the Unit tab
+ *  - Amenities: search + tile grid (multi-select by id); "Amenities Access"
+ *    lists the selected shared facilities to grant units / tenants, then
+ *    Generate Access (dialog)
+ *  - Save & Continue / Save Property: success dialog, unlocks and opens the
+ *    Unit tab
  */
 
 import { createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -33,6 +37,7 @@ import {
   MAX_PROPERTY_IMAGES,
   MAP_ZOOM,
   OWNERSHIP_TYPES,
+  PROPERTY_AMENITIES,
   PROPERTY_TYPES,
 } from './constants';
 
@@ -107,7 +112,11 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
   const [picker, setPicker] = useState<Picker>(null);
   const [images, setImages] = useState<PickedMedia[]>([]);
   const [video, setVideo] = useState<PickedMedia | null>(null);
+  /** Selected amenity ids */
   const [amenities, setAmenities] = useState<string[]>([]);
+  /** Amenity ids units / tenants get access to */
+  const [access, setAccess] = useState<string[]>([]);
+  const [amenityQuery, setAmenityQuery] = useState('');
   const [mapPoint, setMapPoint] = useState(DEFAULT_MAP_POINT);
   const [located, setLocated] = useState(false);
   const [zoom, setZoom] = useState(MAP_ZOOM.initial);
@@ -288,11 +297,51 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
     [pickMedia],
   );
 
-  const toggleAmenity = useCallback(
-    (a: string) =>
-      setAmenities(prev => (prev.includes(a) ? prev.filter(x => x !== a) : [...prev, a])),
+  const toggleAmenity = useCallback((id: string) => {
+    setAmenities(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
+    // Unselecting an amenity also drops its access
+    setAccess(prev => prev.filter(x => x !== id));
+  }, []);
+
+  const toggleAccess = useCallback(
+    (id: string) => setAccess(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])),
     [],
   );
+
+  /** Grid: every amenity, narrowed by the search */
+  const shownAmenities = useMemo(() => {
+    const q = amenityQuery.trim().toLowerCase();
+    return q ? PROPERTY_AMENITIES.filter(a => a.label.toLowerCase().includes(q)) : PROPERTY_AMENITIES;
+  }, [amenityQuery]);
+
+  /** Access list: selected amenities that are shared facilities */
+  const accessAmenities = useMemo(
+    () => PROPERTY_AMENITIES.filter(a => a.accessName && amenities.includes(a.id)),
+    [amenities],
+  );
+
+  const generateAccess = useCallback(() => {
+    const granted = accessAmenities.filter(a => access.includes(a.id));
+    if (granted.length === 0) {
+      show({
+        tone: 'info',
+        title: 'Choose amenities first',
+        message:
+          accessAmenities.length === 0
+            ? 'Select shared amenities above (gym, community hall, elevator, garden or laundry room), then tick the ones units and tenants can use.'
+            : 'Tick the amenities units and tenants can use, then generate access.',
+        actions: [{ label: 'OK', variant: 'brand' }],
+      });
+      return;
+    }
+    show({
+      tone: 'success',
+      title: 'Access generated',
+      message: 'Units and tenants of this property can use these amenities.',
+      details: granted.map(a => ({ label: a.label, value: 'Access on' })),
+      actions: [{ label: 'Done', variant: 'brand' }],
+    });
+  }, [access, accessAmenities, show]);
 
   const check = useCallback((): Errors => {
     const e: Errors = {};
@@ -434,6 +483,13 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
     removeVideo: () => setVideo(null),
     amenities,
     toggleAmenity,
+    amenityQuery,
+    setAmenityQuery,
+    shownAmenities,
+    accessAmenities,
+    access,
+    toggleAccess,
+    generateAccess,
     map: { point: mapPoint, zoom, located, addressLine, zoomIn, zoomOut },
     picker,
     pickerProps,

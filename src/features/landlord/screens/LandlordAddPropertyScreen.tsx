@@ -13,8 +13,10 @@
  *    description, photos: upload area + thumbnails), Address Details (country,
  *    streets with suggestions, landmark, city, state, ZIP), Upload Property
  *    Video, Location Preview (map follows the address)
- *  - Amenities: multi-select chips
- *  - fixed footer: Cancel + Save & Continue →
+ *  - Amenities ("Property Amenities" design): Amenities (search + 4-column
+ *    tiles), Amenities Access (selected shared amenities to grant +
+ *    Generate Access), info note
+ *  - fixed footer: Cancel + Save & Continue → (Save Property → on Amenities)
  * Sections lay on the page (no cards), app form rule.
  */
 
@@ -39,7 +41,6 @@ import { HEADER_BUILDING_ASPECT, applicationAssets } from '@/features/applicatio
 import { AddressSuggestions, CurrentLocationButton } from '@/features/application/components/AddressLookupParts';
 import { FieldInput, FieldRow, LabeledField } from '@/features/application/components/ApplicationFields';
 import { ApplicationSection } from '@/features/application/components/ApplicationSection';
-import { ChoiceChips } from '@/features/application/components/ChoiceChips';
 import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
 import { LightTopBar } from '@/features/renter/components/LightTopBar';
 import { FormSelect } from '@/features/renter/components/form/FormSelect';
@@ -47,7 +48,14 @@ import { CategorySheet } from '@/features/renter/components/inspection/CategoryS
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { moderateScale as ms } from '@/utils/responsive';
 import { LANDLORD_PROFILE } from '../constants';
-import { PROPERTY_AMENITIES } from '../properties/constants';
+import { amenityIcons } from '../assets/landlordAssets';
+import {
+  AmenityAccessList,
+  AmenityGrid,
+  AmenityIcon,
+  AmenitySearch,
+  InfoNote,
+} from '../properties/AmenityParts';
 import {
   DescriptionField,
   LocationPreview,
@@ -73,6 +81,7 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
   const footerPadBottom = Math.max(insets.bottom, spacing.md);
   const footerH = spacing.lg + ms(48) + footerPadBottom;
   const { isKeyboardVisible } = useKeyboard();
+  const onAmenities = vm.tab === 'property' && vm.subTab === 'amenities';
 
   return (
     <KeyboardAvoidingView
@@ -118,10 +127,13 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
           >
             Add New Property
           </Text>
-          <Text style={styles.kicker}>Property Basic Information</Text>
+          <Text style={styles.kicker}>
+            {onAmenities ? 'Property Amenities' : 'Property Basic Information'}
+          </Text>
           <Text style={styles.subtitle}>
-            Enter the foundational details, property type, value and address for your new real
-            estate asset.
+            {onAmenities
+              ? 'Select amenities and manage access for the selected amenities.'
+              : 'Enter the foundational details, property type, value and address for your new real estate asset.'}
           </Text>
         </View>
 
@@ -144,15 +156,42 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.sections}>
             <ApplicationSection
               title="Amenities"
-              subtitle="Pick everything the property offers."
-              icon="circleCheck"
+              subtitle="Select the amenities available at this property."
+              icon="layers"
             >
-              <ChoiceChips
-                options={PROPERTY_AMENITIES}
-                values={vm.amenities}
-                onChange={vm.toggleAmenity}
+              <AmenitySearch value={vm.amenityQuery} onChangeText={vm.setAmenityQuery} />
+              <AmenityGrid
+                amenities={vm.shownAmenities}
+                selected={vm.amenities}
+                onToggle={vm.toggleAmenity}
               />
             </ApplicationSection>
+
+            <ApplicationSection
+              title="Amenities Access"
+              subtitle="Grant access for the selected amenities in this property."
+              icon={<AmenityIcon name="key" size={ms(22)} color={colors.primary} />}
+            >
+              <AmenityAccessList
+                amenities={vm.accessAmenities}
+                granted={vm.access}
+                onToggle={vm.toggleAccess}
+              />
+              <Button
+                title="Generate Access"
+                variant="soft"
+                onPress={vm.generateAccess}
+                leftIcon={
+                  <Image
+                    source={amenityIcons.key}
+                    style={styles.keyIcon}
+                    resizeMode="contain"
+                  />
+                }
+              />
+            </ApplicationSection>
+
+            <InfoNote text="Amenities access can only be configured for the amenities you have selected above." />
           </View>
         ) : (
           <View style={styles.sections}>
@@ -375,7 +414,7 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
         <View style={[styles.footer, { paddingBottom: footerPadBottom }]}>
           <Button title="Cancel" variant="soft" onPress={vm.cancel} style={styles.cancel} />
           <Button
-            title="Save & Continue"
+            title={onAmenities ? 'Save Property' : 'Save & Continue'}
             variant="brand"
             onPress={vm.saveAndContinue}
             style={styles.save}
@@ -447,6 +486,11 @@ const styles = StyleSheet.create({
   },
   half: {
     flex: 1,
+  },
+  keyIcon: {
+    width: ms(18),
+    height: ms(18),
+    tintColor: colors.primary,
   },
   footer: {
     position: 'absolute',

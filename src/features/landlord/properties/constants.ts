@@ -2,6 +2,8 @@
  * Add New Property ("Property Basic Information") options.
  */
 
+import type { AmenityIconName } from '../assets/landlordAssets';
+
 export const PROPERTY_TYPES: readonly { id: string; label: string }[] = [
   { id: 'apartment', label: 'Apartment Building' },
   { id: 'singleFamily', label: 'Single-Family Home' },
@@ -20,19 +22,28 @@ export const OWNERSHIP_TYPES: readonly { id: string; label: string }[] = [
   { id: 'partnership', label: 'Partnership' },
 ];
 
-export const PROPERTY_AMENITIES: readonly string[] = [
-  'Parking',
-  'Elevator',
-  'Gym',
-  'Swimming Pool',
-  'Laundry',
-  'Security',
-  '24/7 Water',
-  'Power Backup',
-  'Garden',
-  'Clubhouse',
-  'Pet Friendly',
-  'EV Charging',
+export interface PropertyAmenity {
+  readonly id: string;
+  readonly label: string;
+  readonly icon: AmenityIconName;
+  /**
+   * Shared facility units / tenants can be given access to ("Amenities
+   * Access"); the name used in "Provide access to the … for units/tenants."
+   * Absent: a feature of the building (AC, CCTV…), nothing to grant.
+   */
+  readonly accessName?: string;
+}
+
+/** Amenities tab: the design's 8 tiles (in its order), then the access list */
+export const PROPERTY_AMENITIES: readonly PropertyAmenity[] = [
+  { id: 'ac', label: 'Air Conditioner', icon: 'airVent' },
+  { id: 'balcony', label: 'Balcony', icon: 'balcony' },
+  { id: 'cctv', label: 'CCTV', icon: 'cctv' },
+  { id: 'gym', label: 'Gym', icon: 'dumbbell', accessName: 'gym' },
+  { id: 'communityHall', label: 'Community Hall', icon: 'users', accessName: 'community hall' },
+  { id: 'elevator', label: 'Elevator / Lift', icon: 'elevator', accessName: 'elevator' },
+  { id: 'garden', label: 'Garden / Lawn', icon: 'sprout', accessName: 'garden/lawn' },
+  { id: 'laundry', label: 'Laundry Room', icon: 'washingMachine', accessName: 'laundry room' },
 ];
 
 /** Most property photos (upload area + thumbnails) */

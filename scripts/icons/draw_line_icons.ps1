@@ -668,6 +668,61 @@ $icons = [ordered]@{
     'path:M4 6h16',
     'path:M4 18h16'
   )
+  # ---- Landlord Add Property amenities (draw into icons/amenities at -Stroke 2):
+  #      -Only air_vent,balcony,cctv,dumbbell,users,elevator,sprout,washing_machine,search,info,key
+  # balcony (own, Lucide style): door above a railing with balusters
+  'balcony' = @(
+    'path:M8 11V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v7',
+    'path:M2 11h20',
+    'path:M2 21h20',
+    'path:M4 11v10',
+    'path:M8 11v10',
+    'path:M12 11v10',
+    'path:M16 11v10',
+    'path:M20 11v10'
+  )
+  # lucide: cctv
+  'cctv' = @(
+    'path:M16.75 12h3.632a1 1 0 0 1 .894 1.447l-2.034 4.069a1 1 0 0 1-1.708.134l-2.124-2.97',
+    'path:M17.106 9.053a1 1 0 0 1 .447 1.341l-3.106 6.211a1 1 0 0 1-1.342.447L3.61 12.3a2.92 2.92 0 0 1-1.3-3.91L3.69 5.6a2.92 2.92 0 0 1 3.92-1.3z',
+    'path:M2 19h3.76a2 2 0 0 0 1.8-1.1L9 15',
+    'path:M2 21v-4',
+    'path:M7 9h.01'
+  )
+  # elevator (own, Lucide style): rounded square with up / down arrows
+  'elevator' = @(
+    'path:M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z',
+    'path:M9 16V8',
+    'path:m6.5 10.5 2.5-2.5 2.5 2.5',
+    'path:M15 8v8',
+    'path:m12.5 13.5 2.5 2.5 2.5-2.5'
+  )
+  # lucide: sprout (garden / lawn)
+  'sprout' = @(
+    'path:M7 20h10',
+    'path:M10 20c5.5-2.5.8-6.4 3-10',
+    'path:M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z',
+    'path:M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z'
+  )
+  # lucide: washing-machine
+  'washing_machine' = @(
+    'path:M3 6h3',
+    'path:M17 6h.01',
+    'path:M5 2h14a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z',
+    'circle:12,13,5',
+    'path:M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5'
+  )
+  # lucide: search
+  'search' = @(
+    'circle:11,11,8',
+    'path:m21 21-4.3-4.3'
+  )
+  # lucide: info
+  'info' = @(
+    'circle:12,12,10',
+    'path:M12 16v-4',
+    'path:M12 8h.01'
+  )
 }
 
 New-Item -ItemType Directory -Force $OutDir | Out-Null
