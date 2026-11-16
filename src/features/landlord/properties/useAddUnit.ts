@@ -8,6 +8,7 @@
  *  - Unit/Home Info sections (collapsible): Unit Basics, Unit Summary
  *    (read-only, from the form), Size & Configuration (+ student housing
  *    switch), Financials, Floor Plan (upload area + 3 slots), Unit Types Guide
+ *  - student housing: switch, rooms per unit, Add Room / view room sheet
  *  - pickers: unit type, ownership, lease type, management model, unit
  * The page's dialog / photo picker come from useAddProperty.
  */
@@ -23,6 +24,7 @@ import {
   OWNERSHIP_TYPES,
   UNIT_TYPES,
 } from './constants';
+import { type StudentRoom, roomTypeLabel } from './RoomSheet';
 import type { PickedMedia } from './useAddProperty';
 
 /** Screens-only phase: skip required-field checks (set false to turn on) */
@@ -54,6 +56,7 @@ export type UnitField = keyof UnitForm;
 interface UnitDraft {
   form: UnitForm;
   studentHousing: boolean;
+  rooms: StudentRoom[];
   amenities: string[];
   photos: PickedMedia[];
   floorPlans: PickedMedia[];
@@ -83,6 +86,7 @@ const EMPTY_FORM: UnitForm = {
 const newUnit = (): UnitDraft => ({
   form: EMPTY_FORM,
   studentHousing: false,
+  rooms: [],
   amenities: [],
   photos: [],
   floorPlans: [],
@@ -110,6 +114,8 @@ export function useAddUnit(
   const [picker, setPicker] = useState<UnitPicker>(null);
   const [closed, setClosed] = useState<UnitSection[]>([]);
   const [amenityQuery, setAmenityQuery] = useState('');
+  /** Room sheet: 'new' to add, a room index to view / edit, null closed */
+  const [roomSheet, setRoomSheet] = useState<'new' | number | null>(null);
 
   const unit = units[active];
   const { form } = unit;
@@ -137,6 +143,20 @@ export function useAddUnit(
   const toggleStudentHousing = useCallback(
     () => update(u => ({ ...u, studentHousing: !u.studentHousing })),
     [update],
+  );
+
+  const saveRoom = useCallback(
+    (room: StudentRoom) => {
+      update(u => ({
+        ...u,
+        rooms:
+          typeof roomSheet === 'number'
+            ? u.rooms.map((r, i) => (i === roomSheet ? room : r))
+            : [...u.rooms, room],
+      }));
+      setRoomSheet(null);
+    },
+    [roomSheet, update],
   );
 
   const toggleAmenity = useCallback(
@@ -226,6 +246,7 @@ export function useAddUnit(
 
   /** "Add Unit": a new blank unit, opened on Unit/Home Info */
   const addUnit = useCallback(() => {
+    setRoomSheet(null);
     setUnits(prev => [...prev, newUnit()]);
     setActive(units.length);
     setSubTab('info');
@@ -341,6 +362,15 @@ export function useAddUnit(
     toggleSection,
     studentHousing: unit.studentHousing,
     toggleStudentHousing,
+    rooms: unit.rooms.map(r => ({ roomNo: r.roomNo.trim(), type: roomTypeLabel(r.typeId) })),
+    openAddRoom: () => setRoomSheet('new'),
+    openRoom: (i: number) => setRoomSheet(i),
+    roomSheet: {
+      visible: roomSheet !== null,
+      room: typeof roomSheet === 'number' ? unit.rooms[roomSheet] ?? null : null,
+      onClose: () => setRoomSheet(null),
+      onSave: saveRoom,
+    },
     floorPlans: unit.floorPlans,
     uploadFloorPlan,
     removeFloorPlan,

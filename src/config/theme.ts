@@ -131,6 +131,11 @@ export const gradients = {
   propertyBanner: ['#032B57', '#2563EB'],
   // Bottom image dark scrim overlay
   imageDarkOverlay: ['transparent', 'rgba(0, 0, 0, 0.8)'],
+  // Landlord Add Property → Unit "Property Context" card, left → right
+  // (light, smooth; ends on the building photo's own edge blue)
+  propertyContext: ['#173764', '#244A7D', '#2F5A90', '#3B6294'],
+  // Round icon disc on that card: lighter centre → edge (radial)
+  propertyContextDisc: ['#6787AF', '#3A6298'],
 };
 
 export const spacing = {
@@ -498,6 +503,46 @@ export const typographyPresets: Record<string, TextStyle> = {
     fontSize: scaleFont(9),
     color: colors.white,
     fontWeight: typography.fontWeight.medium,
+  },
+  // Small bold value / pill text: "Draft" pill, Unit Summary values,
+  // "Replace", Map / Satellite switch
+  cardSubtitleBold: {
+    fontFamily: typography.fontFamily.body.semiBold,
+    fontSize: scaleFont(11.5),
+    lineHeight: scaleFont(16),
+    color: colors.textPrimary,
+  },
+  // Column headings of in-card tables ("ROOM", "ROOM NO.", "ROOM TYPE")
+  tableHeader: {
+    fontFamily: typography.fontFamily.body.medium,
+    fontSize: scaleFont(10.5),
+    lineHeight: scaleFont(14),
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: colors.textSecondary,
+  },
+  // Uppercase tag inside a field or row ("DEFAULT" on Room Status)
+  tag: {
+    fontFamily: typography.fontFamily.body.medium,
+    fontSize: scaleFont(10.5),
+    lineHeight: scaleFont(13),
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  // Bold blue title inside a dashed upload area ("Upload Images",
+  // "Upload Property Video", "Upload Technical Drawings")
+  uploadTitle: {
+    fontFamily: typography.fontFamily.body.semiBold,
+    fontSize: scaleFont(17),
+    lineHeight: scaleFont(22),
+    color: colors.primary,
+  },
+  // Tiny data credit on maps ("© Esri, HERE, Garmin, OpenStreetMap")
+  mapCredit: {
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: scaleFont(8),
+    lineHeight: scaleFont(10),
+    color: colors.textSecondary,
   },
 };
 

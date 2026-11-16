@@ -596,10 +596,8 @@ const styles = StyleSheet.create({
     tintColor: colors.primary,
   },
   uploadTitle: {
-    ...typographyPresets.bodyBold,
-    fontSize: typographyPresets.sectionTitle.fontSize,
+    ...typographyPresets.uploadTitle,
     marginTop: spacing.md,
-    color: colors.primary,
   },
   uploadBody: {
     ...typographyPresets.body,
@@ -701,8 +699,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.chipBlue,
   },
   fileReplaceText: {
-    ...typographyPresets.cardSubtitle,
-    fontFamily: typographyPresets.bodyBold.fontFamily,
+    ...typographyPresets.cardSubtitleBold,
     color: colors.primary,
   },
   hint: {
@@ -817,8 +814,7 @@ const styles = StyleSheet.create({
     backgroundImage: `linear-gradient(90deg, ${gradients.button[0]} 0%, ${gradients.button[1]} 100%)`,
   },
   styleText: {
-    ...typographyPresets.cardSubtitle,
-    fontFamily: typographyPresets.bodyBold.fontFamily,
+    ...typographyPresets.cardSubtitleBold,
     color: colors.textSecondary,
   },
   styleTextOn: {
@@ -849,11 +845,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.navy,
   },
   attribution: {
+    ...typographyPresets.mapCredit,
     position: 'absolute',
     right: spacing.sm,
     bottom: 2,
-    fontSize: ms(8),
-    color: colors.textSecondary,
   },
   // Floating address card, bottom of the map
   mapCaption: {

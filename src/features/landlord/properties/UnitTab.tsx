@@ -20,13 +20,14 @@ import { moderateScale as ms } from '@/utils/responsive';
 import { AmenityGrid, AmenityIcon, AmenitySearch } from './AmenityParts';
 import { PROPERTY_AMENITIES } from './constants';
 import { DescriptionField, PropertyImagesField } from './PropertyParts';
+import { RoomSheet } from './RoomSheet';
 import type { AddUnitVM, UnitSection } from './useAddUnit';
 import {
   DraftPill,
   FloorPlanField,
   PropertyContextCard,
   SectionChevron,
-  StudentHousingRow,
+  StudentHousingPanel,
   UnitIcon,
   UnitSummaryCard,
   UnitTypesGuide,
@@ -284,9 +285,12 @@ export const UnitTabContent: React.FC<{
                 />
               </LabeledField>
             </FieldRow>
-            <StudentHousingRow
+            <StudentHousingPanel
               value={unit.studentHousing}
               onChange={unit.toggleStudentHousing}
+              rooms={unit.rooms}
+              onAddRoom={unit.openAddRoom}
+              onViewRoom={unit.openRoom}
             />
           </>
         ) : null}
@@ -350,6 +354,8 @@ export const UnitTabContent: React.FC<{
       >
         {unit.isOpen('guide') ? <UnitTypesGuide /> : null}
       </ApplicationSection>
+
+      <RoomSheet {...unit.roomSheet} />
     </View>
   );
 };

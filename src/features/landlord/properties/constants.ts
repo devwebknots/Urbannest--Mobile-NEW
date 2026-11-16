@@ -94,3 +94,36 @@ export const UNIT_TYPE_GUIDE: readonly {
 
 /** Floor plan drawings: dashed slots under the upload area */
 export const MAX_FLOOR_PLANS = 3;
+
+/* ───────────── Unit → Student housing rooms ───────────── */
+
+export const ROOM_TYPES: readonly { id: string; label: string }[] = [
+  { id: 'single', label: 'Single' },
+  { id: 'double', label: 'Double' },
+  { id: 'triple', label: 'Triple' },
+  { id: 'quad', label: 'Quad' },
+];
+
+export const BATHROOM_TYPES: readonly { id: string; label: string }[] = [
+  { id: 'attached', label: 'Attached' },
+  { id: 'shared', label: 'Shared' },
+  { id: 'common', label: 'Common' },
+];
+
+/** First one is the default for a new room ("DEFAULT" tag) */
+export const ROOM_STATUSES: readonly { id: string; label: string }[] = [
+  { id: 'vacant', label: 'Vacant' },
+  { id: 'occupied', label: 'Occupied' },
+  { id: 'reserved', label: 'Reserved' },
+  { id: 'maintenance', label: 'Under Maintenance' },
+];
+
+export const BED_TYPES: readonly { id: string; label: string }[] = [
+  { id: 'single', label: 'Single Bed' },
+  { id: 'bunk', label: 'Bunk Bed' },
+  { id: 'double', label: 'Double Bed' },
+];
+
+/** Stepper limits in Add Room */
+export const MAX_ROOM_BEDS = 8;
+export const MAX_ROOM_BATHS = 4;

@@ -10,7 +10,8 @@
  *    Type / Units so far in white), building blended in on the right
  *  - DraftPill: clock + "Draft" (or "Saved")
  *  - UnitSummaryCard: Unit No. / Type / Floor / Area / Rent columns
- *  - StudentHousingRow: bed tile, title + line, switch
+ *  - StudentHousingPanel: bed tile, title + line, switch; when on, the
+ *    "No rooms added yet" state or the rooms table (+ Add Room)
  *  - FloorPlanField: dashed upload area + 3 dashed drawing slots
  *  - UnitTypesGuide: 2-column guide (icon tile, name, line)
  */
@@ -27,7 +28,14 @@ import {
 import { Button } from '@/components/Button';
 import { ChevronDownIcon, CloseIcon, PlusIcon } from '@/components/icons';
 import { ToggleSwitch } from '@/components/ToggleSwitch';
-import { borderRadius, colors, shadows, spacing, typographyPresets } from '@/config/theme';
+import {
+  borderRadius,
+  colors,
+  gradients,
+  shadows,
+  spacing,
+  typographyPresets,
+} from '@/config/theme';
 import { ApplicationIcon } from '@/features/application/components/ApplicationIcon';
 import type { ApplicationIconName } from '@/features/application/types';
 import { TILE_BG, TILE_BORDER } from '@/features/renter/components/checkin/CheckInChecklist';
@@ -202,23 +210,96 @@ export const UnitSummaryCard: React.FC<{
   );
 };
 
-export const StudentHousingRow: React.FC<{
+/**
+ * Student housing panel: toggle header; when on, either the dashed "No rooms
+ * added yet" state with "+ Add Room", or the rooms table (Room, Room No.,
+ * Room Type, eye to view) with an "+ Add Room" link under it.
+ */
+export const StudentHousingPanel: React.FC<{
   value: boolean;
   onChange: () => void;
-}> = ({ value, onChange }) => (
+  rooms: readonly { roomNo: string; type?: string }[];
+  onAddRoom: () => void;
+  onViewRoom: (index: number) => void;
+}> = ({ value, onChange, rooms, onAddRoom, onViewRoom }) => (
   <View style={styles.student}>
-    <View style={styles.iconTile}>
-      <ApplicationIcon name="bed" size={ms(20)} color={colors.navy} />
+    <View style={styles.studentHead}>
+      <View style={styles.iconTile}>
+        <ApplicationIcon name="bed" size={ms(20)} color={colors.primary} />
+      </View>
+      <View style={styles.flex}>
+        <Text style={styles.rowTitle}>Student Housing — Room Details</Text>
+        <Text style={styles.rowBody}>Configure per-room bed & bathroom breakdown</Text>
+      </View>
+      <ToggleSwitch
+        value={value}
+        onChange={onChange}
+        accessibilityLabel="Student housing room details"
+      />
     </View>
-    <View style={styles.flex}>
-      <Text style={styles.rowTitle}>Student housing — room details</Text>
-      <Text style={styles.rowBody}>Configure per-room bed & bathroom breakdown</Text>
-    </View>
-    <ToggleSwitch
-      value={value}
-      onChange={onChange}
-      accessibilityLabel="Student housing room details"
-    />
+
+    {!value ? null : rooms.length === 0 ? (
+      <View style={styles.roomsEmpty}>
+        <View style={styles.roomsEmptyIcon}>
+          <ApplicationIcon name="bed" size={ms(28)} color={colors.navy} />
+        </View>
+        <Text style={styles.roomsEmptyTitle}>No rooms added yet.</Text>
+        <Text style={styles.roomsEmptyBody}>
+          Add rooms to configure bed and bathroom details for student housing.
+        </Text>
+        <Button
+          title="Add Room"
+          variant="light"
+          size="md"
+          onPress={onAddRoom}
+          style={styles.addRoomBtn}
+          leftIcon={<PlusIcon size={ms(14)} color={colors.navy} />}
+        />
+      </View>
+    ) : (
+      <View style={styles.roomsTable}>
+        <View style={[styles.roomRow, styles.roomHeadRow]}>
+          <Text style={[styles.roomHeadText, styles.colRoom]}>ROOM</Text>
+          <Text style={[styles.roomHeadText, styles.colNo]}>ROOM NO.</Text>
+          <Text style={[styles.roomHeadText, styles.colType]}>ROOM TYPE</Text>
+          <View style={styles.colView} />
+        </View>
+        {rooms.map((r, i) => (
+          <View key={`room-${i}`} style={[styles.roomRow, styles.roomDivider]}>
+            <View style={[styles.colRoom, styles.roomName]}>
+              <ApplicationIcon name="bed" size={ms(16)} color={colors.navy} />
+              <Text style={styles.roomNameText} numberOfLines={1}>{`Room ${i + 1}`}</Text>
+            </View>
+            <Text style={[styles.roomCell, styles.colNo]} numberOfLines={1}>
+              {r.roomNo || EMPTY}
+            </Text>
+            <Text style={[styles.roomCell, styles.colType]} numberOfLines={1}>
+              {r.type || EMPTY}
+            </Text>
+            <View style={styles.colView}>
+              <Pressable
+                onPress={() => onViewRoom(i)}
+                hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel={`View room ${i + 1}`}
+                style={({ pressed }) => [styles.eyeBtn, pressed && styles.pressed]}
+              >
+                <ApplicationIcon name="eye" size={ms(16)} color={colors.navy} />
+              </Pressable>
+            </View>
+          </View>
+        ))}
+        <Pressable
+          onPress={onAddRoom}
+          accessibilityRole="button"
+          accessibilityLabel="Add room"
+          style={({ pressed }) => [styles.roomAddLink, styles.roomDivider, pressed && styles.pressed]}
+        >
+          <PlusIcon size={ms(14)} color={colors.primary} />
+          <Text style={styles.roomAddText}>Add Room</Text>
+        </Pressable>
+      </View>
+    )}
   </View>
 );
 
@@ -292,9 +373,9 @@ export const UnitTypesGuide: React.FC = () => (
 
 const SLOT_H = ms(64);
 
-/** Property Context gradient, light and smooth: ends on the photo's own
- * edge blue (#3B6294) so card and building read as one surface */
-const CONTEXT_STOPS = ['#173764', '#244A7D', '#2F5A90', '#3B6294'] as const;
+/** Property Context gradient (theme): light, smooth, ends on the photo's
+ * own edge blue so card and building read as one surface */
+const CONTEXT_STOPS = gradients.propertyContext;
 
 /** Soft shadow so white text reads over the building */
 const TEXT_LIFT = {
@@ -397,14 +478,14 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingHorizontal: spacing.md,
   },
-  // Disc: soft gradient, lighter centre (#6787AF) to #3A6298 at the edge
+  // Disc: soft radial gradient, lighter centre to the edge (theme)
   contextDisc: {
     width: ms(40),
     height: ms(40),
     borderRadius: ms(20),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundImage: 'radial-gradient(circle at 50% 45%, #6787AF 0%, #3A6298 100%)',
+    backgroundImage: `radial-gradient(circle at 50% 45%, ${gradients.propertyContextDisc[0]} 0%, ${gradients.propertyContextDisc[1]} 100%)`,
   },
   contextTitle: {
     ...typographyPresets.formHeading,
@@ -469,8 +550,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.chipBlue,
   },
   draftText: {
-    ...typographyPresets.cardSubtitle,
-    fontFamily: typographyPresets.bodyBold.fontFamily,
+    ...typographyPresets.cardSubtitleBold,
     color: colors.navy,
   },
   // Unit summary
@@ -485,21 +565,131 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   summaryValue: {
-    ...typographyPresets.cardSubtitle,
-    fontFamily: typographyPresets.bodyBold.fontFamily,
+    ...typographyPresets.cardSubtitleBold,
     textAlign: 'center',
     color: colors.navy,
   },
-  // Student housing
+  // Student housing panel
   student: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: spacing.md,
     padding: spacing.md,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
     borderColor: TILE_BORDER,
     backgroundColor: TILE_BG,
+  },
+  studentHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  roomsEmpty: {
+    alignItems: 'center',
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: TILE_BORDER,
+    backgroundColor: colors.white,
+  },
+  roomsEmptyIcon: {
+    width: ms(56),
+    height: ms(56),
+    borderRadius: ms(28),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: `${colors.headerGradientEnd}1A`,
+  },
+  roomsEmptyTitle: {
+    ...typographyPresets.bodyBold,
+    marginTop: spacing.md,
+    color: colors.navy,
+  },
+  roomsEmptyBody: {
+    ...typographyPresets.cardSubtitle,
+    marginTop: spacing.xs,
+    textAlign: 'center',
+    color: colors.textSecondary,
+  },
+  addRoomBtn: {
+    marginTop: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    borderWidth: 1,
+    borderColor: `${colors.primary}66`,
+  },
+  // Rooms table: white box, tinted header row, hairline rows
+  roomsTable: {
+    overflow: 'hidden',
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: TILE_BORDER,
+    backgroundColor: colors.white,
+  },
+  roomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: ms(52),
+    paddingHorizontal: spacing.md,
+  },
+  roomHeadRow: {
+    minHeight: ms(38),
+    backgroundColor: TILE_BG,
+  },
+  roomDivider: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: TILE_BORDER,
+  },
+  roomHeadText: {
+    ...typographyPresets.tableHeader,
+  },
+  colRoom: {
+    flex: 1.4,
+  },
+  colNo: {
+    flex: 1,
+  },
+  colType: {
+    flex: 1.1,
+  },
+  colView: {
+    width: ms(40),
+    alignItems: 'flex-end',
+  },
+  roomName: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  roomNameText: {
+    ...typographyPresets.bodyBold,
+    flexShrink: 1,
+    color: colors.navy,
+  },
+  roomCell: {
+    ...typographyPresets.body,
+    color: colors.textPrimary,
+  },
+  eyeBtn: {
+    width: ms(34),
+    height: ms(34),
+    borderRadius: borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: TILE_BORDER,
+    backgroundColor: colors.white,
+  },
+  roomAddLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    minHeight: ms(48),
+    paddingHorizontal: spacing.md,
+  },
+  roomAddText: {
+    ...typographyPresets.bodyBold,
+    color: colors.primary,
   },
   rowTitle: {
     ...typographyPresets.bodyBold,

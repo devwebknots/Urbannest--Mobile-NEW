@@ -425,6 +425,8 @@ Defined in `src/config/theme.ts`:
 | `headerGradientStart` | `#032B57` | Deep navy start color for linear gradients |
 | `headerGradientEnd` | `#518EF9` | Vibrant periwinkle end color for header gradient |
 | `buttonGradientStart` | `#032B57` (theme) / `#03264C` (gradients.button) | Start gradient for high-priority CTA buttons |
+| `gradients.propertyContext` | `#173764` → `#244A7D` → `#2F5A90` → `#3B6294` | Landlord Add Property → Unit "Property Context" card (CSS `backgroundImage`, 0 / 30 / 60 / 100%) |
+| `gradients.propertyContextDisc` | `#6787AF` → `#3A6298` | Radial icon disc on that card |
 | `buttonGradientEnd` | `#0659B2` | End gradient for high-priority CTA buttons |
 | `secondary` | `#64748B` | Slate gray for secondary subtitles, icons, meta details |
 | `accent` / `warning` | `#F59E0B` | Amber/orange for calendar status dots, inspections segment |
@@ -518,6 +520,11 @@ Body (Inter):
 | `sectionDescription` | `Inter-Regular` 400 | 10 / 17.88 | center, `textSecondary` | Paragraph under a centered `displayTitle` |
 | `premiumBadge` | `Inter-Medium` 500 | 9 | white | "Premium" text in `commonStyles.premiumBadge` + gold `StarGlyph` |
 | `quickActionLabel` / `floatingButtonLabel` | `Inter-Medium` 500 | 11.5 / 6 | — | Old Home dashboard only |
+| `cardSubtitleBold` | `Inter-SemiBold` 600 | 11.5 / 16 | `textPrimary` | Small bold value / pill text: "Draft" pill, Unit Summary values, "Replace", Map / Satellite switch |
+| `tableHeader` | `Inter-Medium` 500 | 10.5 / 14 | uppercase, letterSpacing 0.6, `textSecondary` | Column headings of in-card tables ("ROOM", "ROOM NO.", "ROOM TYPE") |
+| `tag` | `Inter-Medium` 500 | 10.5 / 13 | uppercase, letterSpacing 0.6 | Uppercase tag inside a field or row ("DEFAULT" on Room Status) |
+| `uploadTitle` | `Inter-SemiBold` 600 | 17 / 22 | `primary` | Bold blue title in a dashed upload area ("Upload Images", "Upload Property Video", "Upload Technical Drawings") |
+| `mapCredit` | `Inter-Regular` 400 | 8 / 10 | `textSecondary` | Tiny data credit on maps ("© Esri, HERE, Garmin, OpenStreetMap") |
 
 **Which preset for which element** (same element = same style on every screen):
 
@@ -539,6 +546,11 @@ Body (Inter):
 | Eyebrow / uppercase meta | `eyebrow` |
 | Pill / chip / badge text | `badge` |
 | Footnote / tiny meta | `caption` |
+| Small bold value / pill text | `cardSubtitleBold` |
+| Table column heading | `tableHeader` |
+| Uppercase tag ("DEFAULT") | `tag` |
+| Upload area title | `uploadTitle` |
+| Map data credit | `mapCredit` |
 
 Apply presets directly, e.g. `style={[typographyPresets.listingTitle, styles.name]}`; the local style holds layout and colour only. Don't override `fontSize` / `lineHeight` / `fontFamily`. Avoid making text heavier than these presets (the check-in screen was reworked because `heroTitle` / `price` / Playfair numbers were used on cards and looked bulky).
 
@@ -650,6 +662,13 @@ Not yet on `Button` (special layouts — move them over if a variant fits): "Acc
 ### 2. Pure React Native Vector Icons (`src/components/icons/index.tsx`)
 Crisp, anti-aliased icon components using pure React Native Views or base64 assets to prevent native binary linking bugs:
 - Core icons: `SearchIcon`, `BellIcon`, `CalendarIcon`, `BookmarkIcon`, `ChatTabIcon`, `SettingsIcon`, `ChevronDownIcon`, `ChevronRightIcon`, `ChevronLeftIcon`, `PlusIcon`, `UploadIcon`, `BriefcaseIcon`, `RefreshIcon`, `EditIcon`, `MoreVerticalIcon`, `CloseIcon`, `ClockIcon`, `CheckmarkIcon`, `MapPinIcon`, `MessageBubbleIcon`.
+
+### 2a. Form controls (`src/components/`)
+- `ToggleSwitch`: on / off switch; off = `TILE_BORDER` track + white knob, on = `gradients.button` track, knob slides. Props `value`, `onChange`, `accessibilityLabel`. Used by Add Property → Unit student housing.
+- `NumberStepper`: "−  0  +" counter in the form field look (`formStyles.field`), dividers, ends fade at `min` / `max`. Used by Add Room bed / bathroom counts.
+- `FieldInput` (`application/components/ApplicationFields.tsx`) also takes `suffix` (unit after a divider, e.g. "sq ft").
+- `ApplicationSection` renders the heading only when it has no children (collapsible sections pass `null` when closed).
+- Landlord property parts (`landlord/properties/PropertyParts.tsx`): `UploadZone` (dashed upload area: icon, `uploadTitle`, line, "Supports" pill) + `UploadDisc` (soft blue icon disc); `SubTabs` takes a tab list with optional icons (`spread` shares the width).
 
 ### 2b. Brand Logo (`src/components/BrandLogo.tsx`)
 - `<BrandLogo size={ms(26)} />`: full-colour Urban Nest house mark (blue ribbon house, ice-blue → royal-blue gradient, folded right leg). Never tint it. The PNG has no padding (house touches every edge).
