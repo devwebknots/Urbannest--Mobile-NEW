@@ -2,6 +2,7 @@
  * Landlord onboarding ("Independent Landlord" registration) data.
  */
 
+import { COUNTRIES_US_FIRST } from '@/config/countries';
 import type { ApplicationStep } from '@/features/application/types';
 
 export const ONBOARDING_STEPS: readonly ApplicationStep[] = [
@@ -28,14 +29,8 @@ export const ONBOARDING_STEPS: readonly ApplicationStep[] = [
   },
 ];
 
-export const ONBOARDING_COUNTRIES: readonly { id: string; label: string }[] = [
-  { id: 'us', label: 'United States' },
-  { id: 'in', label: 'India' },
-  { id: 'ca', label: 'Canada' },
-  { id: 'gb', label: 'United Kingdom' },
-  { id: 'au', label: 'Australia' },
-  { id: 'ae', label: 'United Arab Emirates' },
-];
+/** Every country (United States first, then A–Z); the picker has search */
+export const ONBOARDING_COUNTRIES = COUNTRIES_US_FIRST;
 
 export const ID_TYPES: readonly { id: string; label: string }[] = [
   { id: 'passport', label: 'Passport' },

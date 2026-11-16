@@ -40,4 +40,4 @@ export const MAX_PROPERTY_IMAGES = 10;
 
 /** Map shown before an address is found (New York, the form's sample city) */
 export const DEFAULT_MAP_POINT = { lat: 40.7128, lng: -74.006 };
-export const MAP_ZOOM = { initial: 15, min: 11, max: 18 };
+export const MAP_ZOOM = { initial: 15, min: 11, max: 18, pinned: 17 };

@@ -5,12 +5,13 @@
  *  - street address suggestions + "use current location" (shared
  *    useAddressLookup, free Photon search)
  *  - property photos (upload area + "+" tile, several at once) and a video
- *  - Location Preview: the typed address is looked up (debounced) and the
- *    map pin moves there; +/− zoom
+ *  - Location Preview: a picked suggestion / current location pins its
+ *    exact point (zoomed in); a typed address is looked up (debounced) and
+ *    the pin moves there; +/− zoom
  *  - Save & Continue: success dialog, unlocks and opens the Unit tab
  */
 
-import { createElement, useCallback, useEffect, useMemo, useState } from 'react';
+import { createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Asset,
   ImagePickerResponse,
@@ -84,6 +85,16 @@ const EMPTY: PropertyForm = {
   zip: '',
 };
 
+/** Fields whose edits move the pin by text lookup again */
+const ADDRESS_KEYS: ReadonlySet<keyof PropertyForm> = new Set([
+  'countryId',
+  'street1',
+  'city',
+  'stateId',
+  'region',
+  'zip',
+]);
+
 const PHOTO = { mediaType: 'photo' as const, quality: 0.8 as const, maxWidth: 2000, maxHeight: 2000 };
 const VIDEO = { mediaType: 'video' as const, videoQuality: 'high' as const };
 
@@ -104,14 +115,26 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
   const { show } = dialog;
 
   const hasStateList = form.countryId === 'us';
+  /** Pin holds an exact point (suggestion / current location): skip the
+   *  rough text lookup until the user edits the address again */
+  const pinnedExact = useRef(false);
 
   const setField = useCallback((key: keyof PropertyForm, value: string) => {
+    if (ADDRESS_KEYS.has(key)) {
+      pinnedExact.current = false;
+    }
     setForm(prev => ({ ...prev, [key]: value }));
     setErrors(prev => (prev[key] ? { ...prev, [key]: undefined } : prev));
   }, []);
 
   // Street suggestions / current location fill the address fields
   const lookup = useAddressLookup((address, from) => {
+    // Street Address 02 pick: fill only that field, keep Street Address 01
+    // and the rest of the address (and the pin) as they are
+    if (from === 'street2') {
+      setForm(prev => ({ ...prev, street2: address.street1 || prev.street2 }));
+      return;
+    }
     const country = ONBOARDING_COUNTRIES.find(
       c => c.id === address.countryCode.toLowerCase(),
     );
@@ -119,13 +142,20 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
       ...prev,
       countryId: country?.id ?? prev.countryId,
       street1: address.street1 || prev.street1,
-      street2: from === 'street2' ? '' : prev.street2,
+      street2: prev.street2,
       city: address.city || prev.city,
       stateId: country?.id === 'us' ? address.stateCode : prev.stateId,
       region: country?.id === 'us' ? prev.region : address.stateCode,
       zip: address.zip || prev.zip,
     }));
-  }, show);
+    // Drop the pin on the exact spot of the chosen address
+    if (address.point) {
+      pinnedExact.current = true;
+      setMapPoint(address.point);
+      setLocated(true);
+      setZoom(MAP_ZOOM.pinned);
+    }
+  }, show, false); // any country: no "Outside the US" note
 
   // Location Preview follows the typed address (debounced, free service)
   const stateText = hasStateList ? form.stateId : form.region;
@@ -140,7 +170,7 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
     900,
   );
   useEffect(() => {
-    if (!addressQuery) {
+    if (!addressQuery || pinnedExact.current) {
       return;
     }
     const controller = new AbortController();
@@ -346,6 +376,7 @@ export function useAddProperty(navigation?: { goBack: () => void }) {
       } else if (picker === 'ownership') {
         setField('ownershipId', id);
       } else if (picker === 'country') {
+        pinnedExact.current = false;
         setForm(prev => ({ ...prev, countryId: id, stateId: '', region: '' }));
       } else if (picker === 'state') {
         setField('stateId', id);

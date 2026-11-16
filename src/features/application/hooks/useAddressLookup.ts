@@ -31,6 +31,8 @@ export function useAddressLookup(
   /** `from`: the street field the search came from (street2 → clear it) */
   onResolved: (address: ParsedAddress, from: AddressLookupField) => void,
   showDialog: (config: AppDialogConfig) => void,
+  /** false: the form takes any country itself, so skip the "Outside the US" note */
+  usOnly = true,
 ) {
   const [query, setQuery] = useState('');
   /** Which street field is searching (the list shows under it) */
@@ -74,7 +76,7 @@ export function useAddressLookup(
   const deliver = useCallback(
     (address: ParsedAddress, from: AddressLookupField = 'street1') => {
       resolved.current(address, from);
-      if (address.countryCode && address.countryCode !== 'US') {
+      if (usOnly && address.countryCode && address.countryCode !== 'US') {
         showDialog({
           tone: 'info',
           title: 'Outside the US',
@@ -83,7 +85,7 @@ export function useAddressLookup(
         });
       }
     },
-    [showDialog],
+    [showDialog, usOnly],
   );
 
   const select = useCallback(

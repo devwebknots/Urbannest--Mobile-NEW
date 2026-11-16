@@ -268,13 +268,21 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
               <LabeledField label="Street Address 02">
                 <FieldInput
                   value={form.street2}
-                  onChangeText={t => setField('street2', t)}
+                  onChangeText={t => {
+                    setField('street2', t);
+                    lookup.type(t, 'street2');
+                  }}
+                  onFocus={() => lookup.type(form.street2, 'street2')}
+                  onBlur={lookup.close}
                   placeholder="Suite, Floor (Optional)"
                   autoComplete="address-line2"
                   autoCorrect={false}
                   maxLength={80}
                   accessibilityLabel="Street address 02"
                 />
+                {lookup.field === 'street2' ? (
+                  <AddressSuggestions suggestions={lookup.suggestions} onSelect={lookup.select} />
+                ) : null}
               </LabeledField>
               <FieldRow>
                 <LabeledField label="Landmark" style={styles.half}>

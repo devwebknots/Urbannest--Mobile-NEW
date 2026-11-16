@@ -25,6 +25,8 @@ export interface ParsedAddress {
   readonly zip: string;
   /** ISO country code, e.g. "US" */
   readonly countryCode: string;
+  /** Exact map point of the result (suggestion / current location) */
+  readonly point?: { readonly lat: number; readonly lng: number };
 }
 
 export class AddressLookupError extends Error {
@@ -68,7 +70,9 @@ interface PhotonProps {
   type?: string;
 }
 
-const parse = (p: PhotonProps): ParsedAddress => {
+type PhotonCoords = [number, number] | undefined;
+
+const parse = (p: PhotonProps, coords?: PhotonCoords): ParsedAddress => {
   const country = (p.countrycode ?? '').toUpperCase();
   const state = p.state ?? '';
   const street = p.street
@@ -83,6 +87,7 @@ const parse = (p: PhotonProps): ParsedAddress => {
     stateCode: country === 'US' ? US_STATE_CODES[state.toLowerCase()] ?? state : state,
     zip: (p.postcode ?? '').split(/[-\s]/)[0],
     countryCode: country,
+    point: coords ? { lat: coords[1], lng: coords[0] } : undefined,
   };
 };
 
@@ -107,9 +112,9 @@ export async function searchAddresses(
   const seen = new Set<string>();
   // Any country (the user may not be in the US); non-US rows name the country
   return (json.features ?? [])
-    .map((f: { properties: PhotonProps }) => f.properties)
-    .map((p: PhotonProps) => {
-      const address = parse(p);
+    .map((f: { properties: PhotonProps; geometry?: { coordinates?: PhotonCoords } }) => {
+      const p = f.properties;
+      const address = parse(p, f.geometry?.coordinates);
       return {
         id: `${p.osm_type ?? ''}${p.osm_id ?? Math.random()}`,
         main: address.street1 || p.name || '',
@@ -140,7 +145,8 @@ export async function addressFromLocation(lat: number, lng: number): Promise<Par
   if (!props) {
     throw new AddressLookupError('No address here', 'not-found');
   }
-  return parse(props);
+  // Pin the phone's real position, not the matched building's
+  return parse(props, [lng, lat]);
 }
 
 /** Map point for a typed address (Location Preview); null if none found */
