@@ -9,7 +9,9 @@
  *  - "Portfolio Overview" / tagline / OWNER MODE: ACTIVE pill
  *  - 2 x 2 stats box (properties, units, occupancy, rent)
  *  - Managed Assets: search button + filter chips (StatusFilterChips),
- *    "No properties found" card → Add Property (LandlordAddProperty)
+ *    "No properties found" card → Add Property (LandlordAddProperty);
+ *    after the demo Add Property flow, the sample property cards
+ *    (ManagedAssetCard) + "+ Add New Property"
  *  - Recent Unit Activities ("View all units →" only once there are units),
  *    empty row
  * No bottom tab bar on this page.
@@ -38,9 +40,11 @@ import { ArrowRightIcon } from '@/features/guest/components/GuestIcons';
 import { LightTopBar } from '@/features/renter/components/LightTopBar';
 import { moderateScale as ms } from '@/utils/responsive';
 import { LANDLORD_PROFILE } from '../constants';
+import { PlusIcon } from '@/components/icons';
 import {
   EmptyActivity,
   EmptyPropertiesCard,
+  ManagedAssetCard,
   OwnerModePill,
   PortfolioStats,
 } from '../properties/PortfolioParts';
@@ -138,9 +142,34 @@ export const LandlordPropertiesScreen: React.FC<Props> = ({ navigation }) => {
             onChange={vm.setFilter}
           />
         </View>
-        <View style={[styles.padded, styles.card]}>
-          <EmptyPropertiesCard onAdd={vm.addProperty} />
-        </View>
+        {vm.populated ? (
+          <View style={[styles.padded, styles.card, styles.assets]}>
+            {vm.assets.length === 0 ? (
+              <Text style={styles.noMatch}>No properties match this filter.</Text>
+            ) : (
+              vm.assets.map(a => (
+                <ManagedAssetCard
+                  key={a.id}
+                  asset={a}
+                  onView={() => vm.viewProperty(a)}
+                  onUnits={() => vm.viewUnits(a)}
+                  onMenu={() => vm.propertyMenu(a)}
+                />
+              ))
+            )}
+            <Button
+              title="Add New Property"
+              variant="brand"
+              onPress={vm.addProperty}
+              leftIcon={<PlusIcon size={ms(16)} color={colors.white} />}
+              style={styles.addNew}
+            />
+          </View>
+        ) : (
+          <View style={[styles.padded, styles.card]}>
+            <EmptyPropertiesCard onAdd={vm.addProperty} />
+          </View>
+        )}
 
         {/* Recent unit activities */}
         <View style={[styles.padded, styles.sectionHead, styles.activityHead]}>
@@ -241,6 +270,18 @@ const styles = StyleSheet.create({
   },
   card: {
     marginTop: spacing.md,
+  },
+  assets: {
+    gap: spacing.md,
+  },
+  noMatch: {
+    ...typographyPresets.body,
+    paddingVertical: spacing.lg,
+    textAlign: 'center',
+    color: colors.textSecondary,
+  },
+  addNew: {
+    marginTop: spacing.sm,
   },
   linkText: {
     color: colors.primary,

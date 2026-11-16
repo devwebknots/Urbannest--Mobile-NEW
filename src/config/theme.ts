@@ -537,6 +537,42 @@ export const typographyPresets: Record<string, TextStyle> = {
     lineHeight: scaleFont(22),
     color: colors.primary,
   },
+  // ---- Compact card text (landlord Managed Assets cards) ----
+  // Text of a small (sm) app button
+  buttonSmall: {
+    fontFamily: typography.fontFamily.body.semiBold,
+    fontSize: scaleFont(11),
+    lineHeight: scaleFont(14),
+  },
+  // Secondary line on a compact card (address)
+  microText: {
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: scaleFont(9.5),
+    lineHeight: scaleFont(13),
+    color: colors.textSecondary,
+  },
+  // Small stat label on a compact card ("Units", "Occupancy")
+  microLabel: {
+    fontFamily: typography.fontFamily.body.regular,
+    fontSize: scaleFont(9),
+    lineHeight: scaleFont(12),
+    color: colors.textSecondary,
+  },
+  // Small stat value on a compact card ("0 Total", "0%")
+  microValue: {
+    fontFamily: typography.fontFamily.body.semiBold,
+    fontSize: scaleFont(10.5),
+    lineHeight: scaleFont(14),
+    color: colors.textPrimary,
+  },
+  // Tiny uppercase pill text ("APARTMENT", "SELF", "PM - ACTIVE")
+  tagSmall: {
+    fontFamily: typography.fontFamily.body.medium,
+    fontSize: scaleFont(8.5),
+    lineHeight: scaleFont(11),
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+  },
   // Tiny data credit on maps ("© Esri, HERE, Garmin, OpenStreetMap")
   mapCredit: {
     fontFamily: typography.fontFamily.body.regular,

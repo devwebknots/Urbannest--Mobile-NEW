@@ -55,6 +55,18 @@ export const MAP_ZOOM = { initial: 15, min: 11, max: 18, pinned: 17 };
 
 /* ───────────── Unit tab ("Unit / Home Information") ───────────── */
 
+/** Unit → Amenities tab: the design's 8 tiles (same tiles as the property) */
+export const UNIT_AMENITIES: readonly PropertyAmenity[] = [
+  { id: 'ac', label: 'Air Conditioner', icon: 'airVent' },
+  { id: 'balcony', label: 'Balcony', icon: 'balcony' },
+  { id: 'cctv', label: 'CCTV', icon: 'cctv' },
+  { id: 'furnished', label: 'Furnished', icon: 'sofa', accessName: 'furnished setup' },
+  { id: 'geyser', label: 'Geyser', icon: 'geyser' },
+  { id: 'kitchen', label: 'Kitchen', icon: 'microwave', accessName: 'kitchen' },
+  { id: 'wardrobe', label: 'Wardrobe', icon: 'wardrobe', accessName: 'wardrobe' },
+  { id: 'wifi', label: 'Wi-Fi', icon: 'wifi', accessName: 'Wi-Fi' },
+];
+
 export const UNIT_TYPES: readonly { id: string; label: string }[] = [
   { id: 'studio', label: 'Studio' },
   { id: '1br', label: '1 BR' },

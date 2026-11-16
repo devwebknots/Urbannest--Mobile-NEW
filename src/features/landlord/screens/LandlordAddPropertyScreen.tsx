@@ -97,8 +97,14 @@ const HEADINGS = {
     kicker: 'Unit / Home Information',
     line: 'Enter the unit-level details including type, size, rent and configuration.',
   },
-  unitAmenities: { kicker: 'Unit Amenities', line: 'Select the amenities this unit has.' },
-  gallery: { kicker: 'Unit Gallery', line: 'Add photos of this unit.' },
+  unitAmenities: {
+    kicker: 'Unit / Home Information',
+    line: 'Enter the unit-level details including type, size, rent and configuration.',
+  },
+  gallery: {
+    kicker: 'Unit / Home Information',
+    line: 'Upload and manage photos and videos for this unit.',
+  },
 };
 
 interface Props {
@@ -451,7 +457,7 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
             title={
               onUnit
                 ? unit.isLastStep
-                  ? 'Save Unit'
+                  ? 'Save Unit & Send Invite'
                   : 'Next'
                 : onAmenities
                   ? 'Save Property'
@@ -460,7 +466,11 @@ export const LandlordAddPropertyScreen: React.FC<Props> = ({ navigation }) => {
             variant="brand"
             onPress={onUnit ? unit.next : vm.saveAndContinue}
             style={styles.save}
-            rightIcon={<ArrowRightIcon size={ms(16)} color={colors.white} />}
+            rightIcon={
+              onUnit && unit.isLastStep ? undefined : (
+                <ArrowRightIcon size={ms(16)} color={colors.white} />
+              )
+            }
           />
         </View>
       )}

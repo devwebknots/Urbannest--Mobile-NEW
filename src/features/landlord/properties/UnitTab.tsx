@@ -4,9 +4,9 @@
  *  - Unit/Home Info (design): Units Added So Far + Add Unit, Property
  *    Context, Unit Basics, Unit Summary (Draft), Size & Configuration,
  *    Financials, Floor Plan, Unit Types Guide; each heading collapses
- *  - Amenities: search + amenity tiles for this unit (reuses the property
- *    tiles)
- *  - Gallery: unit photos (reuses the property photo field)
+ *  - Amenities: same parts as the property's Amenities tab (search, tiles,
+ *    Amenities Access list + Generate Access, note) with the unit list
+ *  - Gallery: Photo Gallery + Video(s), the property's photo / video fields
  * Sections sit on the page (app form rule).
  */
 
@@ -17,9 +17,16 @@ import { FieldInput, FieldRow, LabeledField } from '@/features/application/compo
 import { ApplicationSection } from '@/features/application/components/ApplicationSection';
 import { FormSelect } from '@/features/renter/components/form/FormSelect';
 import { moderateScale as ms } from '@/utils/responsive';
-import { AmenityGrid, AmenityIcon, AmenitySearch } from './AmenityParts';
-import { PROPERTY_AMENITIES } from './constants';
-import { DescriptionField, PropertyImagesField } from './PropertyParts';
+import { Button } from '@/components/Button';
+import { VideoCameraIcon } from '@/components/icons';
+import {
+  AmenityAccessList,
+  AmenityGrid,
+  AmenityIcon,
+  AmenitySearch,
+  InfoNote,
+} from './AmenityParts';
+import { DescriptionField, PropertyImagesField, VideoDropZone } from './PropertyParts';
 import { RoomSheet } from './RoomSheet';
 import type { AddUnitVM, UnitSection } from './useAddUnit';
 import {
@@ -47,39 +54,71 @@ export const UnitTabContent: React.FC<{
   const { form, errors, setField } = unit;
 
   if (unit.subTab === 'amenities') {
-    const q = unit.amenityQuery.trim().toLowerCase();
+    // Same layout as the property's Amenities tab
     return (
       <View style={styles.sections}>
         <ApplicationSection
           title="Unit Amenities"
-          subtitle="Select the amenities this unit has."
+          subtitle="Select the amenities available for this unit."
           icon="layers"
         >
           <AmenitySearch value={unit.amenityQuery} onChangeText={unit.setAmenityQuery} />
           <AmenityGrid
-            amenities={
-              q ? PROPERTY_AMENITIES.filter(a => a.label.toLowerCase().includes(q)) : PROPERTY_AMENITIES
-            }
+            amenities={unit.shownAmenities}
             selected={unit.amenities}
             onToggle={unit.toggleAmenity}
           />
         </ApplicationSection>
+
+        <ApplicationSection
+          title="Amenities Access"
+          subtitle="Grant access for the selected amenities in this unit."
+          icon={<AmenityIcon name="key" size={ms(22)} color={colors.primary} />}
+        >
+          <AmenityAccessList
+            amenities={unit.accessAmenities}
+            granted={unit.access}
+            onToggle={unit.toggleAccess}
+            audience="the tenant"
+          />
+          <Button
+            title="Generate Access"
+            variant="soft"
+            onPress={unit.generateAccess}
+            leftIcon={<AmenityIcon name="key" size={ms(18)} color={colors.primary} />}
+          />
+        </ApplicationSection>
+
+        <InfoNote text="Amenities access can only be configured for the amenities you have selected above." />
       </View>
     );
   }
 
   if (unit.subTab === 'gallery') {
+    // Same photo / video fields as the property's Basic tab
     return (
       <View style={styles.sections}>
         <ApplicationSection
-          title="Unit Gallery"
-          subtitle="Add photos of this unit."
+          title="Photo Gallery"
+          subtitle="Upload interior photos for this unit's listing."
           icon={<UnitIcon name="image" size={ms(22)} color={colors.primary} />}
         >
           <PropertyImagesField
             images={unit.photos}
             onUpload={unit.uploadPhotos}
             onRemove={unit.removePhoto}
+          />
+        </ApplicationSection>
+
+        <ApplicationSection
+          title="Video(s)"
+          subtitle="Upload a video walkthrough or tour of this unit."
+          icon={<VideoCameraIcon size={ms(22)} color={colors.primary} />}
+        >
+          <VideoDropZone
+            video={unit.video}
+            onUpload={unit.uploadVideo}
+            onRemove={unit.removeVideo}
           />
         </ApplicationSection>
       </View>

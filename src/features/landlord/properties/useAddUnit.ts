@@ -4,10 +4,14 @@
  *  - several units: "Units Added So Far" switcher + "Add Unit" (new blank
  *    unit); each keeps its own form, amenities, photos and floor plans
  *  - sub tabs: Unit/Home Info → Amenities → Gallery (footer "Next" walks
- *    through them, then "Save Unit")
+ *    through them, then "Save Unit & Send Invite": fills the demo portfolio
+ *    (portfolioStore) and offers "View Portfolio")
  *  - Unit/Home Info sections (collapsible): Unit Basics, Unit Summary
  *    (read-only, from the form), Size & Configuration (+ student housing
  *    switch), Financials, Floor Plan (upload area + 3 slots), Unit Types Guide
+ *  - Amenities (reuses the property tab's tiles + access list): unit
+ *    amenities, access ticks per unit, Generate Access
+ *  - Gallery (reuses the property tab's photo + video fields)
  *  - student housing: switch, rooms per unit, Add Room / view room sheet
  *  - pickers: unit type, ownership, lease type, management model, unit
  * The page's dialog / photo picker come from useAddProperty.
@@ -22,9 +26,12 @@ import {
   MAX_FLOOR_PLANS,
   MAX_PROPERTY_IMAGES,
   OWNERSHIP_TYPES,
+  UNIT_AMENITIES,
   UNIT_TYPES,
 } from './constants';
 import { type StudentRoom, roomTypeLabel } from './RoomSheet';
+import { navigationRef } from '@/navigation/navigationRef';
+import { portfolioStore } from '../store/portfolioStore';
 import type { PickedMedia } from './useAddProperty';
 
 /** Screens-only phase: skip required-field checks (set false to turn on) */
@@ -58,7 +65,10 @@ interface UnitDraft {
   studentHousing: boolean;
   rooms: StudentRoom[];
   amenities: string[];
+  /** Amenity ids the tenant gets access to */
+  access: string[];
   photos: PickedMedia[];
+  video: PickedMedia | null;
   floorPlans: PickedMedia[];
   saved: boolean;
 }
@@ -88,12 +98,26 @@ const newUnit = (): UnitDraft => ({
   studentHousing: false,
   rooms: [],
   amenities: [],
+  access: [],
   photos: [],
+  video: null,
   floorPlans: [],
   saved: false,
 });
 
 const SUB_ORDER: readonly UnitSubTab[] = ['info', 'amenities', 'gallery'];
+
+/** Back to the Portfolio Overview (it opened this form; else go there) */
+const openPortfolio = () => {
+  if (!navigationRef.isReady()) {
+    return;
+  }
+  if (navigationRef.canGoBack()) {
+    navigationRef.goBack();
+  } else {
+    navigationRef.navigate('LandlordProperties');
+  }
+};
 
 const labelOf = (list: readonly { id: string; label: string }[], id: string) =>
   list.find(o => o.id === id)?.label;
@@ -166,8 +190,62 @@ export function useAddUnit(
         amenities: u.amenities.includes(id)
           ? u.amenities.filter(x => x !== id)
           : [...u.amenities, id],
+        // Unselecting an amenity also drops its access
+        access: u.access.filter(x => x !== id),
       })),
     [update],
+  );
+
+  const toggleAccess = useCallback(
+    (id: string) =>
+      update(u => ({
+        ...u,
+        access: u.access.includes(id) ? u.access.filter(x => x !== id) : [...u.access, id],
+      })),
+    [update],
+  );
+
+  /** Grid: the unit amenities, narrowed by the search */
+  const shownAmenities = useMemo(() => {
+    const q = amenityQuery.trim().toLowerCase();
+    return q ? UNIT_AMENITIES.filter(a => a.label.toLowerCase().includes(q)) : UNIT_AMENITIES;
+  }, [amenityQuery]);
+
+  /** Access list: selected unit amenities the tenant can be given */
+  const accessAmenities = useMemo(
+    () => UNIT_AMENITIES.filter(a => a.accessName && unit.amenities.includes(a.id)),
+    [unit.amenities],
+  );
+
+  const generateAccess = useCallback(() => {
+    const granted = accessAmenities.filter(a => unit.access.includes(a.id));
+    if (granted.length === 0) {
+      show({
+        tone: 'info',
+        title: 'Choose amenities first',
+        message:
+          accessAmenities.length === 0
+            ? 'Select amenities above (furnished, kitchen, wardrobe, Wi-Fi), then tick the ones the tenant can use.'
+            : 'Tick the amenities the tenant can use, then generate access.',
+        actions: [{ label: 'OK', variant: 'brand' }],
+      });
+      return;
+    }
+    show({
+      tone: 'success',
+      title: 'Access generated',
+      message: 'The tenant of this unit can use these amenities.',
+      details: granted.map(a => ({ label: a.label, value: 'Access on' })),
+      actions: [{ label: 'Done', variant: 'brand' }],
+    });
+  }, [accessAmenities, unit.access, show]);
+
+  const uploadVideo = useCallback(
+    () =>
+      pickMedia('Unit video', 'video', ([a]) =>
+        update(u => ({ ...u, video: toMedia(a, 'unit_video.mp4') })),
+      ),
+    [pickMedia, update],
   );
 
   const toMedia = (a: Asset, fallback: string): PickedMedia => ({
@@ -281,14 +359,17 @@ export function useAddUnit(
       return;
     }
     update(u => ({ ...u, saved: true }));
+    // Demo flow: the portfolio now shows the sample properties
+    portfolioStore.populate();
     show({
       tone: 'success',
-      title: 'Unit saved',
-      message: 'Add another unit to this property, or keep editing this one.',
+      title: 'Unit saved & invite sent',
+      message: 'Your property is now in your portfolio.',
       details: [{ label: 'Unit', value: unitName(unit, active) }],
+      dismissible: false,
       actions: [
-        { label: 'Add Another Unit', variant: 'brand', onPress: addUnit },
-        { label: 'Done', variant: 'link' },
+        { label: 'View Portfolio', variant: 'brand', onPress: openPortfolio },
+        { label: 'Add Another Unit', variant: 'link', onPress: addUnit },
       ],
     });
   }, [subTab, check, update, show, unitName, unit, active, addUnit]);
@@ -376,6 +457,14 @@ export function useAddUnit(
     removeFloorPlan,
     amenities: unit.amenities,
     toggleAmenity,
+    shownAmenities,
+    accessAmenities,
+    access: unit.access,
+    toggleAccess,
+    generateAccess,
+    video: unit.video,
+    uploadVideo,
+    removeVideo: () => update(u => ({ ...u, video: null })),
     amenityQuery,
     setAmenityQuery,
     photos: unit.photos,

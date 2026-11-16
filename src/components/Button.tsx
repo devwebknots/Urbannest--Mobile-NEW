@@ -12,7 +12,7 @@
  *  - glass: clear fill, white hairline rim, white text; the second action
  *           on a dark panel next to `light` (e.g. landlord "Message PM")
  * All share radius 10, the `button` text preset and optional icons.
- * Sizes: md = 44 high, lg = 48 high.
+ * Sizes: sm = 30 high (in-card actions, `buttonSmall` text), md = 44, lg = 48.
  *
  * Older variants (primary / secondary / outline / danger) are kept for the
  * login screen.
@@ -52,13 +52,13 @@ export type ButtonVariant =
   | 'link'
   | 'glass';
 
-export type ButtonSize = 'md' | 'lg';
+export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps {
   readonly title: string;
   readonly onPress?: () => void;
   readonly variant?: ButtonVariant;
-  /** Height for brand / soft: md = 44, lg = 48 (default lg) */
+  /** Height for app buttons: sm = 30, md = 44, lg = 48 (default lg) */
   readonly size?: ButtonSize;
   /** Icon before the text */
   readonly leftIcon?: React.ReactNode;
@@ -172,7 +172,9 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         <View style={styles.content}>
           {leftIcon}
-          <Text style={[getTextStyle(), textStyle]}>{title}</Text>
+          <Text style={[getTextStyle(), isApp && size === 'sm' && styles.smText, textStyle]}>
+            {title}
+          </Text>
           {rightIcon}
         </View>
       )}
@@ -189,6 +191,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     borderRadius: borderRadius.button,
     overflow: 'hidden',
+  },
+  // Compact: in-card actions (Managed Assets "View Property / Units")
+  sm: {
+    height: ms(30),
+    paddingHorizontal: spacing.md,
+  },
+  smText: {
+    ...typographyPresets.buttonSmall,
   },
   md: {
     height: ms(44),

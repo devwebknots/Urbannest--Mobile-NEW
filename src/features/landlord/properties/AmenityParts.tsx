@@ -120,7 +120,9 @@ export const AmenityAccessList: React.FC<{
   amenities: readonly PropertyAmenity[];
   granted: readonly string[];
   onToggle: (id: string) => void;
-}> = ({ amenities, granted, onToggle }) =>
+  /** Who gets access, end of each row's line (unit: "the tenant") */
+  audience?: string;
+}> = ({ amenities, granted, onToggle, audience = 'units/tenants' }) =>
   amenities.length === 0 ? (
     <View style={styles.accessEmpty}>
       <Text style={styles.empty}>
@@ -152,7 +154,7 @@ export const AmenityAccessList: React.FC<{
                 {a.label}
               </Text>
               <Text style={styles.accessBody} numberOfLines={2}>
-                {`Provide access to the ${a.accessName} for units/tenants.`}
+                {`Provide access to the ${a.accessName} for ${audience}.`}
               </Text>
             </View>
             <CheckBox on={on} />

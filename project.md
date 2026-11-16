@@ -525,6 +525,11 @@ Body (Inter):
 | `tag` | `Inter-Medium` 500 | 10.5 / 13 | uppercase, letterSpacing 0.6 | Uppercase tag inside a field or row ("DEFAULT" on Room Status) |
 | `uploadTitle` | `Inter-SemiBold` 600 | 17 / 22 | `primary` | Bold blue title in a dashed upload area ("Upload Images", "Upload Property Video", "Upload Technical Drawings") |
 | `mapCredit` | `Inter-Regular` 400 | 8 / 10 | `textSecondary` | Tiny data credit on maps ("© Esri, HERE, Garmin, OpenStreetMap") |
+| `buttonSmall` | `Inter-SemiBold` 600 | 11 / 14 | colour set by the button | Text of `Button` size `sm` (built in) |
+| `microText` | `Inter-Regular` 400 | 9.5 / 13 | `textSecondary` | Secondary line on a compact card (Managed Assets address) |
+| `microLabel` | `Inter-Regular` 400 | 9 / 12 | `textSecondary` | Small stat label on a compact card ("Units", "Occupancy") |
+| `microValue` | `Inter-SemiBold` 600 | 10.5 / 14 | `textPrimary` (tinted per stat) | Small stat value on a compact card ("0 Total", "0%") |
+| `tagSmall` | `Inter-Medium` 500 | 8.5 / 11 | uppercase, letterSpacing 0.4 | Tiny pill text ("APARTMENT", "SELF", "PM - ACTIVE") |
 
 **Which preset for which element** (same element = same style on every screen):
 
@@ -551,6 +556,7 @@ Body (Inter):
 | Uppercase tag ("DEFAULT") | `tag` |
 | Upload area title | `uploadTitle` |
 | Map data credit | `mapCredit` |
+| Compact card: secondary line / stat label / stat value / tiny pill | `microText` / `microLabel` / `microValue` / `tagSmall` |
 
 Apply presets directly, e.g. `style={[typographyPresets.listingTitle, styles.name]}`; the local style holds layout and colour only. Don't override `fontSize` / `lineHeight` / `fontFamily`. Avoid making text heavier than these presets (the check-in screen was reworked because `heroTitle` / `price` / Playfair numbers were used on cards and looked bulky).
 
@@ -597,7 +603,7 @@ Tokens (`borderRadius` in `theme.ts`): `xs` 4 · `sm` 6 · `md` 8 · `lg` 12 · 
 | `glass` | white 8% fill, white 45% hairline rim, white text | Second action on a dark panel, next to `light` | Landlord hero "Message PM", Communication Hub "Open Messenger" |
 | `primary` / `secondary` / `outline` / `danger` | old styles | Login screen only — don't use on new screens | — |
 
-Shared look: radius `borderRadius.button` (10), text `typographyPresets.button` (Inter SemiBold 13.5), horizontal padding `spacing.xl`, icon gap `spacing.sm`, disabled = 45% opacity.
+Shared look: radius `borderRadius.button` (10), text `typographyPresets.button` (Inter SemiBold 13.5), horizontal padding `spacing.xl`, icon gap `spacing.sm`, disabled = 45% opacity. Sizes: `lg` 48 (default), `md` 44, `sm` 30 (compact in-card actions, `buttonSmall` text, padding `spacing.md`; Managed Assets "View Property" / "View Units").
 
 | Prop | Values |
 | :--- | :--- |

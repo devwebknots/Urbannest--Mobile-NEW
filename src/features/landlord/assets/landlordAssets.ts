@@ -19,6 +19,10 @@ export const landlordAssets = {
   // "Unit / Home Information" design (440 x 240), "Units so far" text
   // painted out, misty left side, left edge faded to transparent
   contextBuilding: require('@/assets/images/landlord/context_building.png'),
+  // Portfolio sample properties (Managed Assets), one building each
+  // Modern residence at dusk, cropped at full size from guest hero_bg.png
+  sampleDusk: require('@/assets/images/landlord/sample_dusk.png'),
+  sampleSterling: require('@/assets/images/renter/residence_sterling.jpg'),
 };
 
 /** Width / height of header_building.png */
@@ -79,6 +83,12 @@ export const amenityIcons = {
   elevator: require('@/assets/icons/amenities/elevator.png'),
   sprout: require('@/assets/icons/amenities/sprout.png'),
   washingMachine: require('@/assets/icons/amenities/washing_machine.png'),
+  // Unit amenities
+  sofa: require('@/assets/icons/amenities/sofa.png'),
+  geyser: require('@/assets/icons/amenities/geyser.png'),
+  microwave: require('@/assets/icons/amenities/microwave.png'),
+  wardrobe: require('@/assets/icons/amenities/wardrobe.png'),
+  wifi: require('@/assets/icons/amenities/wifi.png'),
   search: require('@/assets/icons/amenities/search.png'),
   info: require('@/assets/icons/amenities/info.png'),
   key: require('@/assets/icons/amenities/key.png'),

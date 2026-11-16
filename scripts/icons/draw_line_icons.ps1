@@ -712,6 +712,48 @@ $icons = [ordered]@{
     'circle:12,13,5',
     'path:M12 18a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 1 0-5'
   )
+  # ---- Unit amenities (also icons/amenities at -Stroke 2):
+  #      -Only sofa,geyser,microwave,wardrobe,wifi
+  # lucide: sofa (Furnished)
+  'sofa' = @(
+    'path:M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3',
+    'path:M2 16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z',
+    'path:M4 18v2',
+    'path:M20 18v2',
+    'path:M12 4v9'
+  )
+  # geyser (own, Lucide style): rounded water-heater tank, dial, two pipes
+  'geyser' = @(
+    'path:M8 2h8a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3z',
+    'circle:12,8.5,2.5',
+    'path:M9 14.5h6',
+    'path:M10 19v3',
+    'path:M14 19v3'
+  )
+  # lucide: microwave (Kitchen)
+  'microwave' = @(
+    'path:M4 4h16a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
+    'path:M7 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z',
+    'path:M18 8v7',
+    'path:M6 19v2',
+    'path:M18 19v2'
+  )
+  # wardrobe (own, Lucide style): two doors, handles, feet
+  'wardrobe' = @(
+    'path:M5 2h14a1 1 0 0 1 1 1v17a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z',
+    'path:M12 2v19',
+    'path:M10 10.5v3',
+    'path:M14 10.5v3',
+    'path:M6 21v1',
+    'path:M18 21v1'
+  )
+  # lucide: wifi
+  'wifi' = @(
+    'path:M12 20h.01',
+    'path:M2 8.82a15 15 0 0 1 20 0',
+    'path:M5 12.859a10 10 0 0 1 14 0',
+    'path:M8.5 16.429a5 5 0 0 1 7 0'
+  )
   # lucide: search
   'search' = @(
     'circle:11,11,8',

@@ -5,13 +5,18 @@
  *    white, radius xl, TILE_BORDER, shadows.sm), tinted icon tiles
  *  - EmptyPropertiesCard: as the design: room photo (cropped from it) on
  *    the left melting into the card, "No properties found" + Add Property right
+ *  - ManagedAssetCard: a property in the Managed Assets list (photo + type
+ *    tag, name, SELF / PM - ACTIVE pill, ⋯, address, 4 stats, View
+ *    Property / View Units: app brand + soft buttons)
  *  - EmptyActivity: quiet "No unit activity yet." row
  */
 
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/Button';
-import { ClockIcon, PlusIcon } from '@/components/icons';
+import { ClockIcon, MapPinIcon, PlusIcon } from '@/components/icons';
+import { RenterIcon } from '@/features/renter/components/dashboard/RenterIcon';
+import type { ManagedAsset } from './usePortfolioOverview';
 import {
   borderRadius,
   colors,
@@ -143,6 +148,102 @@ export const EmptyPropertiesCard: React.FC<{ onAdd: () => void }> = ({ onAdd }) 
     </View>
   </View>
 );
+
+/**
+ * Managed asset card (design): photo left with a dark "APARTMENT" tag; name,
+ * SELF / PM - ACTIVE pill, ⋯; address; Units / Occupancy / Maintenance /
+ * Renewals; "View Property →" + "View Units".
+ */
+export const ManagedAssetCard: React.FC<{
+  asset: ManagedAsset;
+  onView: () => void;
+  onUnits: () => void;
+  onMenu: () => void;
+}> = ({ asset, onView, onUnits, onMenu }) => {
+  // 2 x 2 so each stat has room (one row of four was too tight)
+  const stats = [
+    { label: 'Units', value: `${asset.units} Total`, color: colors.navy },
+    { label: 'Occupancy', value: `${asset.occupancy}%`, color: colors.warning },
+    { label: 'Maintenance', value: `${asset.maintenanceOpen} Open`, color: colors.successDark },
+    { label: 'Renewals', value: `${asset.renewalsUpcoming} Upcoming`, color: colors.navy },
+  ];
+  const statRows = [stats.slice(0, 2), stats.slice(2)];
+  const pm = asset.managedBy === 'pm';
+  return (
+    <View style={styles.asset}>
+      <View style={styles.assetPhotoWrap}>
+        <Image source={asset.photo} style={styles.assetPhoto} resizeMode="cover" />
+        <View style={styles.assetType}>
+          <Text style={styles.assetTypeText}>{asset.type}</Text>
+        </View>
+      </View>
+
+      <View style={styles.assetBody}>
+        <View style={styles.assetHead}>
+          <Text style={styles.assetName} numberOfLines={1}>
+            {asset.name}
+          </Text>
+          <View style={[styles.managed, pm && styles.managedPm]}>
+            <Text style={[styles.managedText, pm && styles.managedTextPm]}>
+              {pm ? 'PM - Active' : 'Self'}
+            </Text>
+          </View>
+          <Pressable
+            onPress={onMenu}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={`${asset.name} options`}
+            style={({ pressed }) => pressed && styles.pressed}
+          >
+            <RenterIcon name="ellipsis" size={ms(16)} color={colors.navy} />
+          </Pressable>
+        </View>
+        <View style={styles.assetAddress}>
+          <MapPinIcon size={ms(10)} color={colors.textSecondary} />
+          <Text style={styles.assetAddressText} numberOfLines={1}>
+            {asset.address}
+          </Text>
+        </View>
+
+        {/* Stats: soft panel, 2 x 2 (Units | Occupancy, Maintenance | Renewals) */}
+        <View style={styles.assetStats}>
+          {statRows.map((row, r) => (
+            <View key={`row-${r}`} style={[styles.assetStatRow, r > 0 && styles.assetStatRowRule]}>
+              {row.map((s, c) => (
+                <View key={s.label} style={[styles.assetStat, c > 0 && styles.assetStatRule]}>
+                  <Text style={styles.assetStatLabel} numberOfLines={1}>
+                    {s.label}
+                  </Text>
+                  <Text style={[styles.assetStatValue, { color: s.color }]} numberOfLines={1}>
+                    {s.value}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.assetActions}>
+          {/* App buttons, compact size: brand + light (white, hairline) */}
+          <Button
+            title="View Property"
+            variant="brand"
+            size="sm"
+            onPress={onView}
+            style={styles.assetAction}
+          />
+          <Button
+            title={`View Units (${asset.units})`}
+            variant="light"
+            size="sm"
+            onPress={onUnits}
+            style={[styles.assetAction, styles.assetActionLight]}
+          />
+        </View>
+      </View>
+    </View>
+  );
+};
 
 export const EmptyActivity: React.FC = () => (
   <View style={styles.activity}>
@@ -278,6 +379,132 @@ const styles = StyleSheet.create({
   },
   emptyButton: {
     marginTop: spacing.md,
+  },
+  // Managed asset card (design): white box, small inset photo with its
+  // own rounded corners on the left, compact text column
+  asset: {
+    flexDirection: 'row',
+    gap: spacing.sm + 1,
+    padding: spacing.xs + 2,
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: TILE_BORDER,
+    backgroundColor: colors.white,
+    ...shadows.sm,
+  },
+  assetPhotoWrap: {
+    width: '31%',
+    overflow: 'hidden',
+    borderRadius: borderRadius.lg,
+  },
+  // Pinned to the column's edges (no % size) so "cover" crops the photo
+  // to the card height instead of stretching it
+  assetPhoto: {
+    ...StyleSheet.absoluteFill,
+    width: undefined,
+    height: undefined,
+  },
+  assetType: {
+    position: 'absolute',
+    top: spacing.xs + 2,
+    left: spacing.xs + 2,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.pill,
+    backgroundColor: 'rgba(11,29,58,0.72)',
+  },
+  assetTypeText: {
+    ...typographyPresets.tagSmall,
+    color: colors.white,
+  },
+  assetBody: {
+    flex: 1,
+    gap: spacing.xs + 2,
+    paddingVertical: spacing.xs,
+    paddingRight: spacing.xs,
+  },
+  assetHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  assetName: {
+    ...typographyPresets.bodyBold,
+    flex: 1,
+    color: colors.navy,
+  },
+  managed: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.pill,
+    backgroundColor: colors.chipBlue,
+  },
+  managedPm: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    backgroundColor: colors.white,
+  },
+  managedText: {
+    ...typographyPresets.tagSmall,
+    color: colors.textSecondary,
+  },
+  managedTextPm: {
+    color: colors.primary,
+  },
+  assetAddress: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: -spacing.xs,
+  },
+  assetAddressText: {
+    ...typographyPresets.microText,
+    flex: 1,
+  },
+  // Soft tinted panel holding the 2 x 2 stats
+  assetStats: {
+    paddingHorizontal: spacing.sm,
+    borderRadius: borderRadius.md,
+    backgroundColor: TILE_BG,
+  },
+  assetStatRow: {
+    flexDirection: 'row',
+    paddingVertical: spacing.xs + 2,
+  },
+  assetStatRowRule: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: TILE_BORDER,
+  },
+  assetStat: {
+    flex: 1,
+    gap: 1,
+  },
+  // Second column: hairline on its left, text set in from it
+  assetStatRule: {
+    paddingLeft: spacing.sm,
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderLeftColor: TILE_BORDER,
+  },
+  assetStatLabel: {
+    ...typographyPresets.microLabel,
+  },
+  assetStatValue: {
+    ...typographyPresets.microValue,
+  },
+  assetActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  assetAction: {
+    flex: 1,
+    paddingHorizontal: spacing.sm,
+  },
+  assetActionLight: {
+    borderWidth: 1,
+    borderColor: TILE_BORDER,
+  },
+  pressed: {
+    opacity: 0.7,
   },
   activity: {
     flexDirection: 'row',
