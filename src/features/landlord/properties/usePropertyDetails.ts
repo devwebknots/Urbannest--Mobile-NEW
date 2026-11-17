@@ -297,7 +297,14 @@ export function usePropertyDetails(
     openPhotos: () => comingSoon('Photo Gallery'),
     filterUnits: () => comingSoon('Filter Units'),
     addUnit: () => comingSoon('Add Unit'),
-    viewUnit: (u: InventoryUnit) => comingSoon(`${property.name} — ${u.name}`),
+    viewUnit: (u: InventoryUnit) => {
+      if (navigationRef.isReady()) {
+        navigationRef.navigate('LandlordUnitDetails', {
+          propertyId: propertyId ?? 'test',
+          unitId: u.id,
+        });
+      }
+    },
     messageUnit: (u: InventoryUnit) => comingSoon(`Message ${u.name}`),
     openAction: (a: QuickAction) => comingSoon(a.title),
     openFolder: (f: VaultFolder) => comingSoon(f.title),

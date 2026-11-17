@@ -33,6 +33,9 @@ export const landlordAssets = {
   detailsBedroom: require('@/assets/images/landlord/details_bedroom.jpg'),
   detailsKitchen: require('@/assets/images/landlord/details_kitchen.jpg'),
   detailsUnit101: require('@/assets/images/landlord/details_unit_101.jpg'),
+  // Unit Details main photo: high-res Unsplash bedroom
+  // (photo-1505693416388-ac5ce068fe85, 1200 x 800)
+  unitBedroom: require('@/assets/images/landlord/unit_bedroom.jpg'),
 };
 
 /** Width / height of header_building.png */

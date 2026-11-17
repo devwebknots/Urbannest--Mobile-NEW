@@ -341,7 +341,8 @@ export const MaintenanceQueueBody: React.FC<{ openTickets: number; vendorScore: 
 export interface ActionRowItem {
   readonly id: string;
   readonly title: string;
-  readonly subtitle: string;
+  /** Optional second line (Quick Actions on Unit Details have none) */
+  readonly subtitle?: string;
   readonly icon: ImageSourcePropType;
   readonly tint: string;
   readonly tile: string;
@@ -350,9 +351,12 @@ export interface ActionRowItem {
 export function ActionRows<T extends ActionRowItem>({
   items,
   onPress,
+  trailingIcon = DETAIL_ICONS.chevron,
 }: {
   items: readonly T[];
   onPress: (item: T) => void;
+  /** Icon at the row end (default chevron; Document Vault on Unit Details: download) */
+  trailingIcon?: ImageSourcePropType;
 }) {
   return (
     <View>
@@ -361,7 +365,7 @@ export function ActionRows<T extends ActionRowItem>({
           key={it.id}
           onPress={() => onPress(it)}
           accessibilityRole="button"
-          accessibilityLabel={`${it.title}, ${it.subtitle}`}
+          accessibilityLabel={it.subtitle ? `${it.title}, ${it.subtitle}` : it.title}
           style={({ pressed }) => [styles.actionRow, i > 0 && styles.factRule, pressed && styles.pressed]}
         >
           <View style={[styles.actionTile, { backgroundColor: it.tile }]}>
@@ -371,11 +375,13 @@ export function ActionRows<T extends ActionRowItem>({
             <Text style={styles.actionTitle} numberOfLines={1}>
               {it.title}
             </Text>
-            <Text style={styles.actionSub} numberOfLines={1}>
-              {it.subtitle}
-            </Text>
+            {it.subtitle ? (
+              <Text style={styles.actionSub} numberOfLines={1}>
+                {it.subtitle}
+              </Text>
+            ) : null}
           </View>
-          <TintIcon source={DETAIL_ICONS.chevron} size={ms(14)} color={colors.textSecondary} />
+          <TintIcon source={trailingIcon} size={ms(14)} color={colors.textSecondary} />
         </Pressable>
       ))}
     </View>
