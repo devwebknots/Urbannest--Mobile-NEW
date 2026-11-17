@@ -74,6 +74,13 @@ const ICON_TOP = PILL_TOP + ms(12);
 // get almost the whole slot width
 const PILL_INSET_X = ms(2);
 const BAR_PAD_X = ms(4);
+/**
+ * Clear space between a label and the capsule's side edges: the label
+ * box is the slot minus the capsule inset minus this, so long labels
+ * ("Dashboard", "Properties" with 5 tabs) shrink to fit instead of
+ * touching the capsule.
+ */
+const LABEL_GAP_X = ms(6);
 const ADD_SIZE = ms(48);
 /** With "+": how many tabs sit to its left */
 const ADD_AFTER = 2;
@@ -275,7 +282,7 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'center',
     gap: ms(4),
-    paddingHorizontal: ms(5),
+    paddingHorizontal: PILL_INSET_X + LABEL_GAP_X,
   },
   icon: {
     width: ms(19),

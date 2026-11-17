@@ -8,6 +8,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { borderRadius, colors, shadows, spacing, typographyPresets } from '@/config/theme';
+import { CARD_BG, CardBackground } from '@/features/guest/components/CardBackground';
 import { moderateScale as ms } from '@/utils/responsive';
 import type { PmsIconName } from '../types';
 import { PmsIcon } from './PmsIcon';
@@ -23,6 +24,8 @@ interface CardProps {
   /** Small count badge after the title ("6") */
   count?: number;
   right?: React.ReactNode;
+  /** Frosted light-blue background of the guest search card (CardBackground) */
+  frosted?: boolean;
   children: React.ReactNode;
 }
 
@@ -33,9 +36,11 @@ export const PmsCard: React.FC<CardProps> = ({
   subtitle,
   count,
   right,
+  frosted = false,
   children,
 }) => (
-  <View style={styles.card}>
+  <View style={[styles.card, frosted && styles.frosted]}>
+    {frosted ? <CardBackground radius={borderRadius.xl} /> : null}
     <View style={styles.header}>
       <View style={[styles.disc, { backgroundColor: `${tint}1F` }]}>
         <PmsIcon name={icon} size={ms(19)} color={tint} />
@@ -114,6 +119,16 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: spacing.lg,
     ...shadows.sm,
+  },
+  // Same look as the guest search card
+  frosted: {
+    backgroundColor: CARD_BG.base,
+    borderWidth: 1.5,
+    borderColor: CARD_BG.edge,
+    ...shadows.lg,
+    shadowColor: CARD_BG.shadow,
+    shadowOpacity: 0.16,
+    shadowRadius: 16,
   },
   header: {
     flexDirection: 'row',

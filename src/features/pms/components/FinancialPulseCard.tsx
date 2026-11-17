@@ -1,8 +1,16 @@
 /**
- * FinancialPulseCard: the design's dark "Financial Pulse" panel: header
- * with the green "94% COLLECTED" pill, 2 × 2 glass figure tiles (Revenue,
- * Expenses in red, Net Income in green, Pending Rent on an amber tile),
- * the collection-rate bar (teal → green) and the View P&L / Export buttons.
+ * FinancialPulseCard: "Financial Pulse" in the layout of the design
+ * ("Screenshot 2026-11-17 182715"), on the guest search card's frosted
+ * light-blue background (PmsCard `frosted` → CardBackground). Text and
+ * accents use only the app theme (navy, primary / secondary blue, greys):
+ *  - header: wallet disc, title / subtitle, chipBlue "94% collected" pill;
+ *  - Net Income: big navy figure + label on the left, secondary-blue trend chart
+ *    on the right;
+ *  - one row of three stats with a coloured bar on the left of each:
+ *    Revenue MTD (primary blue), Expenses MTD (grey), Pending Rent
+ *    (secondary blue);
+ *  - Collection Rate + navy → blue bar (gradients.header);
+ *  - `soft` View P&L (file icon) and `brand` Export (download icon).
  */
 
 import React from 'react';
@@ -12,25 +20,21 @@ import { borderRadius, colors, gradients, spacing, typographyPresets } from '@/c
 import { moderateScale as ms } from '@/utils/responsive';
 import type { FinancialFigure, MoneyTone } from '../types';
 import { PmsIcon } from './PmsIcon';
-import { GradientBar, PMS_HEADER_DISC } from './PmsCard';
+import { GradientBar, PmsCard } from './PmsCard';
+import { TrendChart } from './TrendChart';
 
-const TONE: Record<MoneyTone, { value: string; icon: string; tile?: string; rim?: string }> = {
-  income: { value: colors.white, icon: '#4ADE80' },
-  expense: { value: '#FCA5A5', icon: '#F87171' },
-  net: { value: '#4ADE80', icon: '#4ADE80' },
-  pending: {
-    value: '#FCD34D',
-    icon: '#FBBF24',
-    tile: 'rgba(245,158,11,0.16)',
-    rim: 'rgba(251,191,36,0.28)',
-  },
+/** Side bar / value colour of the three small stats (app theme blues only) */
+const STAT_TONE: Record<Exclude<MoneyTone, 'net'>, { bar: string; value: string }> = {
+  income: { bar: colors.primary, value: colors.navy },
+  expense: { bar: colors.textMuted, value: colors.navy },
+  pending: { bar: colors.headerGradientEnd, value: colors.navy },
 };
-
-const FIGURE_BUTTON = ms(28);
 
 interface Props {
   figures: readonly FinancialFigure[];
   collectionRate: number;
+  /** Net income, oldest → latest month */
+  trend: readonly number[];
   onFigurePress: (figure: FinancialFigure) => void;
   onViewPnl: () => void;
   onExport: () => void;
@@ -39,214 +43,186 @@ interface Props {
 export const FinancialPulseCard: React.FC<Props> = ({
   figures,
   collectionRate,
+  trend,
   onFigurePress,
   onViewPnl,
   onExport,
-}) => (
-  <View style={styles.card}>
-    <View style={styles.glow} pointerEvents="none" />
+}) => {
+  const net = figures.find(f => f.tone === 'net');
+  const stats = figures.filter(f => f.tone !== 'net');
 
-    <View style={styles.header}>
-      <View style={styles.disc}>
-        <PmsIcon name="wallet" size={ms(19)} color={colors.white} />
-      </View>
-      <View style={styles.headerText}>
-        <Text style={[typographyPresets.cardTitle, styles.white]} accessibilityRole="header">
-          Financial Pulse
-        </Text>
-        <Text style={[typographyPresets.cardSubtitle, styles.muted]}>Month to date overview</Text>
-      </View>
-      <View style={styles.collected}>
-        <PmsIcon name="arrowUp" size={ms(10)} color={colors.white} />
-        <Text style={[typographyPresets.tagSmall, styles.white]}>{collectionRate}% Collected</Text>
-      </View>
-    </View>
-
-    <View style={styles.grid}>
-      {figures.map(f => {
-        const tone = TONE[f.tone];
-        return (
+  return (
+    <PmsCard
+      frosted
+      icon="wallet"
+      title="Financial Pulse"
+      subtitle="Month to date overview"
+      right={
+        <View style={styles.collected}>
+          <PmsIcon name="check" size={ms(11)} color={colors.navy} />
+          <Text style={[typographyPresets.badge, styles.collectedText]}>
+            {collectionRate}% Collected
+          </Text>
+        </View>
+      }
+    >
+      {/* Net income + trend */}
+      {net ? (
+        <View style={styles.hero}>
           <Pressable
-            key={f.id}
-            onPress={() => onFigurePress(f)}
-            style={({ pressed }) => [
-              styles.figure,
-              tone.tile ? { backgroundColor: tone.tile, borderColor: tone.rim } : null,
-              pressed && styles.pressed,
-            ]}
+            onPress={() => onFigurePress(net)}
+            style={({ pressed }) => [styles.net, pressed && styles.pressed]}
             accessibilityRole="button"
-            accessibilityLabel={`${f.label}: ${f.amount}`}
+            accessibilityLabel={`${net.label}: ${net.amount}`}
           >
-            <View style={styles.figureTop}>
-              <Text
-                style={[styles.figureLabel, f.tone === 'pending' && { color: tone.value }]}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.8}
-              >
-                {f.label}
-              </Text>
-              <View style={[styles.figureIcon, { backgroundColor: `${tone.icon}26` }]}>
-                <PmsIcon name={f.icon} size={ms(14)} color={tone.icon} />
-              </View>
-            </View>
-            <Text
-              style={[styles.amount, { color: tone.value }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              minimumFontScale={0.75}
-            >
-              {f.amount}
+            <Text style={styles.netAmount} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+              {net.amount}
+            </Text>
+            <Text style={typographyPresets.cardSubtitle} numberOfLines={1}>
+              {net.label}
             </Text>
           </Pressable>
-        );
-      })}
-    </View>
+          <View style={styles.chart}>
+            <TrendChart values={trend} />
+          </View>
+        </View>
+      ) : null}
 
-    <View style={styles.rateRow}>
-      <Text style={[typographyPresets.tag, styles.rateLabel]}>Collection Rate</Text>
-      <Text style={[typographyPresets.bodyBold, styles.rate]}>{collectionRate}%</Text>
-    </View>
-    <GradientBar
-      progress={collectionRate / 100}
-      from={gradients.pmsCollect[0]}
-      to={gradients.pmsCollect[1]}
-      track="rgba(255,255,255,0.12)"
-    />
+      {/* Revenue / Expenses / Pending */}
+      <View style={styles.stats}>
+        {stats.map(f => {
+          const tone = STAT_TONE[f.tone as Exclude<MoneyTone, 'net'>];
+          return (
+            <Pressable
+              key={f.id}
+              onPress={() => onFigurePress(f)}
+              style={({ pressed }) => [styles.stat, pressed && styles.pressed]}
+              accessibilityRole="button"
+              accessibilityLabel={`${f.label}: ${f.amount}`}
+            >
+              <View style={[styles.statBar, { backgroundColor: tone.bar }]} />
+              <View style={styles.statText}>
+                <Text
+                  style={[typographyPresets.bodyBold, { color: tone.value }]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.8}
+                >
+                  {f.amount}
+                </Text>
+                <Text style={typographyPresets.caption} numberOfLines={1}>
+                  {f.label}
+                </Text>
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
 
-    <View style={styles.actions}>
-      <Button title="View P&L" variant="glass" size="md" onPress={onViewPnl} style={styles.action} />
-      <Button
-        title="Export"
-        variant="light"
-        size="md"
-        onPress={onExport}
-        leftIcon={<PmsIcon name="download" size={ms(16)} color={colors.pmsNavy} />}
-        style={[styles.action, styles.export]}
-        textStyle={styles.exportText}
+      {/* Collection rate */}
+      <View style={styles.rateRow}>
+        <Text style={typographyPresets.bodyBold}>Collection Rate</Text>
+        <Text style={[typographyPresets.bodyBold, styles.rate]}>{collectionRate}%</Text>
+      </View>
+      <GradientBar
+        progress={collectionRate / 100}
+        from={gradients.header[0]}
+        to={gradients.header[1]}
+        track="rgba(81,142,249,0.14)"
       />
-    </View>
-  </View>
-);
+
+      <View style={styles.actions}>
+        <Button
+          title="View P&L"
+          variant="soft"
+          size="md"
+          onPress={onViewPnl}
+          leftIcon={<PmsIcon name="fileText" size={ms(16)} color={colors.navy} />}
+          style={styles.action}
+        />
+        <Button
+          title="Export"
+          variant="brand"
+          size="md"
+          onPress={onExport}
+          leftIcon={<PmsIcon name="download" size={ms(16)} color={colors.white} />}
+          style={styles.action}
+        />
+      </View>
+    </PmsCard>
+  );
+};
 
 const styles = StyleSheet.create({
-  card: {
-    padding: spacing.lg,
-    borderRadius: borderRadius.xl,
-    backgroundColor: colors.pmsNavy,
-    overflow: 'hidden',
-    boxShadow: '0px 10px 24px rgba(14,33,71,0.22)',
-  },
-  // Soft light behind the header (design: faint waves top right)
-  glow: {
-    position: 'absolute',
-    top: -ms(120),
-    right: -ms(80),
-    width: ms(300),
-    height: ms(260),
-    backgroundImage:
-      'radial-gradient(circle at center, rgba(81,142,249,0.22) 0%, rgba(81,142,249,0) 70%)',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  disc: {
-    width: PMS_HEADER_DISC,
-    height: PMS_HEADER_DISC,
-    borderRadius: PMS_HEADER_DISC / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.12)',
-  },
-  headerText: {
-    flex: 1,
-  },
-  white: {
-    color: colors.white,
-  },
-  muted: {
-    color: colors.textInverseMuted,
-  },
   collected: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
     paddingHorizontal: ms(9),
-    paddingVertical: ms(5),
+    paddingVertical: ms(4),
     borderRadius: borderRadius.pill,
-    backgroundColor: 'rgba(16,185,129,0.85)',
+    backgroundColor: colors.chipBlue,
   },
-  grid: {
+  collectedText: {
+    color: colors.navy,
+  },
+  pressed: {
+    opacity: 0.75,
+  },
+  hero: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
     gap: spacing.md,
     marginTop: spacing.lg,
   },
-  figure: {
-    // Two per row: half the row minus half the gap
-    width: '47.5%',
-    flexGrow: 1,
-    padding: spacing.md,
-    borderRadius: borderRadius.lg,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+  net: {
+    flexShrink: 0,
   },
-  pressed: {
-    opacity: 0.8,
+  netAmount: {
+    ...typographyPresets.priceLarge,
+    color: colors.navy,
   },
-  figureTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  figureLabel: {
-    ...typographyPresets.tagSmall,
+  chart: {
     flex: 1,
-    color: colors.textInverseMuted,
   },
-  figureIcon: {
-    width: FIGURE_BUTTON,
-    height: FIGURE_BUTTON,
-    borderRadius: FIGURE_BUTTON / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
+  stats: {
+    flexDirection: 'row',
+    marginTop: spacing.lg,
+    paddingVertical: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(81,142,249,0.25)',
   },
-  amount: {
-    ...typographyPresets.price,
-    fontSize: typographyPresets.sectionHeading.fontSize,
-    lineHeight: typographyPresets.sectionHeading.lineHeight,
-    marginTop: spacing.xs,
+  stat: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingRight: spacing.xs,
+  },
+  statBar: {
+    width: 3,
+    borderRadius: 2,
+  },
+  statText: {
+    flex: 1,
   },
   rateRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: spacing.xl,
+    marginTop: spacing.lg,
     marginBottom: spacing.sm,
   },
-  rateLabel: {
-    color: colors.white,
-  },
   rate: {
-    color: '#4ADE80',
+    color: colors.primary,
   },
   actions: {
     flexDirection: 'row',
     gap: spacing.md,
-    marginTop: spacing.xl,
+    marginTop: spacing.lg,
   },
   action: {
     flex: 1,
-  },
-  // Design: teal → green Export button
-  export: {
-    backgroundImage: `linear-gradient(90deg, ${gradients.pmsCollect[0]} 0%, ${gradients.pmsCollect[1]} 100%)`,
-  },
-  exportText: {
-    color: colors.pmsNavy,
   },
 });
 

@@ -51,6 +51,13 @@ interface Props {
   /** Burger button: opens the side menu (GuestSideMenu) */
   onMenuPress: () => void;
   onExplorePress: () => void;
+  /**
+   * Optional: replaces the header row (logo + burger). Other pages (PMS
+   * home) reuse this hero with their own header.
+   */
+  header?: React.ReactNode;
+  /** Optional: replaces the headline + Explore button */
+  body?: React.ReactNode;
 }
 
 export const HeroSection: React.FC<Props> = ({
@@ -58,6 +65,8 @@ export const HeroSection: React.FC<Props> = ({
   topInset,
   onMenuPress,
   onExplorePress,
+  header,
+  body,
 }) => {
   const { width } = useWindowDimensions();
   const [index, setIndex] = useState(0);
@@ -131,6 +140,7 @@ export const HeroSection: React.FC<Props> = ({
           },
         ]}
       >
+        {header ?? (
         <View style={styles.header}>
           <View style={styles.brand} pointerEvents="none">
             <HeaderBrand />
@@ -157,9 +167,12 @@ export const HeroSection: React.FC<Props> = ({
             <BurgerIcon size={ms(18)} color={colors.white} />
           </Pressable>
         </View>
+        )}
 
         {/* Headline + Explore button, centered between header and dots */}
         <View pointerEvents="box-none" style={styles.middle}>
+          {body ?? (
+          <>
           <View pointerEvents="none">
             <Text style={typographyPresets.heroTitle}>Finding New</Text>
             <View style={styles.titleLine}>
@@ -192,6 +205,8 @@ export const HeroSection: React.FC<Props> = ({
             rightIcon={<ArrowRightIcon size={ms(16)} color={colors.navy} />}
             style={styles.exploreButton}
           />
+          </>
+          )}
         </View>
 
         {/* Page dots, centered, just above the fade into the page */}
@@ -212,6 +227,31 @@ export const HeroSection: React.FC<Props> = ({
     </View>
   );
 };
+
+/** Gold slanted accent word with its soft underline ("Simple") */
+export const HeroAccentWord: React.FC<{ text: string }> = ({ text }) => (
+  <View>
+    <Text style={[typographyPresets.heroAccent, styles.titleAccent]}>{text}</Text>
+    <View style={styles.accentUnderline} />
+  </View>
+);
+
+/** Frosted round header button (same as the burger button) */
+export const HeroRoundButton: React.FC<{
+  onPress: () => void;
+  accessibilityLabel: string;
+  children: React.ReactNode;
+}> = ({ onPress, accessibilityLabel, children }) => (
+  <Pressable
+    onPress={onPress}
+    hitSlop={8}
+    style={styles.menuButton}
+    accessibilityRole="button"
+    accessibilityLabel={accessibilityLabel}
+  >
+    {children}
+  </Pressable>
+);
 
 /** Three-line menu icon */
 const BurgerIcon: React.FC<{ size: number; color: string }> = ({

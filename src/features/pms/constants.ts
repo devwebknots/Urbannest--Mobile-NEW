@@ -65,20 +65,24 @@ export const LEASING_STATS: readonly LeasingStat[] = [
 export const LEASE_CYCLE = { days: 18, target: 30 };
 
 export const PROPERTY_TYPES: readonly PropertyTypeShare[] = [
-  { id: 'residential', label: 'Residential', count: 14, color: colors.primary },
-  { id: 'commercial', label: 'Commercial', count: 5, color: colors.success },
-  { id: 'student', label: 'Student Housing', count: 3, color: colors.warning },
-  { id: 'shortTerm', label: 'Short-term', count: 2, color: colors.pmsPurple },
+  // Four distinct app colours, each a deep → light gradient (colors.pmsSnapshot)
+  { id: 'residential', label: 'Residential', count: 14, gradient: colors.pmsSnapshot[0] },
+  { id: 'commercial', label: 'Commercial', count: 5, gradient: colors.pmsSnapshot[1] },
+  { id: 'student', label: 'Student Housing', count: 3, gradient: colors.pmsSnapshot[2] },
+  { id: 'shortTerm', label: 'Short-term', count: 2, gradient: colors.pmsSnapshot[3] },
 ];
 
 export const FINANCIAL_FIGURES: readonly FinancialFigure[] = [
   { id: 'revenue', label: 'Revenue MTD', amount: '$18,420', tone: 'income', icon: 'trendingUp' },
   { id: 'expenses', label: 'Expenses MTD', amount: '($5,840)', tone: 'expense', icon: 'trendingDown' },
-  { id: 'net', label: 'Net Income (MOI)', amount: '$12,580', tone: 'net', icon: 'check' },
+  { id: 'net', label: 'Net Income (MTD)', amount: '$12,580', tone: 'net', icon: 'check' },
   { id: 'pending', label: 'Pending Rent', amount: '$1,200', tone: 'pending', icon: 'clock' },
 ];
 
 export const COLLECTION_RATE = 94;
+
+/** Net income over the last 6 months (Financial Pulse trend line, design) */
+export const NET_INCOME_TREND: readonly number[] = [9800, 11200, 10400, 11800, 11500, 12580];
 
 export const MANAGED_PROPERTIES: readonly ManagedProperty[] = [
   {

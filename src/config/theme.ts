@@ -124,11 +124,51 @@ export const colors = {
   // (soft fill, gradient end, accent for the icon disc / pills)
   pmsNavy: '#0E2147',
   pmsPurple: '#8B5CF6',
+  // Property Snapshot: four distinct colours of even weight (primary blue,
+  // teal, gold, violet). Each is a deep → light gradient, used on the bars,
+  // legend swatches and donut slices: [from, to]
+  pmsSnapshot: [
+    ['#2563EB', '#60A5FA'],
+    ['#0D9488', '#5EEAD4'],
+    ['#F59E0B', '#FCD34D'],
+    ['#7C3AED', '#C4B5FD'],
+  ],
+  // Same four colours as pmsSnapshot (blue, teal, amber, violet) so the page
+  // reads as one palette: tile fill from → to, icon disc accent → accentTo,
+  // ink for pills / trend text, rgb for the faint corner art
   pmsTiles: {
-    units: { from: '#E9F8F0', to: '#D2F1E1', accent: '#22A06B' },
-    occupancy: { from: '#EEEEFF', to: '#DADDFD', accent: '#4F5FE8' },
-    revenue: { from: '#FFF3E6', to: '#FFE2C4', accent: '#F59E0B' },
-    maintenance: { from: '#FDEEF3', to: '#F9D9E5', accent: '#DB4C82' },
+    units: {
+      from: '#F2F7FF',
+      to: '#DCE8FB',
+      accent: '#2563EB',
+      accentTo: '#60A5FA',
+      ink: '#1D4ED8',
+      rgb: '37,99,235',
+    },
+    occupancy: {
+      from: '#EFFCF9',
+      to: '#D3F3EC',
+      accent: '#0D9488',
+      accentTo: '#5EEAD4',
+      ink: '#0F766E',
+      rgb: '13,148,136',
+    },
+    revenue: {
+      from: '#FFF9EC',
+      to: '#FDEDCB',
+      accent: '#F59E0B',
+      accentTo: '#FCD34D',
+      ink: '#B45309',
+      rgb: '245,158,11',
+    },
+    maintenance: {
+      from: '#F6F3FF',
+      to: '#E7E0FD',
+      accent: '#7C3AED',
+      accentTo: '#C4B5FD',
+      ink: '#6D28D9',
+      rgb: '124,58,237',
+    },
   },
 } as const;
 

@@ -33,7 +33,8 @@ export interface PropertyTypeShare {
   readonly id: string;
   readonly label: string;
   readonly count: number;
-  readonly color: string;
+  /** Deep → light gradient: bars, legend swatch, donut slice */
+  readonly gradient: readonly [string, string];
 }
 
 export type MoneyTone = 'income' | 'expense' | 'net' | 'pending';

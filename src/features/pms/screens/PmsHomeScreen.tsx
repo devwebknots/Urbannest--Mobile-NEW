@@ -1,7 +1,8 @@
 /**
  * PmsHomeScreen: the property manager's dashboard, opened by "Continue as
  * PMS" on the persona page. Layout follows the "UrbanNest Real Estate
- * Dashboard" design: navy hero (header, greeting, building photo, units
+ * Dashboard" design: top section like the guest home (PmsTopSection: photo
+ * carousel hero; the navy PmsHero is unwired), header, greeting, units
  * pill), period switch + scope row, 2 × 2 pastel KPI tiles, Leasing
  * Activity, Property Snapshot donut, dark Financial Pulse panel, My
  * Property(s) carousel, Recent Activity, Recent Transactions and the bottom
@@ -21,13 +22,16 @@ import {
   landlordTabBarBottomGap,
 } from '@/features/landlord/components/LandlordTabBar';
 import { Reveal } from '@/features/renter/components/Reveal';
+import { moderateScale as ms } from '@/utils/responsive';
 import { pmsIcons } from '../assets/pmsAssets';
 import { DashboardFilters } from '../components/DashboardFilters';
 import { FinancialPulseCard } from '../components/FinancialPulseCard';
 import { KpiTiles } from '../components/KpiTiles';
 import { LeasingActivityCard } from '../components/LeasingActivityCard';
 import { MyPropertiesCard } from '../components/MyPropertiesCard';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for the unwired navy hero
 import { PmsHero } from '../components/PmsHero';
+import { PmsTopSection } from '../components/PmsTopSection';
 import { PropertySnapshotCard } from '../components/PropertySnapshotCard';
 import { RecentActivityCard } from '../components/RecentActivityCard';
 import { RecentTransactionsCard } from '../components/RecentTransactionsCard';
@@ -55,6 +59,18 @@ export const PmsHomeScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: tabBarClearance }}
       >
+        {/* Top section: same as the guest home top (photo carousel hero) */}
+        <PmsTopSection
+          topInset={insets.top}
+          profile={vm.profile}
+          greeting={vm.greeting}
+          totalUnits={vm.units.total}
+          onMenu={() => vm.comingSoon('Menu')}
+          onNotifications={() => vm.comingSoon('Notifications')}
+          onProfile={() => vm.comingSoon('Profile')}
+          onViewPortfolio={() => vm.comingSoon('Portfolio')}
+        />
+        {/* Unwired: previous navy hero from the design (kept in components/PmsHero.tsx)
         <PmsHero
           topInset={insets.top}
           profile={vm.profile}
@@ -65,6 +81,7 @@ export const PmsHomeScreen: React.FC = () => {
           onNotifications={() => vm.comingSoon('Notifications')}
           onProfile={() => vm.comingSoon('Profile')}
         />
+        */}
 
         <View style={styles.content}>
           <Reveal delay={40}>
@@ -101,6 +118,7 @@ export const PmsHomeScreen: React.FC = () => {
           <FinancialPulseCard
             figures={vm.financial.figures}
             collectionRate={vm.financial.collectionRate}
+            trend={vm.financial.trend}
             onFigurePress={f => vm.comingSoon(f.label)}
             onViewPnl={() => vm.comingSoon('Profit & Loss')}
             onExport={() => vm.comingSoon('Export')}
@@ -142,10 +160,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.pageTint,
   },
-  // Design: same gap between every block under the hero
+  // Same gap between every block; the first one rides over the hero's
+  // fade like the guest search card (HeroSection SEARCH_OVERLAP)
   content: {
     paddingHorizontal: spacing.screenHorizontal,
-    paddingTop: spacing.xl,
+    marginTop: -ms(28),
     gap: spacing.lg,
   },
 });

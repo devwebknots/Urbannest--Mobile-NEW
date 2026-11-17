@@ -10,6 +10,7 @@ import { useAppDialog } from '@/components/AppDialog';
 import { greetingFor } from '@/features/landlord/utils';
 import {
   COLLECTION_RATE,
+  NET_INCOME_TREND,
   FINANCIAL_FIGURES,
   LEASE_CYCLE,
   LEASING_STATS,
@@ -105,7 +106,11 @@ export function usePmsDashboard() {
     },
     propertyTypes: PROPERTY_TYPES,
     propertyTotal: totalByType,
-    financial: { figures: FINANCIAL_FIGURES, collectionRate: COLLECTION_RATE },
+    financial: {
+      figures: FINANCIAL_FIGURES,
+      collectionRate: COLLECTION_RATE,
+      trend: NET_INCOME_TREND,
+    },
     properties: MANAGED_PROPERTIES,
     activity: RECENT_ACTIVITY,
     transactions: RECENT_TRANSACTIONS,

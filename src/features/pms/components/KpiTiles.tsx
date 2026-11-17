@@ -1,9 +1,11 @@
 /**
- * KpiTiles: the design's 2 × 2 pastel KPI tiles under the filters.
- *  - Total Units (mint): 24, "Active" pill, "Across 6 properties", faint building
- *  - Occupancy (lavender): 87.5 %, ↑ 2.3 % vs last month, faint ring
- *  - Revenue MTD (peach): $18,420, ↑ 94 % collected, faint bars
- *  - Maintenance (rose): 7, "Overdue" pill, "5 in progress", faint wrench
+ * KpiTiles: the design's 2 × 2 KPI tiles under the filters, in the page's
+ * one palette (colors.pmsTiles = the Property Snapshot colours as soft
+ * tints, gradient icon discs, navy values, pills / trends in the tile ink):
+ *  - Total Units (blue): 24, "Active" pill, "Across 6 properties", faint building
+ *  - Occupancy (teal): 87.5 %, ↑ 2.3 % vs last month, faint ring
+ *  - Revenue MTD (amber): $18,420, ↑ 94 % collected, faint bars
+ *  - Maintenance (violet): 7, "Overdue" pill, "5 in progress", faint wrench
  *
  * Every tile has the same three rows on one left edge: icon disc + label,
  * value (+ pill), one-line caption. The art (small icon) sits inside the
@@ -57,7 +59,12 @@ const Tile: React.FC<TileProps> = ({ tone, icon, label, value, badge, footer, ar
       </View>
 
       <View style={styles.head}>
-        <View style={[styles.disc, { backgroundColor: t.accent }]}>
+        <View
+          style={[
+            styles.disc,
+            { backgroundImage: `linear-gradient(135deg, ${t.accent} 0%, ${t.accentTo} 100%)` },
+          ]}
+        >
           <PmsIcon name={icon} size={ms(15)} color={colors.white} />
         </View>
         <Text style={styles.label} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
@@ -77,25 +84,29 @@ const Tile: React.FC<TileProps> = ({ tone, icon, label, value, badge, footer, ar
   );
 };
 
-const Pill: React.FC<{ text: string; color: string; bg: string }> = ({ text, color, bg }) => (
-  <View style={[styles.pill, { backgroundColor: bg }]}>
-    <Text style={[typographyPresets.badge, { color }]} numberOfLines={1}>
+/** Faint corner art in the tile's colour */
+const artColor = (tone: PmsTileTone) => `rgba(${colors.pmsTiles[tone].rgb},0.4)`;
+
+/** Pill in the tile's colour ("Active", "Overdue") */
+const Pill: React.FC<{ text: string; tone: PmsTileTone }> = ({ text, tone }) => (
+  <View style={[styles.pill, { backgroundColor: `rgba(${colors.pmsTiles[tone].rgb},0.14)` }]}>
+    <Text style={[typographyPresets.badge, { color: colors.pmsTiles[tone].ink }]} numberOfLines={1}>
       {text}
     </Text>
   </View>
 );
 
-/** Green ↑ figure, optionally followed by a muted note on the same line */
-const Trend: React.FC<{ text: string; note?: string }> = ({ text, note }) => (
+/** ↑ figure in the tile's ink colour, optionally followed by a muted note */
+const Trend: React.FC<{ text: string; note?: string; tone: PmsTileTone }> = ({ text, note, tone }) => (
   <View style={styles.trend}>
-    <PmsIcon name="arrowUp" size={ms(11)} color={colors.successDark} />
+    <PmsIcon name="arrowUp" size={ms(11)} color={colors.pmsTiles[tone].ink} />
     <Text
       style={[styles.caption, styles.shrink]}
       numberOfLines={1}
       adjustsFontSizeToFit
       minimumFontScale={0.85}
     >
-      <Text style={styles.trendText}>{text}</Text>
+      <Text style={[styles.trendText, { color: colors.pmsTiles[tone].ink }]}>{text}</Text>
       {note ? ` ${note}` : ''}
     </Text>
   </View>
@@ -123,9 +134,9 @@ export const KpiTiles: React.FC<Props> = ({ units, occupancy, revenue, maintenan
         icon="building"
         label="Total Units"
         value={String(units.total)}
-        badge={<Pill text={units.status} color={colors.successDark} bg="rgba(34,160,107,0.16)" />}
+        badge={<Pill tone="units" text={units.status} />}
         footer={<Caption text={`Across ${units.properties} properties`} />}
-        art={<PmsIcon name="building" size={ART} color="rgba(34,160,107,0.4)" />}
+        art={<PmsIcon name="building" size={ART} color={artColor('units')} />}
         onPress={() => onPress('Total Units')}
       />
       <Tile
@@ -133,15 +144,15 @@ export const KpiTiles: React.FC<Props> = ({ units, occupancy, revenue, maintenan
         icon="trendingUp"
         label="Occupancy"
         value={`${occupancy.rate}%`}
-        footer={<Trend text={`${occupancy.trend}%`} note="vs last month" />}
+        footer={<Trend tone="occupancy" text={`${occupancy.trend}%`} note="vs last month" />}
         art={
           <ProgressRing
             progress={occupancy.rate / 100}
             size={ART}
             stroke={ms(5)}
             showLabel={false}
-            color="rgba(79,95,232,0.45)"
-            trackColor="rgba(79,95,232,0.12)"
+            color={artColor('occupancy')}
+            trackColor={`rgba(${colors.pmsTiles.occupancy.rgb},0.12)`}
             accessibilityLabel={`${occupancy.rate}% occupied`}
           />
         }
@@ -154,7 +165,7 @@ export const KpiTiles: React.FC<Props> = ({ units, occupancy, revenue, maintenan
         icon="circleDollar"
         label="Revenue MTD"
         value={revenue.amount}
-        footer={<Trend text={`${revenue.collected}%`} note="collected" />}
+        footer={<Trend tone="revenue" text={`${revenue.collected}%`} note="collected" />}
         art={
           <View style={styles.bars}>
             {[0.45, 0.7, 1].map(h => (
@@ -169,9 +180,9 @@ export const KpiTiles: React.FC<Props> = ({ units, occupancy, revenue, maintenan
         icon="wrench"
         label="Maintenance"
         value={String(maintenance.overdue)}
-        badge={<Pill text="Overdue" color={colors.error} bg={colors.errorLight} />}
+        badge={<Pill tone="maintenance" text="Overdue" />}
         footer={<Caption text={`${maintenance.inProgress} in progress`} />}
-        art={<PmsIcon name="wrench" size={ART} color="rgba(219,76,130,0.4)" />}
+        art={<PmsIcon name="wrench" size={ART} color={artColor('maintenance')} />}
         onPress={() => onPress('Maintenance')}
       />
     </View>
@@ -229,7 +240,7 @@ const styles = StyleSheet.create({
   },
   value: {
     ...typographyPresets.heroTitleCompact,
-    color: colors.textPrimary,
+    color: colors.navy,
     flexShrink: 1,
   },
   pill: {
@@ -254,9 +265,9 @@ const styles = StyleSheet.create({
   shrink: {
     flexShrink: 1,
   },
+  // Colour comes from the tile (ink)
   trendText: {
     fontFamily: typographyPresets.cardSubtitleBold.fontFamily,
-    color: colors.successDark,
   },
   bars: {
     flexDirection: 'row',
@@ -267,7 +278,7 @@ const styles = StyleSheet.create({
     width: ms(8),
     borderTopLeftRadius: ms(4),
     borderTopRightRadius: ms(4),
-    backgroundColor: 'rgba(245,158,11,0.4)',
+    backgroundColor: `rgba(${colors.pmsTiles.revenue.rgb},0.4)`,
   },
 });
 
