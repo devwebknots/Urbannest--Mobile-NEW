@@ -186,7 +186,7 @@ export const HeroSection: React.FC<Props> = ({
                 >
                   Simple
                 </Text>
-                <View style={styles.accentUnderline} />
+                {/* Underline removed on request: <View style={styles.accentUnderline} /> */}
               </View>
             </View>
             {/* Subtitle hidden for now
@@ -228,11 +228,12 @@ export const HeroSection: React.FC<Props> = ({
   );
 };
 
-/** Gold slanted accent word with its soft underline ("Simple") */
+/** Gold slanted accent word ("Simple"); its underline is removed */
 export const HeroAccentWord: React.FC<{ text: string }> = ({ text }) => (
-  <View>
+  // Only as wide as the word, so the underline never runs past it
+  <View style={styles.accentWord}>
     <Text style={[typographyPresets.heroAccent, styles.titleAccent]}>{text}</Text>
-    <View style={styles.accentUnderline} />
+    {/* Underline removed on request: <View style={styles.accentUnderline} /> */}
   </View>
 );
 
@@ -316,6 +317,9 @@ const styles = StyleSheet.create({
   // Italic look without an italic font file
   titleAccent: {
     transform: [{ skewX: '-10deg' }],
+  },
+  accentWord: {
+    alignSelf: 'flex-start',
   },
   accentUnderline: {
     position: 'absolute',
