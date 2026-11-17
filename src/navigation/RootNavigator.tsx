@@ -27,6 +27,7 @@ import {
   LandlordUnitDetailsScreen,
 } from '@/features/landlord';
 import { AddPersonaScreen, PersonaSelectScreen } from '@/features/persona';
+import { PmsHomeScreen } from '@/features/pms';
 import {
   CheckInScreen,
   InspectionAreaScreen,
@@ -130,6 +131,11 @@ export const RootNavigator: React.FC = () => (
       <Stack.Screen
         name="LandlordHome"
         component={LandlordHomeScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="PmsHome"
+        component={PmsHomeScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen

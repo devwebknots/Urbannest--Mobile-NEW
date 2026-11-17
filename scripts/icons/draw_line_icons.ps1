@@ -817,6 +817,68 @@ $icons = [ordered]@{
     'path:M2 7h20',
     'path:M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7'
   )
+  # ---- PMS home (icons/pms, -Stroke 2.2) ----
+  # lucide: trending-up (Occupancy, Revenue MTD)
+  'trending_up' = @(
+    'path:M22 7l-8.5 8.5-5-5L2 17',
+    'path:M16 7h6v6'
+  )
+  # lucide: trending-down (Expenses MTD)
+  'trending_down' = @(
+    'path:M22 17l-8.5-8.5-5 5L2 7',
+    'path:M16 17h6v-6'
+  )
+  # lucide: circle-dollar-sign (Revenue MTD, Financials tab)
+  'circle_dollar' = @(
+    'circle:12,12,10',
+    'path:M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8',
+    'path:M12 18V6'
+  )
+  # lucide: chart-pie (Property Snapshot)
+  'pie_chart' = @(
+    'path:M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z',
+    'path:M21.21 15.89A10 10 0 1 1 8 2.83'
+  )
+  # lucide: user-plus (Leads, new tenant)
+  'user_plus' = @(
+    'path:M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2',
+    'circle:9,7,4',
+    'path:M19 8v6',
+    'path:M22 11h-6'
+  )
+  # lucide: user-check (Apps)
+  'user_check' = @(
+    'path:M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2',
+    'circle:9,7,4',
+    'path:m16 11 2 2 4-4'
+  )
+  # lucide: calendar-x (Expiring)
+  'calendar_x' = @(
+    'path:M8 2v4',
+    'path:M16 2v4',
+    'path:M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
+    'path:M3 10h18',
+    'path:m14 14-4 4',
+    'path:m10 14 4 4'
+  )
+  # lucide: history (Recent Activity)
+  'history' = @(
+    'path:M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8',
+    'path:M3 3v5h5',
+    'path:M12 7v5l4 2'
+  )
+  # lucide: check (Net income)
+  'check' = @(
+    'path:M20 6 9 17l-5-5'
+  )
+  # lucide: contact (Leasing Activity)
+  'contact' = @(
+    'path:M16 2v2',
+    'path:M8 2v2',
+    'path:M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2',
+    'circle:12,11,3',
+    'path:M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z'
+  )
 }
 
 New-Item -ItemType Directory -Force $OutDir | Out-Null

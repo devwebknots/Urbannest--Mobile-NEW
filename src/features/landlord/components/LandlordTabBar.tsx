@@ -3,10 +3,22 @@
  * More). Same language as RenterTabBar: a navy capsule springs under the
  * selected tab and icons / labels cross-fade navy <-> white as it passes.
  * The round "+" sits in the exact centre of the bar; it is a quick action, not a tab.
+ *
+ * Other personas reuse the bar with their own `tabs` (PMS home: Dashboard,
+ * Properties, Financials, Approvals, Profile); without `onAdd` there is no "+".
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Animated,
+  Image,
+  ImageSourcePropType,
+  LayoutChangeEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { borderRadius, colors, gradients, spacing, typographyPresets } from '@/config/theme';
 import { Scrim } from '@/features/persona/components/Scrim';
 import {
@@ -14,14 +26,25 @@ import {
   renterTabBarBottomGap,
 } from '@/features/renter/components/RenterTabBar';
 import { moderateScale as ms } from '@/utils/responsive';
-import type { LandlordIconName, LandlordTab } from '../types';
+import { landlordIcons } from '../assets/landlordAssets';
+import type { LandlordTab } from '../types';
 import { LandlordIcon } from './LandlordIcon';
 
-interface Props {
-  active: LandlordTab;
+/** One tab: icon is a white line-icon PNG (tinted here) */
+export interface TabBarItem<K extends string> {
+  key: K;
+  label: string;
+  icon: ImageSourcePropType;
+}
+
+interface Props<K extends string> {
+  active: K;
   bottomInset: number;
-  onChange: (tab: LandlordTab) => void;
-  onAdd: () => void;
+  onChange: (tab: K) => void;
+  /** Round "+" in the centre of the bar; left out = no "+" */
+  onAdd?: () => void;
+  /** Default: the landlord tabs */
+  tabs?: readonly TabBarItem<K>[];
 }
 
 interface Slot {
@@ -29,11 +52,11 @@ interface Slot {
   width: number;
 }
 
-const TABS: { key: LandlordTab; label: string; icon: LandlordIconName }[] = [
-  { key: 'dashboard', label: 'Home', icon: 'house' },
-  { key: 'properties', label: 'Properties', icon: 'building' },
-  { key: 'leases', label: 'Leases', icon: 'fileText' },
-  { key: 'more', label: 'More', icon: 'menu' },
+const LANDLORD_TABS: readonly TabBarItem<LandlordTab>[] = [
+  { key: 'dashboard', label: 'Home', icon: landlordIcons.house },
+  { key: 'properties', label: 'Properties', icon: landlordIcons.building },
+  { key: 'leases', label: 'Leases', icon: landlordIcons.fileText },
+  { key: 'more', label: 'More', icon: landlordIcons.menu },
 ];
 
 /**
@@ -52,14 +75,20 @@ const ICON_TOP = PILL_TOP + ms(12);
 const PILL_INSET_X = ms(2);
 const BAR_PAD_X = ms(4);
 const ADD_SIZE = ms(48);
+/** With "+": how many tabs sit to its left */
+const ADD_AFTER = 2;
 
-const TabContent: React.FC<{ icon: LandlordIconName; label: string; selected: boolean }> = ({
+const TabContent: React.FC<{ icon: ImageSourcePropType; label: string; selected: boolean }> = ({
   icon,
   label,
   selected,
 }) => (
   <View style={styles.content}>
-    <LandlordIcon name={icon} size={ms(19)} color={selected ? colors.white : colors.textSecondary} />
+    <Image
+      source={icon}
+      style={[styles.icon, { tintColor: selected ? colors.white : colors.textSecondary }]}
+      resizeMode="contain"
+    />
     <Text
       style={[styles.label, selected && styles.labelActive]}
       numberOfLines={1}
@@ -74,7 +103,14 @@ const TabContent: React.FC<{ icon: LandlordIconName; label: string; selected: bo
   </View>
 );
 
-export const LandlordTabBar: React.FC<Props> = ({ active, bottomInset, onChange, onAdd }) => {
+export function LandlordTabBar<K extends string = LandlordTab>({
+  active,
+  bottomInset,
+  onChange,
+  onAdd,
+  tabs,
+}: Props<K>) {
+  const TABS = (tabs ?? LANDLORD_TABS) as readonly TabBarItem<K>[];
   const index = Math.max(0, TABS.findIndex(t => t.key === active));
   const position = useRef(new Animated.Value(index)).current;
   const [slots, setSlots] = useState<(Slot | undefined)[]>([]);
@@ -155,24 +191,30 @@ export const LandlordTabBar: React.FC<Props> = ({ active, bottomInset, onChange,
           </Animated.View>
         ) : null}
 
-        {TABS.slice(0, 2).map((tab, i) => renderTab(tab, i))}
+        {onAdd ? (
+          <>
+            {TABS.slice(0, ADD_AFTER).map((tab, i) => renderTab(tab, i))}
 
-        <View style={styles.addSlot}>
-          <Pressable
-            onPress={onAdd}
-            accessibilityRole="button"
-            accessibilityLabel="Add"
-            style={({ pressed }) => [styles.add, pressed && styles.addPressed]}
-          >
-            <LandlordIcon name="plus" size={ms(24)} color={colors.white} />
-          </Pressable>
-        </View>
+            <View style={styles.addSlot}>
+              <Pressable
+                onPress={onAdd}
+                accessibilityRole="button"
+                accessibilityLabel="Add"
+                style={({ pressed }) => [styles.add, pressed && styles.addPressed]}
+              >
+                <LandlordIcon name="plus" size={ms(24)} color={colors.white} />
+              </Pressable>
+            </View>
 
-        {TABS.slice(2).map((tab, i) => renderTab(tab, i + 2))}
+            {TABS.slice(ADD_AFTER).map((tab, i) => renderTab(tab, i + ADD_AFTER))}
+          </>
+        ) : (
+          TABS.map((tab, i) => renderTab(tab, i))
+        )}
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   wrap: {
@@ -234,6 +276,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: ms(4),
     paddingHorizontal: ms(5),
+  },
+  icon: {
+    width: ms(19),
+    height: ms(19),
   },
   label: {
     ...typographyPresets.segmentLabel,

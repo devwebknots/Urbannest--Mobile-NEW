@@ -10,11 +10,12 @@ import { PERSONA_SLIDES } from '../constants';
 import type { PersonaSlide } from '../types';
 
 /** Where each active persona lands after "Continue". */
-export type PersonaRoute = 'Home' | 'RenterHome' | 'LandlordHome';
+export type PersonaRoute = 'Home' | 'RenterHome' | 'LandlordHome' | 'PmsHome';
 
 export const ROUTE_FOR_PERSONA: Record<string, PersonaRoute> = {
   renter: 'RenterHome',
   landlord: 'LandlordHome',
+  manager: 'PmsHome',
 };
 
 export interface PersonaNavigation {

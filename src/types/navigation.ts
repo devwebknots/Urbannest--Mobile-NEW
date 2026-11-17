@@ -55,6 +55,8 @@ export type RootStackParamList = {
   RenterHome: undefined;
   /** Landlord dashboard, opened by "Continue as Landlord" on PersonaSelect */
   LandlordHome: undefined;
+  /** Property manager (PMS) dashboard, opened by "Continue as PMS" on PersonaSelect */
+  PmsHome: undefined;
   /** 3-step "Independent Landlord" registration, opened by Landlord → Continue on AddPersona */
   LandlordOnboarding: undefined;
   /** Landlord's Properties page: dashboard burger menu, or after onboarding is activated */

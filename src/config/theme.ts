@@ -118,6 +118,18 @@ export const colors = {
   // design): deep indigo base, brighter indigo glow / arc
   landlordHero: '#15204F',
   landlordHeroGlow: '#304088',
+
+  // PMS home (sampled from the "UrbanNest Real Estate Dashboard" design):
+  // deep navy hero / Financial Pulse panel and the four pastel KPI tiles
+  // (soft fill, gradient end, accent for the icon disc / pills)
+  pmsNavy: '#0E2147',
+  pmsPurple: '#8B5CF6',
+  pmsTiles: {
+    units: { from: '#E9F8F0', to: '#D2F1E1', accent: '#22A06B' },
+    occupancy: { from: '#EEEEFF', to: '#DADDFD', accent: '#4F5FE8' },
+    revenue: { from: '#FFF3E6', to: '#FFE2C4', accent: '#F59E0B' },
+    maintenance: { from: '#FDEEF3', to: '#F9D9E5', accent: '#DB4C82' },
+  },
 } as const;
 
 export const gradients = {
@@ -136,6 +148,10 @@ export const gradients = {
   propertyContext: ['#173764', '#244A7D', '#2F5A90', '#3B6294'],
   // Round icon disc on that card: lighter centre → edge (radial)
   propertyContextDisc: ['#6787AF', '#3A6298'],
+  // PMS home progress bars: Lease Cycle Efficiency (blue → green) and the
+  // Financial Pulse collection rate / Export button (teal → green)
+  pmsProgress: ['#2563EB', '#10B981'],
+  pmsCollect: ['#14B8A6', '#4ADE80'],
 };
 
 export const spacing = {
