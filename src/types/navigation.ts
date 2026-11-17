@@ -61,6 +61,8 @@ export type RootStackParamList = {
   LandlordProperties: undefined;
   /** "Add New Property" form, opened by Add Property on the Portfolio Overview */
   LandlordAddProperty: undefined;
+  /** Landlord Property Details, opened by "View Property" on a Managed Assets card */
+  LandlordPropertyDetails: { propertyId: string };
   /** Unwired (not in the navigator); kept with ResidenceDashboardScreen */
   ResidenceDashboard: { residenceId: string };
   /** "My Home" page of an active lease, opened by "Manage" on My Residences */

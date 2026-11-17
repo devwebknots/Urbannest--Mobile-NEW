@@ -4,8 +4,8 @@
  *  - empty portfolio: zero stats, the "No properties found" card (Add
  *    Property opens the Add New Property form)
  *  - after the demo flow (Add Property → Unit → "Save Unit & Send Invite",
- *    portfolioStore): the design's sample Managed Assets (Test Property,
- *    Idex 5, Idex4), filter chips + search, "+ Add New Property"
+ *    portfolioStore): the design's sample Managed Assets (LL01,
+ *    LL02, LL03), filter chips + search, "+ Add New Property"
  * View Property / View Units / ⋯ open a "coming soon" dialog for now.
  */
 
@@ -46,7 +46,7 @@ export interface ManagedAsset {
 export const SAMPLE_ASSETS: readonly ManagedAsset[] = [
   {
     id: 'test',
-    name: 'Test Property',
+    name: 'LL01',
     type: 'Apartment',
     address: '1200 Overcup Oak, Centerton, US',
     city: 'Centerton',
@@ -59,7 +59,7 @@ export const SAMPLE_ASSETS: readonly ManagedAsset[] = [
   },
   {
     id: 'idex5',
-    name: 'Idex 5',
+    name: 'LL02',
     type: 'Apartment',
     address: '1471 Overcup Oak ln, Bentonville, US',
     city: 'Bentonville',
@@ -72,7 +72,7 @@ export const SAMPLE_ASSETS: readonly ManagedAsset[] = [
   },
   {
     id: 'idex4',
-    name: 'Idex4',
+    name: 'LL03',
     type: 'Apartment',
     address: '1492 Overcup Oak ln, Bentonville, US',
     city: 'Bentonville',
@@ -177,7 +177,11 @@ export function usePortfolioOverview(navigation?: { goBack: () => void }) {
     query,
     setQuery,
     addProperty,
-    viewProperty: (a: ManagedAsset) => comingSoon(a.name),
+    viewProperty: (a: ManagedAsset) => {
+      if (navigationRef.isReady()) {
+        navigationRef.navigate('LandlordPropertyDetails', { propertyId: a.id });
+      }
+    },
     viewUnits: (a: ManagedAsset) => comingSoon(`${a.name} Units`),
     propertyMenu: (a: ManagedAsset) => comingSoon(`${a.name} options`),
     viewAllUnits: () => comingSoon('All Units'),

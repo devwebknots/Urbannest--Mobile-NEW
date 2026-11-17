@@ -23,6 +23,16 @@ export const landlordAssets = {
   // Modern residence at dusk, cropped at full size from guest hero_bg.png
   sampleDusk: require('@/assets/images/landlord/sample_dusk.png'),
   sampleSterling: require('@/assets/images/renter/residence_sterling.jpg'),
+  // Property Details photos. Building: high-res Unsplash photo
+  // (photo-1574362848149-11496d93a7c7, 1600 x 941; the design's own
+  // building crop was too soft). Living / bedroom / kitchen thumbs (640
+  // wide) and the Unit 101 room (800 x 506) are cropped from the design
+  // ("image 92.png")
+  detailsBuilding: require('@/assets/images/landlord/details_building.jpg'),
+  detailsLiving: require('@/assets/images/landlord/details_living.jpg'),
+  detailsBedroom: require('@/assets/images/landlord/details_bedroom.jpg'),
+  detailsKitchen: require('@/assets/images/landlord/details_kitchen.jpg'),
+  detailsUnit101: require('@/assets/images/landlord/details_unit_101.jpg'),
 };
 
 /** Width / height of header_building.png */
